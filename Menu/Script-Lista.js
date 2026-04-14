@@ -1,10 +1,26 @@
-async function obtenerPokemon() {
-  const test1 = await fetch(
-    "https://pokeapi.co/api/v2/pokemon?limit=20&offset=0",
-  );
-  const testjson = await test1.json();
+let paginaActual = 1;
 
-  testjson.results.forEach((pokemon) => {
+document.getElementById("boton-siguiente").addEventListener("click", () => {
+  paginaActual++;
+  document.getElementById("cartas-pokemon").innerHTML = "";
+  obtenerPokemon();
+});
+
+document.getElementById("boton-anterior").addEventListener("click", () => {
+  if (paginaActual > 1) {
+    paginaActual--;
+    document.getElementById("cartas-pokemon").innerHTML = "";
+    obtenerPokemon();
+  }
+});
+
+async function obtenerPokemon() {
+  const listado = await fetch(
+    `https://pokeapi.co/api/v2/pokemon?limit=20&offset=${(paginaActual - 1) * 20}`,
+  );
+  const listadojson = await listado.json();
+
+  listadojson.results.forEach((pokemon) => {
     const cartapokemon = document.createElement("div");
     const idPokemon = pokemon.url.split("/")[6];
     cartapokemon.innerHTML = `
