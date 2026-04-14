@@ -20,6 +20,35 @@
         <button id="Inicio" class="boton-menu">Volver a Inicio</button>
       </div>
     </header>
+
+    <div class="contenedor-principal">
+      <h1 class="titulo-combate">Bienvenido al Menú de Combate!</h1>
+      <div class="opciones-combate">
+        <div class="opcion-combate">
+          <button id="Comenzar" class="boton-combate">Comenzar Combate</button>
+          <p class="descripcion-opcion">
+            Enfrentate a otro jugador en un duelo pokemon!
+          </p>
+        </div>
+        <div class="opcion-combate">
+          <button id="consultar-combate" class="boton-combate">Consultar Equipos</button>
+          <p class="descripcion-opcion">
+            Consulta, modifica, elimina o selecciona entre tus equipos antes del combate.
+          </p>
+          <div id="equipos-guardados" class="equipos-guardados">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre del Equipo</th>
+                  <th>Pokemons</th>             <!-- Esto es un placeholder hasta hacer la tabla de vdd -->
+                </tr>
+              </thead>
+              <tbody id="tabla-equipos">
+              </tbody>
+        </div>
+        </div>
+      </div>
+    </div>
     <hr class="separador" />
     <script src="Script-MenuInicio.js"></script>
   </body>
