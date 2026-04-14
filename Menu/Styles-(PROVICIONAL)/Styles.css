@@ -1,0 +1,5 @@
+.opciones-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /*Esto aparentemente no me funcionó :( */
+}
