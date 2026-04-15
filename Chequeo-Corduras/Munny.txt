@@ -9,3 +9,8 @@ bitácoras de más abajo TuT, ojalá no pase.
 ehh... Me acabo de dar cuenta de la verdadera magnitud de este proyecto, el uso de la API es lo unico alentador
 de todo esto para ser sincero, por hoy, voy a terminar la planificacion en figma y esperemos que a partir de mañana
 sea solo hacerla realidad a base de puro codigo, de momento creo que sigo bien :P.
+
+15/04/2026
+Termine la busqueda dinámica tanto por nombre como por id y fue muy satisfactorio corregir los errores, hoy en la tarde
+voy a trabajar en filtrar por tipo y generación con checkboxes en un menú desplegable de der posible, de momento seguimos
+bien, muy bien.
