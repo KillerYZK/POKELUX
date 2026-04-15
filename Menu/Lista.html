@@ -23,11 +23,22 @@
     </header>
 
     <main class="contenedor-principal">
+      <div class="barra-busqueda" id="buscar-pokemon">
+        <input
+          type="text"
+          id="input-busqueda"
+          class="busqueda-pokemon"
+          placeholder="Buscar Pokémon por nombre o ID..."
+        />
+        <button id="boton-busqueda" class="boton-busqueda">Buscar</button>
+      </div>
       <div class="contenido" id="cartas-pokemon"></div>
 
       <div class="botones-paginacion" id="paginacion">
+        <button id="boton-inicio" class="boton-paginacion">Inicio</button>
         <button id="boton-anterior" class="boton-paginacion">Anterior</button>
         <button id="boton-siguiente" class="boton-paginacion">Siguiente</button>
+        <button id="boton-final" class="boton-paginacion">Final</button>
       </div>
     </main>
     <script src="Script-MenuInicio.js"></script>
