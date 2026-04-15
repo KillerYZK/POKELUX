@@ -2,13 +2,15 @@
 let paginaActual = 1;
 
 document.getElementById("boton-siguiente").addEventListener("click", () => {
-  paginaActual++;
-  document.getElementById("cartas-pokemon").innerHTML = "";
-  obtenerPokemon();
+  if (paginaActual != 68 && input == "") {
+    paginaActual++;
+    document.getElementById("cartas-pokemon").innerHTML = "";
+    obtenerPokemon();
+  }
 });
 
 document.getElementById("boton-anterior").addEventListener("click", () => {
-  if (paginaActual > 1) {
+  if (paginaActual > 1 && input == "") {
     paginaActual--;
     document.getElementById("cartas-pokemon").innerHTML = "";
     obtenerPokemon();
@@ -16,15 +18,19 @@ document.getElementById("boton-anterior").addEventListener("click", () => {
 });
 
 document.getElementById("boton-inicio").addEventListener("click", () => {
-  paginaActual = 1;
-  document.getElementById("cartas-pokemon").innerHTML = "";
-  obtenerPokemon();
+  if (input == "") {
+    paginaActual = 1;
+    document.getElementById("cartas-pokemon").innerHTML = "";
+    obtenerPokemon();
+  }
 });
 
 document.getElementById("boton-final").addEventListener("click", () => {
-  paginaActual = 52;
-  document.getElementById("cartas-pokemon").innerHTML = "";
-  obtenerPokemon();
+  if (input == "") {
+    paginaActual = 68;
+    document.getElementById("cartas-pokemon").innerHTML = "";
+    obtenerPokemon();
+  }
 });
 
 //Listado de pokemons
@@ -35,17 +41,7 @@ async function obtenerPokemon() {
   const listadojson = await listado.json();
 
   listadojson.results.forEach((pokemon) => {
-    const cartapokemon = document.createElement("div");
-    const idPokemon = pokemon.url.split("/")[6];
-    if (idPokemon > 1025) return; // Le tengo que preguntar a Isaac si vamos a usar megaevoluciones, gmax, etc. En casi de que si, borrar esta linea
-    cartapokemon.innerHTML = `
-      <img
-        class="imagen-pokemon"
-        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${idPokemon}.png"
-      />
-      <p class="nombre-pokemon">${pokemon.name}</p>
-      <p class="id-pokemon">ID: ${idPokemon}</p>
-    `;
+    const cartapokemon = crearCarta(pokemon);
     document.getElementById("cartas-pokemon").appendChild(cartapokemon);
   });
 }
@@ -55,7 +51,7 @@ obtenerPokemon();
 // Codigo de la barra de busqueda (esto sigue en progreso, todo esto esta sujeto a cambios)
 async function buscarPokemon() {
   const input = document.getElementById("input-busqueda");
-  const botonBuscar = document.getElementById("boton-busqueda");
+  const boton = document.getElementById("boton-busqueda");
 
   input.addEventListener("input", async () => {
     const valor = input.value.toLowerCase();
@@ -68,8 +64,9 @@ async function buscarPokemon() {
         document.getElementById("cartas-pokemon").innerHTML = "";
         document
           .getElementById("cartas-pokemon")
-          .appendChild(createPokemonCard(pokemon));
+          .appendChild(crearCarta(pokemon));
       } else {
+        document.getElementById("cartas-pokemon").innerHTML = "";
         obtenerPokemon();
         return;
       }
@@ -78,3 +75,20 @@ async function buscarPokemon() {
 }
 
 buscarPokemon();
+
+function crearCarta(pokemon) {
+  const cartapokemon = document.createElement("div");
+  pokemon.url
+    ? (idPokemon = pokemon.url.split("/")[6])
+    : (idPokemon = pokemon.id);
+  cartapokemon.classList.add("carta-pokemon");
+  cartapokemon.innerHTML = `
+      <img
+        class="imagen-pokemon"
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${idPokemon}.png"
+      />
+      <p class="nombre-pokemon">${pokemon.name}</p>
+      <p class="id-pokemon">ID: ${idPokemon}</p>
+    `;
+  return cartapokemon;
+}
