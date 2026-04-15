@@ -70,6 +70,8 @@ async function buscarPokemon() {
         obtenerPokemon();
         return;
       }
+    } else {
+      obtenerPokemon();
     }
   });
 }
