@@ -96,30 +96,64 @@ function crearCarta(pokemon) {
   return cartapokemon;
 }
 
-//Codigo para los filtros
+//Codigo para los filtros por tipo
 
-const filtroTipos = document
-  .querySelectorAll("input[name='tipo']")
-  .forEach((checkbox) => {
-    checkbox.addEventListener("change", () => {
-      const tiposSeleccionados = Array.from(
-        document.querySelectorAll("input[name='tipo']:checked"),
-      ).map((checkbox) => checkbox.value);
-      filtrarPorTipos(tiposSeleccionados);
-    });
-
-    async function filtrarPorTipos(tipos) {
-      const contenedorCartas = document.getElementById("cartas-pokemon");
-      contenedorCartas.innerHTML = "";
-
-      for (const tipo of tipos) {
-        const respuesta = await fetch(`https://pokeapi.co/api/v2/type/${tipo}`);
-        const datos = await respuesta.json();
-        const pokemonsDelTipo = datos.pokemon;
-        pokemonsDelTipo.forEach((pokemon) => {
-          const cartapokemon = crearCarta(pokemon.pokemon);
-          contenedorCartas.appendChild(cartapokemon);
-        });
-      }
+document.querySelectorAll("input[name='tipo']").forEach((checkbox) => {
+  checkbox.addEventListener("change", () => {
+    const tiposSeleccionados = Array.from(
+      document.querySelectorAll("input[name='tipo']:checked"),
+    ).map((checkbox) => checkbox.value);
+    filtrarPorTipos(tiposSeleccionados);
+    if (document.querySelectorAll("input[name='tipo']:checked").length === 0) {
+      obtenerPokemon();
     }
   });
+
+  async function filtrarPorTipos(tipos) {
+    const contenedorCartasT = document.getElementById("cartas-pokemon");
+    contenedorCartasT.innerHTML = "";
+
+    for (const tipo of tipos) {
+      const respuesta = await fetch(`https://pokeapi.co/api/v2/type/${tipo}`);
+      const datos = await respuesta.json();
+      const pokemonsDelTipo = datos.pokemon;
+      pokemonsDelTipo.forEach((pokemon) => {
+        const cartapokemon = crearCarta(pokemon.pokemon);
+        contenedorCartasT.appendChild(cartapokemon);
+      });
+    }
+  }
+});
+
+//Código para filtros por generación
+
+document.querySelectorAll("input[name='generacion']").forEach((checkbox) => {
+  checkbox.addEventListener("change", () => {
+    const generacionesSeleccionadas = Array.from(
+      document.querySelectorAll("input[name='generacion']:checked"),
+    ).map((checkbox) => checkbox.value);
+    filtrarPorGeneraciones(generacionesSeleccionadas);
+    if (
+      document.querySelectorAll("input[name='generacion']:checked").length === 0
+    ) {
+      obtenerPokemon();
+    }
+  });
+});
+
+async function filtrarPorGeneraciones(generaciones) {
+  const contenedorCartasG = document.getElementById("cartas-pokemon");
+  contenedorCartasG.innerHTML = "";
+  const pokemonsDeGeneracion = [];
+  for (const generacion of generaciones) {
+    const respuesta = await fetch(
+      `https://pokeapi.co/api/v2/generation/${generacion}`,
+    );
+    const datos = await respuesta.json();
+    pokemonsDeGeneracion.push(...datos.pokemon_species);
+  }
+  pokemonsDeGeneracion.forEach((pokemon) => {
+    const cartapokemon = crearCarta(pokemon);
+    contenedorCartasG.appendChild(cartapokemon);
+  });
+}
