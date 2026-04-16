@@ -30,8 +30,56 @@
           class="busqueda-pokemon"
           placeholder="Buscar Pokémon por nombre o ID..."
         />
-        <button id="boton-filtro" class="boton-filtros">Filtros</button>
+
+        <details id="filtros" class="filtros-menu">
+          <summary>Filtros</summary>
+          <div class="filtros-checkbox">
+            <div class="filtros-tipo">
+              <h3>Tipo</h3>
+              <input type="checkbox" name="tipo" value="normal" /> Normal
+              <input type="checkbox" name="tipo" value="fire" /> Fuego
+              <input type="checkbox" name="tipo" value="water" /> Agua
+              <input type="checkbox" name="tipo" value="grass" /> Planta
+              <input type="checkbox" name="tipo" value="electric" /> Electrico
+              <input type="checkbox" name="tipo" value="ice" /> Hielo
+              <input type="checkbox" name="tipo" value="fighting" /> Lucha
+              <input type="checkbox" name="tipo" value="poison" /> Veneno
+              <input type="checkbox" name="tipo" value="ground" /> Tierra
+              <input type="checkbox" name="tipo" value="flying" /> Volador
+              <input type="checkbox" name="tipo" value="psychic" /> Psíquico
+              <input type="checkbox" name="tipo" value="bug" /> Bicho
+              <input type="checkbox" name="tipo" value="rock" /> Roca
+              <input type="checkbox" name="tipo" value="ghost" /> Fantasma
+              <input type="checkbox" name="tipo" value="dragon" /> Dragón
+              <input type="checkbox" name="tipo" value="dark" /> Siniestro
+              <input type="checkbox" name="tipo" value="steel" /> Acero
+              <input type="checkbox" name="tipo" value="fairy" /> Hada
+            </div>
+            <div class="filtros-generacion">
+              <h3>Generación</h3>
+              <input type="checkbox" name="generacion" value="generation-i" />
+              Generación 1
+              <input type="checkbox" name="generacion" value="generation-ii" />
+              Generación 2
+              <input type="checkbox" name="generacion" value="generation-iii" />
+              Generación 3
+              <input type="checkbox" name="generacion" value="generation-iv" />
+              Generación 4
+              <input type="checkbox" name="generacion" value="generation-v" />
+              Generación 5
+              <input type="checkbox" name="generacion" value="generation-vi" />
+              Generación 6
+              <input type="checkbox" name="generacion" value="generation-vii" />
+              Generación 7
+              <input type="checkbox" name="generacion" value="generation-viii" />
+              Generación 8
+              <input type="checkbox" name="generacion" value="generation-ix" />
+              Generación 9
+            </div>
+          </div>
+        </details>
       </div>
+
       <div class="contenido" id="cartas-pokemon"></div>
 
       <div class="botones-paginacion" id="paginacion">

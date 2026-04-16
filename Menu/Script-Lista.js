@@ -1,5 +1,6 @@
 // Codigo de la paginación
 let paginaActual = 1;
+let input = document.getElementById("input-busqueda").value;
 
 document.getElementById("boton-siguiente").addEventListener("click", () => {
   if (paginaActual != 68 && input == "") {
@@ -48,7 +49,7 @@ async function obtenerPokemon() {
 
 obtenerPokemon();
 
-// Codigo de la barra de busqueda (esto sigue en progreso, todo esto esta sujeto a cambios)
+// Codigo de la barra de busqueda
 async function buscarPokemon() {
   const input = document.getElementById("input-busqueda");
   const boton = document.getElementById("boton-busqueda");
@@ -94,3 +95,31 @@ function crearCarta(pokemon) {
     `;
   return cartapokemon;
 }
+
+//Codigo para los filtros
+
+const filtroTipos = document
+  .querySelectorAll("input[name='tipo']")
+  .forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      const tiposSeleccionados = Array.from(
+        document.querySelectorAll("input[name='tipo']:checked"),
+      ).map((checkbox) => checkbox.value);
+      filtrarPorTipos(tiposSeleccionados);
+    });
+
+    async function filtrarPorTipos(tipos) {
+      const contenedorCartas = document.getElementById("cartas-pokemon");
+      contenedorCartas.innerHTML = "";
+
+      for (const tipo of tipos) {
+        const respuesta = await fetch(`https://pokeapi.co/api/v2/type/${tipo}`);
+        const datos = await respuesta.json();
+        const pokemonsDelTipo = datos.pokemon;
+        pokemonsDelTipo.forEach((pokemon) => {
+          const cartapokemon = crearCarta(pokemon.pokemon);
+          contenedorCartas.appendChild(cartapokemon);
+        });
+      }
+    }
+  });
