@@ -92,6 +92,7 @@ function crearCarta(pokemon) {
       />
       <p class="nombre-pokemon">${pokemon.name}</p>
       <p class="id-pokemon">ID: ${idPokemon}</p>
+      <button class="boton-anadir">Añadir al equipo</button>
     `;
   return cartapokemon;
 }
@@ -157,3 +158,5 @@ async function filtrarPorGeneraciones(generaciones) {
     contenedorCartasG.appendChild(cartapokemon);
   });
 }
+
+//Exportar funciones
