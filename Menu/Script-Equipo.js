@@ -6,7 +6,7 @@ document.getElementById("AgregarPokemon").addEventListener("click", () => {
 
 //Funciones importadas
 
-//pokemons peleando
+//pokemons pelea test
 
 async function obtenerPokemon() {
   const listado = await fetch(`https://pokeapi.co/api/v2/pokemon`);
@@ -49,7 +49,7 @@ async function pelea() {
 }
 
 pelea();
-
+/*
 function calcularDaño(atacante, defensor, poder, especial) {
   const ataque = especial
     ? atacante.stats[3].base_stat // Ataque especial
@@ -67,22 +67,25 @@ function calcularDaño(atacante, defensor, poder, especial) {
     ((((2 * nivel) / 5 + 2) * poder * (ataque / defensa)) / 50 + 2) * random,
   );
 
+  const efectividad = calcularEfectividad("grass", datosStarmie); // Aquí se puede cambiar el tipo del movimiento
+  console.log(`Efectividad del movimiento: ${efectividad}`);
+
   return daño;
 }
+*/
 
-document.getElementById("Atacar").addEventListener("click", () => {
-  const dañoMeowscarada = calcularDaño(
-    datosMeowscarada,
-    datosStarmie,
-    90,
-    false,
-  );
-  console.log(
-    `Meowscarada ataca a Starmie y causa ${dañoMeowscarada} de daño.`,
-  );
-
+//Boton de atacar
+document.getElementById("Atacar").addEventListener("click", async () => {
   console.log(datosMeowscarada.types.map((type) => type.type.name)); // Imprime los tipos de Meowscarada
   console.log(datosStarmie.types.map((type) => type.type.name)); // Imprime los tipos de Starmie
+  const daño = await calcularDaño(
+    datosMeowscarada,
+    datosStarmie,
+    80,
+    "grass",
+    true,
+  );
+  console.log(`Daño: ${daño}`);
 });
 
 function calcularSTAB(atacante, tipoMovimiento) {
@@ -91,12 +94,53 @@ function calcularSTAB(atacante, tipoMovimiento) {
   return tiposAtacante.includes(tipoMovimiento) ? 1.5 : 1;
 }
 
-async function STAB() {
-  const res = await fetch(`https://pokeapi.co/api/v2/type/grass`); // Meowscarada
-  const datos = await res.json();
-  console.log(datos.damage_relations);
-  console.log(datos.damage_relations.double_damage_to.map((type) => type.name)); // Tipos que hacen el doble de daño a Meowscarada
-  console.log(datos.damage_relations.half_damage_to.map((type) => type.name)); // Tipos que hacen la mitad de daño a Meowscarada
+async function calcularEfectividad(tipoMovimiento, defensor) {
+  const resultado = await fetch(
+    `https://pokeapi.co/api/v2/type/${tipoMovimiento}`,
+  );
+  const datosTipo = await resultado.json();
+  const relaciones = datosTipo.damage_relations;
+
+  const tiposDefensor = defensor.types.map((type) => type.type.name);
+
+  let multiplicador = 1;
+
+  tiposDefensor.forEach((tipo) => {
+    if (relaciones.double_damage_to.some((t) => t.name === tipo)) {
+      multiplicador *= 2;
+    } else if (relaciones.half_damage_to.some((t) => t.name === tipo)) {
+      multiplicador *= 0.5;
+    } else if (relaciones.no_damage_to.some((t) => t.name === tipo)) {
+      multiplicador *= 0;
+    }
+  });
+
+  return multiplicador;
 }
 
-STAB();
+async function calcularDaño(
+  atacante,
+  defensor,
+  poder,
+  tipoMovimiento,
+  especial,
+) {
+  const ataque = especial
+    ? atacante.stats[3].base_stat // Ataque especial
+    : atacante.stats[1].base_stat; // Ataque físico o normal
+  const defensa = especial
+    ? defensor.stats[4].base_stat // Defensa especial
+    : defensor.stats[2].base_stat;
+
+  const nivel = 50;
+  const random = (Math.floor(Math.random() * 16) + 85) / 100;
+  const stab = calcularSTAB(atacante, tipoMovimiento);
+  const efectividad = await calcularEfectividad(tipoMovimiento, defensor);
+
+  return Math.floor(
+    ((((2 * nivel) / 5 + 2) * poder * (ataque / defensa)) / 50 + 2) *
+      random *
+      stab *
+      efectividad,
+  );
+}
