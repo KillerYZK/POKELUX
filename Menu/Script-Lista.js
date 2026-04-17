@@ -81,9 +81,9 @@ buscarPokemon();
 
 function crearCarta(pokemon) {
   const cartapokemon = document.createElement("div");
-  pokemon.url
-    ? (idPokemon = pokemon.url.split("/")[6])
-    : (idPokemon = pokemon.id);
+  const idPokemon = pokemon.url
+    ? parseInt(pokemon.url.split("/")[6])
+    : pokemon.id;
   cartapokemon.classList.add("carta-pokemon");
   cartapokemon.innerHTML = `
       <img
@@ -94,6 +94,20 @@ function crearCarta(pokemon) {
       <p class="id-pokemon">ID: ${idPokemon}</p>
       <button class="boton-anadir">Añadir al equipo</button>
     `;
+
+  //guardar pokemons en localStorage para poder añadirlos al equipo
+  cartapokemon.querySelector(".boton-anadir").addEventListener("click", () => {
+    const equipo = JSON.parse(localStorage.getItem("equipo")) || [];
+
+    if (equipo.length >= 6) {
+      alert("Tu equipo ya tiene 6 pokemons!");
+      return;
+    }
+
+    equipo.push(idPokemon);
+    localStorage.setItem("equipo", JSON.stringify(equipo));
+    alert(`${pokemon.name} ha sido añadido a tu equipo! (${equipo.length}/6)`);
+  });
   return cartapokemon;
 }
 

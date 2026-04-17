@@ -1,4 +1,5 @@
-let paginaActual = 1;
+let peleaActiva = true;
+let datosMeowscarada, datosStarmie, hpMeowscarada, hpStarmie, turno;
 
 document.getElementById("AgregarPokemon").addEventListener("click", () => {
   window.location.href = "Lista.html";
@@ -20,9 +21,8 @@ async function obtenerPokemon() {
 
 obtenerPokemon();
 
-let datosMeowscarada, datosStarmie;
-
-async function pelea() {
+//Versión hardcodeada (en caso de que algo se rompa 😭)
+/*async function pelea() {
   const resultadoMeowscarada = await fetch(
     `https://pokeapi.co/api/v2/pokemon/908`,
   );
@@ -31,11 +31,17 @@ async function pelea() {
   const resultadoStarmie = await fetch(`https://pokeapi.co/api/v2/pokemon/121`);
   datosStarmie = await resultadoStarmie.json();
 
+  // Inicializar HP y turno
+
+  hpMeowscarada = datosMeowscarada.stats[0].base_stat;
+  hpStarmie = datosStarmie.stats[0].base_stat;
+  turno = "Meowscarada";
+
   Meowscarada = document.createElement("div");
   Meowscarada.innerHTML = `
     <img class="imagen-pokemon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/908.png" />
     <p class="nombre-pokemon">Meowscarada</p>
-    <p>HP: ${datosMeowscarada.stats[0].base_stat}</p>
+    <p id="hp-meowscarada">HP: ${hpMeowscarada}</p>
   `;
   document.getElementById("cartas-pokemon").appendChild(Meowscarada);
 
@@ -43,49 +49,74 @@ async function pelea() {
   Starmie.innerHTML = `
     <img class="imagen-pokemon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/121.png" />
     <p class="nombre-pokemon">Starmie</p>
-    <p>HP: ${datosStarmie.stats[0].base_stat}</p>
+    <p id="hp-starmie">HP: ${hpStarmie}</p>
   `;
   document.getElementById("cartas-pokemon").appendChild(Starmie);
 }
 
 pelea();
-/*
-function calcularDaño(atacante, defensor, poder, especial) {
-  const ataque = especial
-    ? atacante.stats[3].base_stat // Ataque especial
-    : atacante.stats[2].base_stat; // Ataque físico o normal
-
-  const defensa = especial
-    ? defensor.stats[3].base_stat // Defensa especial
-    : defensor.stats[2].base_stat; // Defensa física o normal
-
-  const nivel = 50; // Nivel hardcodeado para hacer pruebas
-
-  const random = (Math.floor(Math.random() * 16) + 85) / 100; // Número aleatorio entre 85 y 100 (parte de la formula de daño)
-
-  const daño = Math.floor(
-    ((((2 * nivel) / 5 + 2) * poder * (ataque / defensa)) / 50 + 2) * random,
-  );
-
-  const efectividad = calcularEfectividad("grass", datosStarmie); // Aquí se puede cambiar el tipo del movimiento
-  console.log(`Efectividad del movimiento: ${efectividad}`);
-
-  return daño;
-}
 */
+
+async function pelea() {
+  const equipo = JSON.parse(localStorage.getItem("equipo"));
+
+  if (!equipo || equipo.length === 0) {
+    alert("No tienes Pokémon en tu equipo!");
+    return;
+  }
+
+  for (const id of equipo) {
+    const resultado = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const datos = await resultado.json();
+
+    const carta = document.createElement("div");
+    carta.innerHTML = `
+      <img class="imagen-pokemon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png" />
+      <p class="nombre-pokemon">${datos.name}</p>
+      <p id="hp-${id}">HP: ${datos.stats[0].base_stat}</p>
+    `;
+    document.getElementById("cartas-pokemon").appendChild(carta);
+  }
+}
+
+pelea();
 
 //Boton de atacar
 document.getElementById("Atacar").addEventListener("click", async () => {
-  console.log(datosMeowscarada.types.map((type) => type.type.name)); // Imprime los tipos de Meowscarada
-  console.log(datosStarmie.types.map((type) => type.type.name)); // Imprime los tipos de Starmie
-  const daño = await calcularDaño(
-    datosMeowscarada,
-    datosStarmie,
-    80,
-    "grass",
-    true,
-  );
-  console.log(`Daño: ${daño}`);
+  if (peleaActiva === false) return;
+  if (turno === "Meowscarada") {
+    const daño = await calcularDaño(
+      datosMeowscarada,
+      datosStarmie,
+      80,
+      "grass",
+      true,
+    );
+    hpStarmie = Math.max(0, hpStarmie - daño);
+    document.getElementById("hp-starmie").textContent = `HP: ${hpStarmie}`;
+    turno = "Starmie";
+  } else {
+    const daño = await calcularDaño(
+      datosStarmie,
+      datosMeowscarada,
+      90,
+      "water",
+      true,
+    );
+    hpMeowscarada = Math.max(0, hpMeowscarada - daño);
+    document.getElementById("hp-meowscarada").textContent =
+      `HP: ${hpMeowscarada}`;
+    turno = "Meowscarada";
+  }
+
+  if (hpMeowscarada === 0) {
+    peleaActiva = false;
+    console.log("Starmie gana la pelea!");
+  }
+  if (hpStarmie === 0) {
+    peleaActiva = false;
+    console.log("Meowscarada gana la pelea!");
+  }
 });
 
 function calcularSTAB(atacante, tipoMovimiento) {
