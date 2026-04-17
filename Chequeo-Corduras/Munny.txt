@@ -14,3 +14,7 @@ sea solo hacerla realidad a base de puro codigo, de momento creo que sigo bien :
 Termine la busqueda dinámica tanto por nombre como por id y fue muy satisfactorio corregir los errores, hoy en la tarde
 voy a trabajar en filtrar por tipo y generación con checkboxes en un menú desplegable de der posible, de momento seguimos
 bien, muy bien.
+
+16/04/2026
+Hoy chambié un chingo y todo me salio bien porque soy una pistolota pero ya no quiero escribir más pq llevo más de 5 horas
+viendo Visual ayuda.
