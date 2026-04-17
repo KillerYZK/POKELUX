@@ -57,7 +57,7 @@ obtenerPokemon();
 pelea();
 */
 
-async function pelea() {
+async function equipos() {
   const equipo = JSON.parse(localStorage.getItem("equipo"));
 
   if (!equipo || equipo.length === 0) {
@@ -73,14 +73,62 @@ async function pelea() {
     carta.innerHTML = `
       <img class="imagen-pokemon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png" />
       <p class="nombre-pokemon">${datos.name}</p>
-      <p id="hp-${id}">HP: ${datos.stats[0].base_stat}</p>
     `;
     document.getElementById("cartas-pokemon").appendChild(carta);
   }
 }
 
-pelea();
+equipos();
 
+async function getDetallesEquipo() {
+  const equipo = JSON.parse(localStorage.getItem("equipo"));
+  const contenedor = document.getElementById("detalles-equipo");
+
+  if (!equipo || equipo.length === 0) return;
+
+  for (const id of equipo) {
+    const resultado = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const datos = await resultado.json();
+
+    const configuracion =
+      JSON.parse(localStorage.getItem(`configuracion-${id}`)) || {};
+
+    const tarjeta = document.createElement("div");
+    tarjeta.classList.add("tarjeta-detalle");
+    tarjeta.innerHTML = `
+    <img src="${configuracion.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`}" />
+      <div>
+        <p>${datos.name}</p>
+        <p>${configuracion.apodo || "Sin apodo"}</p>
+        <p>${datos.types.map((t) => t.type.name).join(", ")}</p>
+        <p>Nivel: ${configuracion.nivel || "1"}</p>
+        <p>Género: ${configuracion.genero || "Desconocido"}</p>
+        <p>Shiny: ${configuracion.shiny ? "Sí" : "No"}</p>
+      </div>
+      <div>
+        <p>${configuracion.movimientos?.[0] || "Movimiento 1"}</p>
+        <p>${configuracion.movimientos?.[1] || "Movimiento 2"}</p>
+        <p>${configuracion.movimientos?.[2] || "Movimiento 3"}</p>
+        <p>${configuracion.movimientos?.[3] || "Movimiento 4"}</p>
+      </div>
+      <button class="boton-personalizar">+</button>
+    `;
+
+    tarjeta
+      .querySelector(".boton-personalizar")
+      .addEventListener("click", () => {
+        localStorage.setItem("pokemonConfigurar", id);
+        window.location.href = "Personalizar.html";
+      });
+
+    contenedor.appendChild(tarjeta);
+  }
+}
+
+getDetallesEquipo();
+
+//SIMULADOR DE PELEAS (Tests)
+/*
 //Boton de atacar
 document.getElementById("Atacar").addEventListener("click", async () => {
   if (peleaActiva === false) return;
@@ -175,3 +223,13 @@ async function calcularDaño(
       efectividad,
   );
 }
+
+//  Codigo para los movimientos de los pokemons (hardcodeados para testeos)
+
+const movimientosMeowscarada = [
+  { nombre: "Truco Floral", tipo: "grass", poder: 70, especial: false },
+  { nombre: "Tajo Umbrío", tipo: "dark", poder: 70, especial: false },
+  { nombre: "Ida y Vuelta", tipo: "bug", poder: 70, especial: false },
+  { nombre: "Rastro Ardiente", tipo: "grass", poder: 50, especial: false },
+];
+*/
