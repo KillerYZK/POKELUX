@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POKELUX - Unirse a Partida</title>
+    <link rel="stylesheet" href="MenuJuego-Interfaz.css">
+</head>
+<body>
+  <div class="pk-root">
+    <div class="pk-content">
+      <!-- NAVBAR -->
+      <nav class="pk-navbar">
+        <div class="pk-nav-logo">POKE<span>LUX</span></div>
+        <!-- Botones de navegación -->
+        <div class="pk-nav-buttons">
+          <button class="pk-btn pk-btn-secondary" onclick="window.location.href='MenuJuego-Interfaz.html'">Inicio</button>
+          <button class="pk-btn pk-btn-secondary">Pokemones</button>
+          <button class="pk-btn pk-btn-secondary">Jugar</button>
+          <button class="pk-btn pk-btn-secondary">Equipo</button>
+          <button class="pk-btn pk-btn-secondary">Instrucciones</button>
+        </div>
+        <hr class="pk-nav-divider">
+      </nav>
+
+      <!-- HERO SECTION -->
+      <div class="pk-hero">
+        <h1 class="pk-title">Unirse a Partida</h1>
+        <p class="pk-subtitle">Busca y únete a partidas disponibles</p>
+      </div>
+
+      <!-- FORMULARIO UNIRSE -->
+      <div class="pk-form-container">
+        <div class="pk-info">
+          Ingresa el ID de la partida a la que quieres unirte. Si la partida tiene contraseña, te la pediremos.
+        </div>
+        <form id="formUnirse">
+          <div class="pk-form-group">
+            <label for="input-id-partida">ID de la Partida *</label>
+            <input type="text" id="input-id-partida" placeholder="Ej: -N1a2b3c4d5e" required>
+          </div>
+
+          <div class="pk-form-group">
+            <label for="input-nombre-jugador">Tu Nombre *</label>
+            <input type="text" id="input-nombre-jugador" placeholder="Ej: Tu nombre de usuario" required>
+          </div>
+
+          <div class="pk-form-group">
+            <label for="input-contrasena-partida">Contraseña de la Partida</label>
+            <input type="password" id="input-contrasena-partida" placeholder="Contraseña (si la partida la tiene)">
+          </div>
+
+          <div class="pk-form-buttons">
+            <button type="button" class="pk-btn btn-secondary" onclick="window.location.href='MenuJuego-Interfaz.html'">Atrás</button>
+            <button type="button" class="pk-btn" id="btn-unirse">Unirse</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="UnirseP.js"></script>
+</body>
+</html>

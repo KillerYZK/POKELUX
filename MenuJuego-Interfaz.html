@@ -1,36 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MenuJuego-Interfaz</title>
+    <title>POKELUX - Menu</title>
     <link rel="stylesheet" href="MenuJuego-Interfaz.css">
+    <script src="MenuJuego.js"></script>
 </head>
 <body>
-    <div class="menu-Title">
-        <h1 class="menu-title">POKELUX</h1>
-    </div>
-<!-- Opciones del menú -->
-    <div class="menu-Options-Cards">
-        <div class="menu-Option-Card">
-            <h2 class="menu-option-title">Jugar</h2>
-            <p class="menu-option-description">Inicia el juego y desafía tus habilidades como maestro Pokemon.</p>
-            <button class="menu-option-button">Jugar</button>
+  <div class="pk-root">
+    <div class="pk-content">
+      <!-- NAVBAR -->
+      <nav class="pk-navbar">
+        <div class="pk-nav-logo">POKE<span>LUX</span></div>
+        <!-- Botones de navegación -->
+        <div class="pk-nav-buttons">
+          <button class="pk-btn pk-btn-secondary">Inicio</button>
+          <button class="pk-btn pk-btn-secondary">Pokemones</button>
+          <button class="pk-btn pk-btn-secondary">Jugar</button>
+          <button class="pk-btn pk-btn-secondary">Equipo</button>
+          <button class="pk-btn pk-btn-secondary">Instrucciones</button>
         </div>
+        <hr class="pk-nav-divider">
+      </nav>
 
-        <div class="menu-Option-Card">
-             <h2 class="menu-option-title">Equipo</h2>
-             <p class="menu-option-description">Configura tu equipo de Pokemon para el combate.</p>
-             <button class="menu-option-button">Equipo</button>
+      <!-- HERO SECTION -->
+      <div class="pk-hero">
+        <h1 class="pk-title">Comenzar Combate</h1>
+        <p class="pk-subtitle">Desafía tus habilidades como maestro Pokémon</p>
+        <button class="pk-btn" id="btnCrearPartida">Crear Partida</button>
+        <button class="pk-btn" id="btnUnirse">Unirse</button>
+      </div>
+
+      <!-- EQUIPO EQUIPADO SECTION -->
+      <div class="pk-equipo-container">
+        <h2 class="pk-equipo-title">Equipo Equipado</h2>
+        <div class="pk-equipo-list">
+          <div class="pk-equipo-item">
+            <span class="pk-equipo-name">Equipo Activo</span>
+            <div class="pk-pokemon-slots">
+              <div class="pk-pokemon-slot"></div>
+              <div class="pk-pokemon-slot"></div>
+              <div class="pk-pokemon-slot"></div>
+              <div class="pk-pokemon-slot"></div>
+              <div class="pk-pokemon-slot"></div>
+              <div class="pk-pokemon-slot"></div>
             </div>
+            <span class="pk-equipo-options">S / B / E</span>
+          </div>
+        </div>
+      </div>
 
-        <div class="menu-Option-Card">
-            <h2 class="menu-option-title">Instrucciones</h2>
-            <p class="menu-option-description">Aprende a jugar y descubre los secretos para convertirte en un verdadero maestro Pokemon.</p>
-            <button class="menu-option-button">Instrucciones</button>
-        </div>    
+      </div>
     </div>
-
-    
+  </div>
 </body>
