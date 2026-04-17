@@ -1,5 +1,9 @@
 const idPokemon = localStorage.getItem("pokemonConfigurar");
 
+document.getElementById("Equipo").addEventListener("click", () => {
+  window.location.href = "Equipo.html";
+});
+
 async function cargarPokemon() {
   const resultado = await fetch(
     `https://pokeapi.co/api/v2/pokemon/${idPokemon}`,

@@ -104,6 +104,11 @@ function crearCarta(pokemon) {
       return;
     }
 
+    if (equipo.includes(idPokemon)) {
+      alert("Este pokemon ya está en tu equipo!");
+      return;
+    }
+
     equipo.push(idPokemon);
     localStorage.setItem("equipo", JSON.stringify(equipo));
     alert(`${pokemon.name} ha sido añadido a tu equipo! (${equipo.length}/6)`);

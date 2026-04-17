@@ -127,109 +127,11 @@ async function getDetallesEquipo() {
 
 getDetallesEquipo();
 
-//SIMULADOR DE PELEAS (Tests)
-/*
-//Boton de atacar
-document.getElementById("Atacar").addEventListener("click", async () => {
-  if (peleaActiva === false) return;
-  if (turno === "Meowscarada") {
-    const daño = await calcularDaño(
-      datosMeowscarada,
-      datosStarmie,
-      80,
-      "grass",
-      true,
-    );
-    hpStarmie = Math.max(0, hpStarmie - daño);
-    document.getElementById("hp-starmie").textContent = `HP: ${hpStarmie}`;
-    turno = "Starmie";
-  } else {
-    const daño = await calcularDaño(
-      datosStarmie,
-      datosMeowscarada,
-      90,
-      "water",
-      true,
-    );
-    hpMeowscarada = Math.max(0, hpMeowscarada - daño);
-    document.getElementById("hp-meowscarada").textContent =
-      `HP: ${hpMeowscarada}`;
-    turno = "Meowscarada";
-  }
-
-  if (hpMeowscarada === 0) {
-    peleaActiva = false;
-    console.log("Starmie gana la pelea!");
-  }
-  if (hpStarmie === 0) {
-    peleaActiva = false;
-    console.log("Meowscarada gana la pelea!");
-  }
-});
-
-function calcularSTAB(atacante, tipoMovimiento) {
-  // STAB es Same Type Attack Bonus
-  const tiposAtacante = atacante.types.map((type) => type.type.name);
-  return tiposAtacante.includes(tipoMovimiento) ? 1.5 : 1;
-}
-
-async function calcularEfectividad(tipoMovimiento, defensor) {
-  const resultado = await fetch(
-    `https://pokeapi.co/api/v2/type/${tipoMovimiento}`,
-  );
-  const datosTipo = await resultado.json();
-  const relaciones = datosTipo.damage_relations;
-
-  const tiposDefensor = defensor.types.map((type) => type.type.name);
-
-  let multiplicador = 1;
-
-  tiposDefensor.forEach((tipo) => {
-    if (relaciones.double_damage_to.some((t) => t.name === tipo)) {
-      multiplicador *= 2;
-    } else if (relaciones.half_damage_to.some((t) => t.name === tipo)) {
-      multiplicador *= 0.5;
-    } else if (relaciones.no_damage_to.some((t) => t.name === tipo)) {
-      multiplicador *= 0;
-    }
+document.getElementById("BorrarEquipo").addEventListener("click", () => {
+  const equipo = JSON.parse(localStorage.getItem("equipo")) || [];
+  equipo.forEach((idPokemon) => {
+    localStorage.removeItem(`configuracion-${idPokemon}`);
   });
-
-  return multiplicador;
-}
-
-async function calcularDaño(
-  atacante,
-  defensor,
-  poder,
-  tipoMovimiento,
-  especial,
-) {
-  const ataque = especial
-    ? atacante.stats[3].base_stat // Ataque especial
-    : atacante.stats[1].base_stat; // Ataque físico o normal
-  const defensa = especial
-    ? defensor.stats[4].base_stat // Defensa especial
-    : defensor.stats[2].base_stat;
-
-  const nivel = 50;
-  const random = (Math.floor(Math.random() * 16) + 85) / 100;
-  const stab = calcularSTAB(atacante, tipoMovimiento);
-  const efectividad = await calcularEfectividad(tipoMovimiento, defensor);
-
-  return Math.floor(
-    ((((2 * nivel) / 5 + 2) * poder * (ataque / defensa)) / 50 + 2) *
-      random *
-      stab *
-      efectividad,
-  );
-}
-
-//  Codigo para los movimientos de los pokemons (hardcodeados para testeos)
-
-const movimientosMeowscarada = [
-  { nombre: "Truco Floral", tipo: "grass", poder: 70, especial: false },
-  { nombre: "Tajo Umbrío", tipo: "dark", poder: 70, especial: false },
-  { nombre: "Ida y Vuelta", tipo: "bug", poder: 70, especial: false },
-  { nombre: "Rastro Ardiente", tipo: "grass", poder: 50, especial: false },
-];
-*/
+  localStorage.removeItem("equipo");
+  location.reload();
+});
