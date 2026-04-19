@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ==================== CARGAR DATOS DE LA PARTIDA ====================
+// Cargar datos de la partida en tiempo real
 function cargarDatosPartida() {
   const partidaRef = ref(db, `partidas/${idPartida}`);
 
@@ -90,7 +90,7 @@ function cargarDatosPartida() {
   });
 }
 
-// ==================== ACTUALIZAR JUGADORES ====================
+// Actualizar la sección de jugadores en la sala de espera
 function actualizarJugadores() {
   const jugadores = Object.keys(datosPartidaActual.jugadores);
   
@@ -139,7 +139,7 @@ function actualizarJugadores() {
   }
 }
 
-// ==================== VERIFICAR SI AMBOS JUGADORES ESTÁN LISTOS ====================
+// Verificar si ambos jugadores están listos para habilitar el botón iniciar
 function verificarJugadoresListo() {
   const jugadores = Object.values(datosPartidaActual.jugadores);
   const todosListos = jugadores.length === 2 && jugadores.every(j => j.listo);
@@ -149,7 +149,7 @@ function verificarJugadoresListo() {
   btnIniciar.textContent = todosListos ? "Iniciar Partida" : "Esperando a que todos estén listos...";
 }
 
-// ==================== INICIAR PARTIDA ====================
+// funcion para iniciar la partida
 async function iniciarPartida() {
   try {
     const estadoRef = ref(db, `partidas/${idPartida}/estado`);
@@ -163,7 +163,7 @@ async function iniciarPartida() {
   }
 }
 
-// ==================== SALIR DE LA PARTIDA ====================
+//funcion para salir de la partida
 async function salirDelaPartida() {
   try {
     const jugadorRef = ref(db, `partidas/${idPartida}/jugadores/${nombreJugadorLocal}`);
@@ -182,7 +182,7 @@ async function salirDelaPartida() {
   }
 }
 
-// ==================== CHAT ====================
+//Funcion de chat
 function cargarChat() {
   const chatRef = ref(db, `partidas/${idPartida}/chat`);
   
@@ -232,7 +232,7 @@ async function enviarMensaje() {
   }
 }
 
-// ==================== UTILIDADES ====================
+
 function copiarID() {
   const idPartida = document.getElementById("partida-id").textContent;
   navigator.clipboard.writeText(idPartida).then(() => {
