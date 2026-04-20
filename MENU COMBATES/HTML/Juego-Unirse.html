@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POKELUX - Unirse a Partida</title>
+    <link rel="stylesheet" href="MenuJuego-Interfaz.css">
+</head>
+<body>
+  <div class="root">
+    <div class="content">
+      <!-- NAVBAR -->
+      <nav class="navbar">
+        <div class="nav-logo">POKE<span>LUX</span></div>
+        <!-- Botones de navegación -->
+        <div class="nav-buttons">
+          <button onclick="window.location.href='../../MENU PRINCIPAL/Menu-Inicio.html'">Inicio</button>
+          <button>Pokemones</button>
+          <button>Equipo</button>
+          <button>Instrucciones</button>
+        </div>
+        <hr class="nav-divider">
+      </nav>
+
+      <!-- HERO SECTION -->
+      <div class="hero">
+        <h1 class="title">Unirse a Partida</h1>
+        <p class="subtitle">Busca y únete a partidas disponibles</p>
+      </div>
+
+      <!-- FORMULARIO UNIRSE -->
+      <div class="form-container">
+        <div class="info">
+          Ingresa el ID de la partida a la que quieres unirte. Si la partida tiene contraseña, te la pediremos.
+        </div>
+        <form id="formUnirse">
+          <div class="form-group">
+            <label for="input-id-partida">ID de la Partida *</label>
+            <input type="text" id="input-id-partida" placeholder="Ej: -N1a2b3c4d5e" required>
+          </div>
+
+          <div class="form-group">
+            <label for="input-nombre-jugador">Tu Nombre *</label>
+            <input type="text" id="input-nombre-jugador" placeholder="Ej: Tu nombre de usuario" required>
+          </div>
+
+          <div class="form-group">
+            <label for="input-contrasena-partida">Contraseña de la Partida</label>
+            <input type="password" id="input-contrasena-partida" placeholder="Contraseña (si la partida la tiene)">
+          </div>
+
+          <div class="form-buttons">
+            <button type="button" onclick="window.location.href='../../MENU PRINCIPAL/Combate.html'">Atrás</button>
+            <button type="button" id="btn-unirse">Unirse</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="../JS/UnirseP.js"></script>
+</body>
+</html>
