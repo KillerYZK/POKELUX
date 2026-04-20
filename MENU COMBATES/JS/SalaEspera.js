@@ -24,12 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Obtener ID de la partida de la URL
   const params = new URLSearchParams(window.location.search);
   idPartida = params.get("id");
-  nombreJugadorLocal = localStorage.getItem("pk-nombreJugador");
-  esHostLocal = localStorage.getItem("pk-esHost") === "true";
+  nombreJugadorLocal = localStorage.getItem("nombreJugador");
+  esHostLocal = localStorage.getItem("esHost") === "true";
 
   if (!idPartida || !nombreJugadorLocal) {
     alert("Información de la partida incompleta.");
-    window.location.href = "MenuJuego-Interfaz.html";
+    window.location.href = "../MENU PRINCIPAL/Menu-Inicio.html";
     return;
   }
 
@@ -175,7 +175,7 @@ async function salirDelaPartida() {
       await remove(partidaRef);
     }
 
-    window.location.href = "MenuJuego-Interfaz.html";
+   window.location.href = "../../MENU PRINCIPAL/Combate.html";
   } catch (error) {
     console.error("Error al salir:", error);
     alert("Error al salir de la partida.");

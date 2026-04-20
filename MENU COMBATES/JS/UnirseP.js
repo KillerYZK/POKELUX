@@ -102,16 +102,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     esHost: false
                 });
                 
-                console.log("✅ Jugador agregado exitosamente");
+                console.log("Jugador agregado exitosamente");
                 
                 // Guardar información local
-                localStorage.setItem("pk-nombreJugador", nombreJugador);
-                localStorage.setItem("pk-esHost", "false");
-                localStorage.setItem("pk-idPartida", idPartida);
+                localStorage.setItem("nombreJugador", nombreJugador);
+                localStorage.setItem("esHost", "false");
+                localStorage.setItem("idPartida", idPartida);
                 
-                // Redirigir a la sala de espera
-                console.log("Redirigiendo a:", `Juego-Lobby.html?id=${idPartida}`);
-                window.location.href = `Juego-Lobby.html?id=${idPartida}`;
+                // Redirigir a la sala de espera con el ID de la partida
+                console.log("Redirigiendo a:", "../../MENU COMBATES/HTML/Juego-Lobby.html?id=" + idPartida);
+                window.location.href = "../../MENU COMBATES/HTML/Juego-Lobby.html?id=" + idPartida;
                 
             } catch (error) {
                 console.error("ERROR DETALLADO:", error);
@@ -124,3 +124,17 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("No se encontró el botón btn-unirse");
     }
 });
+
+const botonEquipoUnirse = document.getElementById("Equipo");
+if (botonEquipoUnirse) {
+    botonEquipoUnirse.addEventListener("click", function () {
+        window.location.href = "../../MENU PRINCIPAL/Equipo.html";
+    });
+}
+
+const botonInicioUnirse = document.getElementById("inicio");
+if (botonInicioUnirse) {
+    botonInicioUnirse.addEventListener("click", function () {
+        window.location.href = "../../MENU PRINCIPAL/Menu-Inicio.html";
+    });
+}

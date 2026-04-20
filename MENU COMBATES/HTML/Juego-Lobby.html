@@ -8,20 +8,15 @@
     <link rel="stylesheet" href="MenuJuego-Interfaz.css">
 </head>
 <body>
-  <div class="pk-root">
-    <div class="pk-content">
+  <div class="root">
+    <div class="content">
 
       <!-- NAVBAR -->
-      <nav class="pk-navbar">
-        <div class="pk-nav-logo">POKE<span>LUX</span></div>
-        <div class="pk-nav-buttons">
-          <button class="pk-btn pk-btn-secondary">Inicio</button>
-          <button class="pk-btn pk-btn-secondary">Pokemones</button>
-          <button class="pk-btn pk-btn-secondary">Jugar</button>
-          <button class="pk-btn pk-btn-secondary">Equipo</button>
-          <button class="pk-btn pk-btn-secondary">Instrucciones</button>
+      <nav class="navbar">
+        <div class="nav-logo">POKE<span>LUX</span></div>
+        <div class="nav-buttons">
         </div>
-        <hr class="pk-nav-divider">
+        <hr class="nav-divider">
       </nav>
 
       <!-- SALA DE ESPERA -->
@@ -125,15 +120,15 @@
             <span class="sala-id-label">ID de Partida</span>
             <div class="sala-id-row">
               <span class="sala-id-codigo" id="partida-id">--------</span>
-              <button class="pk-btn pk-btn-secondary sala-id-copiar" id="btn-copiar" onclick="copiarID()">Copiar</button>
+              <button class="sala-id-copiar" id="btn-copiar" onclick="copiarID()">Copiar</button>
             </div>
             <span class="sala-id-hint" id="copiar-feedback"></span>
           </div>
 
           <!-- Botón iniciar (solo host lo ve) -->
           <div class="sala-acciones">
-            <button class="pk-btn sala-btn-iniciar" id="btn-iniciar" disabled>Iniciar Partida</button>
-            <button class="pk-btn pk-btn-secondary sala-btn-salir" id="btn-salir">Salir</button>
+            <button class="sala-btn-iniciar" id="btn-iniciar" disabled>Iniciar Partida</button>
+            <button class="sala-btn-salir" id="btn-salir">Salir</button>
           </div>
 
         </div>
@@ -153,13 +148,13 @@
             placeholder="Escribe un mensaje..."
             maxlength="200"
           />
-          <button class="pk-btn sala-chat-enviar" id="btn-enviar-chat">Enviar</button>
+          <button class="sala-chat-enviar" id="btn-enviar-chat">Enviar</button>
         </div>
       </div>
 
     </div>
   </div>
 
-  <script type="module" src="SalaEspera.js"></script>
+  <script type="module" src="../JS/SalaEspera.js"></script>
 </body>
 </html>
