@@ -1,160 +1,178 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>POKELUX - Sala de Espera</title>
-    <link rel="stylesheet" href="MenuJuego-Interfaz.css">
-</head>
-<body>
-  <div class="root">
-    <div class="content">
+    <link rel="stylesheet" href="MenuJuego-Interfaz.css" />
+  </head>
+  <body>
+    <div class="root">
+      <div class="content">
+        <!-- NAVBAR -->
+        <nav class="navbar">
+          <div class="nav-logo">POKE<span>LUX</span></div>
+          <div class="nav-buttons"></div>
+          <hr class="nav-divider" />
+        </nav>
 
-      <!-- NAVBAR -->
-      <nav class="navbar">
-        <div class="nav-logo">POKE<span>LUX</span></div>
-        <div class="nav-buttons">
+        <!-- SALA DE ESPERA -->
+        <div class="sala-container">
+          <!-- COLUMNA IZQUIERDA: equipos -->
+          <div class="sala-equipos">
+            <!-- Jugador 1 (Host) -->
+            <div class="sala-jugador">
+              <div class="sala-jugador-header">
+                <span class="sala-jugador-nombre" id="nombre-host"
+                  >HostName</span
+                >
+                <span class="sala-jugador-badge host">HOST</span>
+                <span class="sala-jugador-estado listo" id="estado-host"
+                  >● Listo</span
+                >
+              </div>
+              <div class="sala-equipo-slots" id="equipo-host">
+                <div class="sala-slot">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sala-vs">VS</div>
+
+            <!-- Jugador 2 (Guest) -->
+            <div class="sala-jugador">
+              <div class="sala-jugador-header">
+                <span class="sala-jugador-nombre" id="nombre-guest"
+                  >Esperando...</span
+                >
+                <span class="sala-jugador-estado esperando" id="estado-guest"
+                  >● Esperando</span
+                >
+              </div>
+              <div class="sala-equipo-slots" id="equipo-guest">
+                <div class="sala-slot vacio">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot vacio">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot vacio">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot vacio">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot vacio">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+                <div class="sala-slot vacio">
+                  <img class="sala-slot-sprite" src="" alt="" />
+                  <span class="sala-slot-nombre">---</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COLUMNA DERECHA: info + ID -->
+          <div class="sala-info">
+            <!-- Info de la partida -->
+            <div class="sala-info-card">
+              <h2 class="sala-info-titulo" id="partida-nombre">
+                Nombre de la Partida
+              </h2>
+              <p class="sala-info-descripcion" id="partida-descripcion">
+                Descripción de la partida...
+              </p>
+              <div class="sala-info-fila">
+                <span class="sala-info-label">Contraseña</span>
+                <span class="sala-info-valor" id="partida-contrasena">No</span>
+              </div>
+              <div class="sala-info-fila">
+                <span class="sala-info-label">Estado</span>
+                <span class="sala-info-valor esperando" id="partida-estado"
+                  >Esperando jugadores...</span
+                >
+              </div>
+            </div>
+
+            <!-- ID de la partida -->
+            <div class="sala-id-card">
+              <span class="sala-id-label">ID de Partida</span>
+              <div class="sala-id-row">
+                <span class="sala-id-codigo" id="partida-id">--------</span>
+                <button
+                  class="sala-id-copiar"
+                  id="btn-copiar"
+                  onclick="copiarID()"
+                >
+                  Copiar
+                </button>
+              </div>
+              <span class="sala-id-hint" id="copiar-feedback"></span>
+            </div>
+
+            <!-- Botón iniciar (solo host lo ve) -->
+            <div class="sala-acciones">
+              <button class="sala-btn-iniciar" id="btn-iniciar" disabled>
+                Iniciar Partida
+              </button>
+              <button class="sala-btn-cargar" id="btn-cargar-equipo">
+                Cargar Equipo
+              </button>
+              <button class="sala-btn-salir" id="btn-salir">Salir</button>
+            </div>
+          </div>
         </div>
-        <hr class="nav-divider">
-      </nav>
 
-      <!-- SALA DE ESPERA -->
-      <div class="sala-container">
-
-        <!-- COLUMNA IZQUIERDA: equipos -->
-        <div class="sala-equipos">
-
-          <!-- Jugador 1 (Host) -->
-          <div class="sala-jugador">
-            <div class="sala-jugador-header">
-              <span class="sala-jugador-nombre" id="nombre-host">HostName</span>
-              <span class="sala-jugador-badge host">HOST</span>
-              <span class="sala-jugador-estado listo" id="estado-host">● Listo</span>
-            </div>
-            <div class="sala-equipo-slots" id="equipo-host">
-              <div class="sala-slot">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-            </div>
+        <!-- CHAT -->
+        <div class="sala-chat-container">
+          <div class="sala-chat-mensajes" id="chat-mensajes">
+            <!-- mensajes se insertan aquí con JS -->
           </div>
-
-          <div class="sala-vs">VS</div>
-
-          <!-- Jugador 2 (Guest) -->
-          <div class="sala-jugador">
-            <div class="sala-jugador-header">
-              <span class="sala-jugador-nombre" id="nombre-guest">Esperando...</span>
-              <span class="sala-jugador-estado esperando" id="estado-guest">● Esperando</span>
-            </div>
-            <div class="sala-equipo-slots" id="equipo-guest">
-              <div class="sala-slot vacio">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot vacio">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot vacio">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot vacio">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot vacio">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-              <div class="sala-slot vacio">
-                <img class="sala-slot-sprite" src="" alt="">
-                <span class="sala-slot-nombre">---</span>
-              </div>
-            </div>
+          <div class="sala-chat-input-row">
+            <input
+              class="sala-chat-input"
+              type="text"
+              id="chat-input"
+              placeholder="Escribe un mensaje..."
+              maxlength="200"
+            />
+            <button class="sala-chat-enviar" id="btn-enviar-chat">
+              Enviar
+            </button>
           </div>
-
         </div>
-
-        <!-- COLUMNA DERECHA: info + ID -->
-        <div class="sala-info">
-
-          <!-- Info de la partida -->
-          <div class="sala-info-card">
-            <h2 class="sala-info-titulo" id="partida-nombre">Nombre de la Partida</h2>
-            <p class="sala-info-descripcion" id="partida-descripcion">Descripción de la partida...</p>
-            <div class="sala-info-fila">
-              <span class="sala-info-label">Contraseña</span>
-              <span class="sala-info-valor" id="partida-contrasena">No</span>
-            </div>
-            <div class="sala-info-fila">
-              <span class="sala-info-label">Estado</span>
-              <span class="sala-info-valor esperando" id="partida-estado">Esperando jugadores...</span>
-            </div>
-          </div>
-
-          <!-- ID de la partida -->
-          <div class="sala-id-card">
-            <span class="sala-id-label">ID de Partida</span>
-            <div class="sala-id-row">
-              <span class="sala-id-codigo" id="partida-id">--------</span>
-              <button class="sala-id-copiar" id="btn-copiar" onclick="copiarID()">Copiar</button>
-            </div>
-            <span class="sala-id-hint" id="copiar-feedback"></span>
-          </div>
-
-          <!-- Botón iniciar (solo host lo ve) -->
-          <div class="sala-acciones">
-            <button class="sala-btn-iniciar" id="btn-iniciar" disabled>Iniciar Partida</button>
-            <button class="sala-btn-salir" id="btn-salir">Salir</button>
-          </div>
-
-        </div>
-
       </div>
-
-      <!-- CHAT -->
-      <div class="sala-chat-container">
-        <div class="sala-chat-mensajes" id="chat-mensajes">
-          <!-- mensajes se insertan aquí con JS -->
-        </div>
-        <div class="sala-chat-input-row">
-          <input
-            class="sala-chat-input"
-            type="text"
-            id="chat-input"
-            placeholder="Escribe un mensaje..."
-            maxlength="200"
-          />
-          <button class="sala-chat-enviar" id="btn-enviar-chat">Enviar</button>
-        </div>
-      </div>
-
     </div>
-  </div>
 
-  <script type="module" src="../JS/SalaEspera.js"></script>
-</body>
+    <script type="module" src="../JS/SalaEspera.js"></script>
+  </body>
 </html>
