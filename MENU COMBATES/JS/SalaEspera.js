@@ -132,6 +132,7 @@ function cargarDatosPartida() {
 
 // Actualizar la sección de jugadores en la sala de espera
 function actualizarJugadores() {
+  /*
   const jugadores = Object.keys(datosPartidaActual.jugadores);
 
   // Separar host y guest
@@ -172,17 +173,131 @@ function actualizarJugadores() {
     // Marcar equipos como "llenos" si tiene pokémon
     if (guestData.equipo && guestData.equipo.length > 0) {
       const slotsGuest = document.querySelectorAll("#equipo-guest .sala-slot");
-      slotsGuest.forEach((slot) => slot.classList.remove("vacio"));
+      slotsGuest.forEach((slot, index) => {
+        slot.classList.remove("vacio");
+        const pokemon = guestData.equipo[index];
+        const imagen = slot.querySelector("img");
+        const nombre = slot.querySelector("span");
+
+        pokemon.configuracion.shiny
+          ? (imagen.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`)
+          : (imagen.src =
+              `${pokemon.configuracion.sprite}` ||
+              `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png}`);
+      });
+    } else {
+      // Si no hay guest, mostrar esperando
+      document.getElementById("nombre-guest").textContent = "Esperando...";
+      document.getElementById("estado-guest").textContent = "● Esperando";
+      const slotsGuest = document.querySelectorAll("#equipo-guest .sala-slot");
+      slotsGuest.forEach((slot) => slot.classList.add("vacio"));
     }
-  } else {
-    // Si no hay guest, mostrar esperando
-    document.getElementById("nombre-guest").textContent = "Esperando...";
-    document.getElementById("estado-guest").textContent = "● Esperando";
-    const slotsGuest = document.querySelectorAll("#equipo-guest .sala-slot");
-    slotsGuest.forEach((slot) => slot.classList.add("vacio"));
+
+    console.log(datosPartidaActual.jugadores);
+  }
+}*/
+  const jugadores = datosPartidaActual.jugadores;
+
+  let hostData = null;
+  let guestData = null;
+
+  for (const [nombre, data] of Object.entries(jugadores)) {
+    if (data.esHostLocal) {
+      hostData = { nombre, ...data };
+    } else {
+      guestData = { nombre, ...data };
+    }
   }
 
-  console.log(datosPartidaActual.jugadores);
+  /* DATOS HOST */
+
+  if (hostData) {
+    document.getElementById("nombre-host").textContent = hostData.nombre;
+    const estadoHostSpan = document.getElementById("estado-host");
+    estadoHostSpan.className = `sala-jugador-estado ${hostData.listo ? "listo" : "esperando"}`;
+    estadoHostSpan.textContent = hostData.listo
+      ? "● Listo"
+      : "● Preparando equipo";
+
+    const slotsHost = document.querySelectorAll("#equipo-host .sala-slot");
+    const equipoHost = hostData.equipo || [];
+
+    for (let i = 0; i < slotsHost.length; i++) {
+      const slot = slotsHost[i];
+      const pokemon = equipoHost[i];
+
+      if (pokemon && pokemon.id) {
+        slot.classList.remove("vacio");
+        const img = slot.querySelector("img");
+        const nombreSpan = slot.querySelector("span");
+
+        let spriteURL = "";
+        if (pokemon.configuracion?.shiny) {
+          spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`;
+        } else {
+          spriteURL =
+            pokemon.configuracion?.sprite ||
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+        }
+
+        img.src = spriteURL;
+        img.alt = pokemon.id;
+
+        nombreSpan.textContent =
+          pokemon.configuracion?.apodo ||
+          (pokemon.nombre ? pokemon.nombre : `#${pokemon.id}`);
+      } else {
+        slot.classList.add("vacio");
+        slot.querySelector("img").src = "";
+        slot.querySelector("span").textContent = "---";
+      }
+    }
+  }
+
+  /* DATOS GUEST */
+
+  if (guestData) {
+    document.getElementById("nombre-guest").textContent = guestData.nombre;
+    const estadoGuestSpan = document.getElementById("estado-guest");
+    estadoGuestSpan.className = `sala-jugador-estado ${guestData.listo ? "listo" : "esperando"}`;
+    estadoGuestSpan.textContent = guestData.listo
+      ? "● Listo"
+      : "● Preparando equipo";
+
+    const slotsGuest = document.querySelectorAll("#equipo-guest .sala-slot");
+    const equipoGuest = guestData.equipo || [];
+
+    for (let i = 0; i < slotsGuest.length; i++) {
+      const slot = slotsGuest[i];
+      const pokemon = equipoGuest[i];
+
+      if (pokemon && pokemon.id) {
+        slot.classList.remove("vacio");
+        const img = slot.querySelector("img");
+        const nombreSpan = slot.querySelector("span");
+
+        let spriteURL = "";
+        if (pokemon.configuracion?.shiny) {
+          spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`;
+        } else {
+          spriteURL =
+            pokemon.configuracion?.sprite ||
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+        }
+
+        img.src = spriteURL;
+        img.alt = pokemon.id;
+
+        nombreSpan.textContent =
+          pokemon.configuracion?.apodo ||
+          (pokemon.nombre ? pokemon.nombre : `#${pokemon.id}`);
+      } else {
+        slot.classList.add("vacio");
+        slot.querySelector("img").src = "";
+        slot.querySelector("span").textContent = "---";
+      }
+    }
+  }
 }
 
 // Verificar si ambos jugadores están listos para habilitar el botón iniciar
