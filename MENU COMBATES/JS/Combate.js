@@ -20,8 +20,8 @@ const db = getDatabase(app);
 // ── DATOS DEL JUGADOR LOCAL ──────────────────────────────────
 const params = new URLSearchParams(window.location.search);
 const partidaId = params.get("id");
-const miNombre = localStorage.getItem("pk-nombreJugador");
-const esHost = localStorage.getItem("pk-esHost") === "true";
+const miNombre = localStorage.getItem("nombreJugador");
+const esHost = localStorage.getItem("esHost") === "true";
 
 // ── TABLA DE TIPOS ───────────────────────────────────────────
 const TIPO_CHART = {
@@ -149,6 +149,11 @@ async function iniciarCombate() {
       cargarEquipo(data.jugadores[rivalNombreGlobal].equipo)
     ]);
 
+    if (miEquipo.length === 0 || equipoRival.length === 0) {
+      log("Error: uno de los equipos no está cargado.");
+      return;
+    }
+
     if (!data.combate && esHost) {
       await inicializarCombateEnFirebase();
     }
@@ -205,7 +210,7 @@ function calcularQuienEmpieza() {
 // ── CARGAR EQUIPO ────────────────────────────────────────────
 async function cargarEquipo(listaEquipo) {
   return Promise.all(listaEquipo.map(async (entry) => {
-    const nombre = typeof entry === "string" ? entry : entry.nombre;
+    const nombre = String(typeof entry === "string" ? entry : entry.id);
     
     if (pokemonCache.has(nombre)) {
       return structuredClone(pokemonCache.get(nombre));
