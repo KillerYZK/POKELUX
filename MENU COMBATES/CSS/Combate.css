@@ -1,0 +1,622 @@
+/* ============================================
+   POKELUX - COMBATE COMPLETO
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  font-family: 'Courier New', monospace;
+  color: #e0e0e0;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.combate-root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100vh;
+  position: relative;
+}
+
+/* ── ANIMACIONES ── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes damageFlash {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.5) drop-shadow(0 0 10px red); }
+}
+
+@keyframes pokemonEnter {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes pokemonFaint {
+  0% { transform: scale(1) rotate(0); opacity: 1; }
+  100% { transform: scale(0) rotate(180deg); opacity: 0; }
+}
+
+@keyframes statusPulse {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 0, 255, 0.5)); }
+  50% { filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.8)); }
+}
+
+/* ── CAMPOS DE BATALLA ── */
+.combate-campo {
+  position: relative;
+  display: flex;
+  height: 380px;
+  overflow: hidden;
+  border-bottom: 3px solid #ffcb05;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+  transition: background 0.5s ease;
+}
+
+/* Campo estándar */
+.combate-campo.estandar {
+  background: linear-gradient(180deg, 
+    #1a2d4a 0%, #2a4a6e 20%, #4a8a8a 40%,
+    #1a6e6e 55%, #1a1a1a 55%, #2a2a2a 75%, #1a1a1a 100%);
+}
+
+/* Campo FUEGO */
+.combate-campo.fuego {
+  background: linear-gradient(180deg, #8b3a3a 0%, #c95a3a 20%, #e87a3a 40%, #f09040 55%, #2a1a0a 55%, #1a0a00 100%);
+  animation: heatHaze 2s ease infinite;
+}
+@keyframes heatHaze {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.1); }
+}
+
+/* Campo AGUA */
+.combate-campo.agua {
+  background: linear-gradient(180deg, #1a3a6e 0%, #2a5a8e 20%, #3a7aae 40%, #4a9ace 55%, #1a3a4e 55%, #0a2a3a 100%);
+}
+.combate-campo.agua::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(0deg, rgba(100,200,255,0.1) 0px, rgba(100,200,255,0.1) 2px, transparent 2px, transparent 15px);
+  pointer-events: none;
+  animation: waveMove 3s linear infinite;
+}
+@keyframes waveMove {
+  from { background-position: 0 0; }
+  to { background-position: 0 20px; }
+}
+
+/* Campo PLANTA */
+.combate-campo.planta {
+  background: linear-gradient(180deg, #1a4a2a 0%, #2a6a3a 20%, #3a8a4a 40%, #4aaa5a 55%, #1a3a1a 55%, #0a2a0a 100%);
+}
+
+/* Campo ELÉCTRICO */
+.combate-campo.electrico {
+  background: linear-gradient(180deg, #2a2a3a 0%, #3a3a5a 20%, #f8d030 40%, #f8e870 55%, #1a1a2a 55%, #0a0a1a 100%);
+  animation: lightningFlash 4s infinite;
+}
+@keyframes lightningFlash {
+  0%, 90%, 100% { background-position: 0 0; }
+  92% { background: linear-gradient(180deg, #fff8e0 0%, #f8d030 20%, #3a3a5a 40%, #2a2a3a 100%); }
+}
+
+/* Campo ROCA */
+.combate-campo.roca {
+  background: linear-gradient(180deg, #8a7a5a 0%, #9a8a6a 20%, #aa9a7a 40%, #baaa8a 55%, #5a4a3a 55%, #3a2a1a 100%);
+}
+
+/* Campo HIELO */
+.combate-campo.hielo {
+  background: linear-gradient(180deg, #7ab8d8 0%, #8ac8e8 20%, #9ad8f8 40%, #aae8ff 55%, #3a6a8a 55%, #2a5a7a 100%);
+}
+
+/* Campo PSÍQUICO */
+.combate-campo.psiquico {
+  background: radial-gradient(circle at 50% 50%, #9b59b6 0%, #8e44ad 30%, #6c3483 60%, #4a235a 100%);
+  animation: psychicPulse 3s ease infinite;
+}
+@keyframes psychicPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+}
+
+/* Campo SINIESTRO */
+.combate-campo.siniestro {
+  background: linear-gradient(180deg, #1a1a2a 0%, #2a2a3a 20%, #3a3a4a 40%, #4a4a5a 55%, #0a0a1a 55%, #000000 100%);
+}
+
+/* Campo DRAGÓN */
+.combate-campo.dragon {
+  background: radial-gradient(ellipse at 50% 100%, #1a237e 0%, #283593 30%, #3f51b5 60%, #5c6bc0 100%);
+}
+
+/* Campo HADA */
+.combate-campo.hada {
+  background: linear-gradient(135deg, #f48fb1 0%, #f8bbd0 30%, #fce4ec 60%, #ffebee 100%);
+}
+
+/* Campo MONTE */
+.combate-campo.monte {
+  background: linear-gradient(180deg, #6a8aaa 0%, #8aaaca 20%, #aaaada 40%, #cacaea 55%, #8a7a5a 55%, #6a5a3a 100%);
+}
+
+/* Campo BOSQUE */
+.combate-campo.bosque {
+  background: linear-gradient(180deg, #2a6e3a 0%, #3a8e4a 20%, #4aae5a 40%, #5ace6a 55%, #1a4e2a 55%, #0a3e1a 100%);
+}
+
+/* Campo GIMNASIO */
+.combate-campo.gimnasio {
+  background: linear-gradient(180deg, #3a2a1a 0%, #5a4a3a 30%, #4a3a2a 60%, #2a1a0a 100%);
+}
+
+/* Campo CIUDAD */
+.combate-campo.ciudad {
+  background: linear-gradient(180deg, #4a4a5a 0%, #5a5a6a 20%, #6a6a7a 40%, #7a7a8a 55%, #2a2a3a 55%, #1a1a2a 100%);
+}
+
+/* Campo DESIERTO */
+.combate-campo.desierto {
+  background: linear-gradient(180deg, #c8a86e 0%, #d8b87e 20%, #e8c88e 40%, #f8d89e 55%, #a8885e 55%, #88684e 100%);
+}
+
+/* Campo VOLCÁN */
+.combate-campo.volcan {
+  background: linear-gradient(180deg, #6a2a1a 0%, #8a3a2a 20%, #aa4a3a 40%, #ca5a4a 55%, #3a1a0a 55%, #1a0a00 100%);
+}
+
+/* Campo CUEVA */
+.combate-campo.cueva {
+  background: linear-gradient(180deg, #2a2a2a 0%, #3a3a3a 20%, #4a4a4a 40%, #5a5a5a 55%, #1a1a1a 55%, #0a0a0a 100%);
+}
+
+/* ── CLIMA ── */
+.combate-campo.lluvia::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(0deg, rgba(100,150,200,0.2) 0px, rgba(100,150,200,0.2) 2px, transparent 2px, transparent 10px);
+  pointer-events: none;
+  animation: rainFall 0.5s linear infinite;
+}
+@keyframes rainFall {
+  from { background-position: 0 0; }
+  to { background-position: 0 20px; }
+}
+
+.combate-campo.sol::before {
+  content: '☀️';
+  position: absolute;
+  font-size: 60px;
+  top: 10px;
+  right: 10px;
+  opacity: 0.6;
+  animation: sunGlow 2s ease infinite;
+  pointer-events: none;
+}
+@keyframes sunGlow {
+  0%, 100% { filter: drop-shadow(0 0 5px gold); opacity: 0.6; }
+  50% { filter: drop-shadow(0 0 20px orange); opacity: 0.8; }
+}
+
+.combate-campo.tormenta-arena::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(45deg, rgba(180,140,80,0.15) 0px, rgba(180,140,80,0.15) 3px, transparent 3px, transparent 15px);
+  pointer-events: none;
+  animation: sandStorm 0.3s linear infinite;
+}
+@keyframes sandStorm {
+  from { background-position: 0 0; }
+  to { background-position: 20px 20px; }
+}
+
+/* ── LADOS ── */
+.combate-lado {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.combate-lado.enemigo {
+  justify-content: flex-start;
+}
+
+/* ── INFOBARS ── */
+.combate-infobar {
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2a 100%);
+  border: 2px solid #ffcb05;
+  border-radius: 12px;
+  padding: 10px 14px;
+  min-width: 200px;
+  max-width: 240px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.combate-infobar.enemigo {
+  margin-top: 16px;
+}
+
+.combate-infobar.jugador {
+  margin-bottom: 10px;
+}
+
+.combate-info-nombre-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.combate-nombre {
+  color: #ffcb05;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.combate-nivel {
+  color: #aaa;
+  font-size: 11px;
+}
+
+.combate-hpbar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.combate-hp-label {
+  color: #ff6b6b;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.combate-hpbar-bg {
+  flex: 1;
+  height: 6px;
+  background: #2a2a2a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.combate-hpbar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: #38c172;
+  transition: width 0.5s ease;
+}
+
+.combate-hpbar-fill.hp-mid { background: #f6c90e; }
+.combate-hpbar-fill.hp-low { background: #e3342f; }
+
+.combate-hp-numero {
+  text-align: right;
+  color: #aaa;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+/* ── SPRITES ── */
+.combate-sprite-wrapper {
+  position: absolute;
+  z-index: 3;
+}
+
+.combate-sprite-wrapper.enemigo {
+  top: 20px;
+  right: 60px;
+}
+
+.combate-sprite-wrapper.jugador {
+  bottom: 50px;
+  left: 80px;
+}
+
+.combate-sprite {
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  width: 120px;
+  height: 120px;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.7));
+}
+
+/* Estados alterados en sprites */
+.combate-sprite-wrapper.paralyzed .combate-sprite,
+.combate-sprite-wrapper.poisoned .combate-sprite,
+.combate-sprite-wrapper.burned .combate-sprite {
+  animation: statusPulse 1s infinite;
+}
+
+/* ── EQUIPO MINIATURAS ── */
+.combate-equipos-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #0a0a0a, #1a1a2a, #0a0a0a);
+  border-top: 2px solid #ffcb05;
+  border-bottom: 2px solid #ffcb05;
+}
+
+.combate-equipo-mini {
+  display: flex;
+  gap: 8px;
+}
+
+.combate-pokeball {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #e3342f, #c0392b);
+  border: 2px solid #ffcb05;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.combate-pokeball::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ffcb05;
+  transform: translateY(-50%);
+}
+
+.combate-pokeball::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: #ffcb05;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.combate-pokeball.debil {
+  background: radial-gradient(circle at 30% 30%, #4a4a4a, #2a2a2a);
+  border-color: #666;
+  opacity: 0.5;
+}
+
+.combate-pokeball.activo {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px #ffcb05;
+}
+
+.combate-pokeball.estado {
+  border-color: #9b59b6;
+  box-shadow: 0 0 5px #9b59b6;
+}
+
+/* ── PANEL INFERIOR ── */
+.combate-panel {
+  display: flex;
+  background: linear-gradient(135deg, #111111 0%, #1a1a2a 100%);
+  border-top: 3px solid #ffcb05;
+  flex: 1;
+  min-height: 130px;
+  max-height: 140px;
+}
+
+.combate-log {
+  flex: 1;
+  padding: 16px 20px;
+  border-right: 2px solid #ffcb05;
+  display: flex;
+  align-items: center;
+  background: rgba(0,0,0,0.3);
+}
+
+.combate-log p {
+  color: #e0e0e0;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: bold;
+}
+
+/* ── MENÚ PRINCIPAL ── */
+.combate-menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: #ffcb05;
+  width: 260px;
+  flex-shrink: 0;
+  padding: 2px;
+}
+
+.combate-menu.oculto {
+  display: none;
+}
+
+.combate-opcion {
+  background: linear-gradient(135deg, #1a1a2a 0%, #0f0f1a 100%);
+  color: #e0e0e0;
+  border: none;
+  padding: 0 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.combate-opcion:hover {
+  background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
+  color: #ffcb05;
+  transform: scale(1.02);
+}
+
+.combate-opcion:active {
+  transform: scale(0.98);
+}
+
+/* ── MENÚ MOVIMIENTOS ── */
+.combate-movimientos {
+  width: 340px;
+}
+
+.movimientos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+  background: #ffcb05;
+  height: 100%;
+}
+
+.combate-movimiento {
+  background: linear-gradient(135deg, #1a1a2a 0%, #0f0f1a 100%);
+  border: none;
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.combate-movimiento:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
+  transform: translateY(-2px);
+}
+
+.combate-movimiento:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mov-nombre {
+  color: #ffcb05;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.mov-tipo {
+  font-size: 9px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  width: fit-content;
+  text-transform: uppercase;
+}
+
+.mov-pp, .mov-poder {
+  font-size: 9px;
+  color: #aaa;
+}
+
+/* Tipos de Pokémon */
+.tipo-normal { background: #9a9a9a; color: #fff; }
+.tipo-fuego { background: #e3342f; color: #fff; }
+.tipo-agua { background: #3b82f6; color: #fff; }
+.tipo-electrico { background: #f6c90e; color: #3a2e00; }
+.tipo-planta { background: #38c172; color: #fff; }
+.tipo-hielo { background: #89d4df; color: #003a40; }
+.tipo-lucha { background: #c0392b; color: #fff; }
+.tipo-veneno { background: #9b59b6; color: #fff; }
+.tipo-tierra { background: #e67e22; color: #fff; }
+.tipo-volador { background: #85c1e9; color: #003a40; }
+.tipo-psiquico { background: #e91e8c; color: #fff; }
+.tipo-bicho { background: #8bc34a; color: #fff; }
+.tipo-roca { background: #795548; color: #fff; }
+.tipo-fantasma { background: #6c3483; color: #fff; }
+.tipo-dragon { background: #1a237e; color: #fff; }
+.tipo-siniestro { background: #2c3e50; color: #fff; }
+.tipo-acero { background: #7f8c8d; color: #fff; }
+.tipo-hada { background: #f48fb1; color: #5a0030; }
+
+.combate-volver {
+  grid-column: span 2;
+  background: #0a0a0a;
+  color: #666;
+  font-size: 11px;
+  padding: 8px;
+}
+
+.combate-volver:hover {
+  background: #111;
+  color: #aaa;
+}
+
+/* ── MENÚ CAMBIO ── */
+.combate-cambio {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2a 100%);
+  width: 340px;
+  flex-shrink: 0;
+  padding: 12px;
+  gap: 8px;
+  overflow-y: auto;
+  border-left: 3px solid #ffcb05;
+}
+
+.combate-cambio.oculto {
+  display: none;
+}
+
+.cambio-pokemon-btn {
+  background: linear-gradient(135deg, #1a1a2a 0%, #0f0f1a 100%);
+  border: 2px solid #ffcb05;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.cambio-pokemon-btn:hover {
+  transform: scale(1.
