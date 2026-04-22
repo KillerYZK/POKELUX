@@ -1,1 +1,335 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800&display=swap");
 
+/* ============================================
+   VARIABLES
+   ============================================ */
+:root {
+  --magenta: #ff2d78;
+  --magenta-dark: #c4005a;
+  --azul-marino: #0d1b4b;
+  --azul-medio: #1a3080;
+  --azul-claro: #4fc3f7;
+  --blanco: #f0f4ff;
+  --sombra: rgba(255, 45, 120, 0.35);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: "Nunito", sans-serif;
+  background-color: var(--azul-marino);
+  color: var(--blanco);
+  cursor: default;
+}
+
+/* ============================================
+   FONDO ANIMADO — líneas de perspectiva
+   ============================================ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 60%, rgba(255, 45, 120, 0.08) 100%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 80px,
+      rgba(79, 195, 247, 0.04) 80px,
+      rgba(79, 195, 247, 0.04) 81px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 80px,
+      rgba(79, 195, 247, 0.04) 80px,
+      rgba(79, 195, 247, 0.04) 81px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Destello magenta en esquina superior derecha */
+body::after {
+  content: "";
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 45, 120, 0.18) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: pulso 4s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+/* ============================================
+   LAYOUT PRINCIPAL
+   ============================================ */
+.contenedor-principal {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 2.5rem 4rem;
+}
+
+/* ============================================
+   HEADER / LOGO
+   ============================================ */
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  animation: deslizar-arriba 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2rem;
+}
+
+.titulo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: var(--blanco);
+  /* Sombra doble: magenta abajo, azul claro sutil */
+  text-shadow:
+    4px 4px 0px var(--magenta),
+    8px 8px 0px var(--azul-medio);
+  position: relative;
+}
+
+/* Subrayado magenta decorativo bajo el título */
+.titulo::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--magenta), transparent);
+}
+
+.subtitulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--azul-claro);
+  opacity: 0.8;
+  padding-bottom: 4px;
+}
+
+.separador {
+  border: none;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--magenta) 0%,
+    var(--azul-claro) 40%,
+    transparent 100%
+  );
+  margin-top: 0.2rem;
+}
+
+/* ============================================
+   CONTENIDO CENTRAL
+   ============================================ */
+.contenido {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.opciones-menu {
+  display: flex;
+  gap: 3rem;
+  align-items: stretch;
+  animation: deslizar-arriba 0.8s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================
+   TARJETAS DE OPCIÓN
+   ============================================ */
+.opcion-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 260px;
+  padding: 2.5rem 2rem;
+  background: rgba(26, 48, 128, 0.4);
+  border: 2px solid rgba(79, 195, 247, 0.15);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease;
+  cursor: pointer;
+}
+
+/* Línea magenta superior — aparece en hover */
+.opcion-menu::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--magenta);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+/* Brillo de fondo en hover */
+.opcion-menu::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(255, 45, 120, 0.12) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.opcion-menu:hover {
+  transform: translateY(-6px);
+  border-color: rgba(79, 195, 247, 0.4);
+}
+
+.opcion-menu:hover::before {
+  transform: scaleX(1);
+}
+.opcion-menu:hover::after {
+  opacity: 1;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+.boton-menu {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.1em;
+  color: var(--azul-marino);
+  background: var(--magenta);
+  border: none;
+  border-radius: 3px;
+  padding: 0.7rem 2rem;
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+  box-shadow:
+    0 4px 0 var(--magenta-dark),
+    0 6px 20px var(--sombra);
+}
+
+.boton-menu:hover {
+  background: #ff4d8d;
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 0 var(--magenta-dark),
+    0 10px 30px var(--sombra);
+}
+
+.boton-menu:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 2px 0 var(--magenta-dark),
+    0 4px 12px var(--sombra);
+}
+
+/* ============================================
+   DESCRIPCIÓN
+   ============================================ */
+.descripcion-opcion {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--azul-claro);
+  opacity: 0.7;
+  text-align: center;
+  line-height: 1.5;
+  transition: opacity 0.3s ease;
+}
+
+.opcion-menu:hover .descripcion-opcion {
+  opacity: 1;
+}
+
+/* ============================================
+   ANIMACIONES DE ENTRADA
+   ============================================ */
+@keyframes deslizar-arriba {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 640px) {
+  .contenedor-principal {
+    padding: 2rem 1.5rem;
+  }
+  .opciones-menu {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .opcion-menu {
+    width: 100%;
+  }
+}
