@@ -1,6 +1,3 @@
-let peleaActiva = true;
-let datosMeowscarada, datosStarmie, hpMeowscarada, hpStarmie, turno;
-
 document.getElementById("AgregarPokemon").addEventListener("click", () => {
   window.location.href = "Lista.html";
 });

@@ -93,6 +93,7 @@ function crearCarta(pokemon) {
       <p class="nombre-pokemon">${pokemon.name}</p>
       <p class="id-pokemon">ID: ${idPokemon}</p>
       <button class="boton-anadir">Añadir al equipo</button>
+      <button class="boton-detalles">Detalles</button>
     `;
 
   //guardar pokemons en localStorage para poder añadirlos al equipo
@@ -114,6 +115,12 @@ function crearCarta(pokemon) {
     alert(`${pokemon.name} ha sido añadido a tu equipo! (${equipo.length}/6)`);
   });
   return cartapokemon;
+
+  cartapokemon
+    .querySelector(".boton-detalles")
+    .addEventListener("click", () => {
+      /* TRABAJAR EN ESTO */
+    });
 }
 
 //Codigo para los filtros por tipo
