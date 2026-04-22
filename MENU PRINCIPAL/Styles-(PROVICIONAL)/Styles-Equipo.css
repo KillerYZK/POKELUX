@@ -1,3 +1,439 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800&display=swap");
+
+/* ============================================
+   VARIABLES
+   ============================================ */
+:root {
+  --magenta: #ff2d78;
+  --magenta-dark: #c4005a;
+  --azul-marino: #0d1b4b;
+  --azul-medio: #1a3080;
+  --azul-claro: #4fc3f7;
+  --blanco: #f0f4ff;
+  --sombra: rgba(255, 45, 120, 0.35);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  font-family: "Nunito", sans-serif;
+  background-color: var(--azul-marino);
+  color: var(--blanco);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fondo con cuadrícula sutil */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 80px,
+      rgba(79, 195, 247, 0.03) 80px,
+      rgba(79, 195, 247, 0.03) 81px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 80px,
+      rgba(79, 195, 247, 0.03) 80px,
+      rgba(79, 195, 247, 0.03) 81px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================
+   HEADER / NAVBAR
+   ============================================ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13, 27, 75, 0.92);
+  backdrop-filter: blur(10px);
+  padding: 1rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  animation: deslizar-arriba 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+}
+
+.titulo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.06em;
+  color: var(--blanco);
+  text-shadow: 3px 3px 0px var(--magenta);
+}
+
+.subtitulo {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--azul-claro);
+  opacity: 0.7;
+}
+
+.navbar {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.separador {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border: none;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--magenta) 0%,
+    var(--azul-claro) 40%,
+    transparent 100%
+  );
+}
+
+/* ============================================
+   BOTONES NAVBAR
+   ============================================ */
+.boton-menu {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  color: var(--blanco);
+  background: transparent;
+  border: 2px solid rgba(79, 195, 247, 0.25);
+  border-radius: 3px;
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.boton-menu:hover {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: var(--azul-marino);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--sombra);
+}
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+.contenedor-principal {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: deslizar-arriba 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================
+   TÍTULO DE SECCIÓN
+   ============================================ */
+.titulo-seccion {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.5rem;
+  letter-spacing: 0.08em;
+  color: var(--blanco);
+  position: relative;
+  display: inline-block;
+}
+
+.titulo-seccion::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 60%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--magenta), transparent);
+}
+
+/* ============================================
+   BOTONES DE ACCIÓN
+   ============================================ */
+.boton-agregar,
+.boton-clear {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  border: none;
+  border-radius: 3px;
+  padding: 0.6rem 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.boton-agregar {
+  background: var(--magenta);
+  color: var(--azul-marino);
+  box-shadow:
+    0 4px 0 var(--magenta-dark),
+    0 6px 20px var(--sombra);
+}
+
+.boton-agregar:hover {
+  background: #ff4d8d;
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 0 var(--magenta-dark),
+    0 10px 28px var(--sombra);
+}
+
+.boton-agregar:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--magenta-dark);
+}
+
+.boton-clear {
+  background: transparent;
+  color: var(--azul-claro);
+  border: 2px solid rgba(79, 195, 247, 0.3);
+}
+
+.boton-clear:hover {
+  background: rgba(79, 195, 247, 0.1);
+  border-color: var(--azul-claro);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   CONTENEDOR DE CARTAS POKEMON
+   ============================================ */
+#cartas-pokemon {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+/* ============================================
+   TARJETA POKEMON (generada por JS)
+   ============================================ */
+#cartas-pokemon > div {
+  background: rgba(26, 48, 128, 0.5);
+  border: 2px solid rgba(79, 195, 247, 0.12);
+  border-radius: 4px;
+  padding: 1rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+#cartas-pokemon > div::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--magenta);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+#cartas-pokemon > div:hover {
+  transform: translateY(-4px);
+  border-color: rgba(79, 195, 247, 0.35);
+}
+
+#cartas-pokemon > div:hover::before {
+  transform: scaleX(1);
+}
+
+#cartas-pokemon img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 6px rgba(255, 45, 120, 0.3));
+}
+
+#cartas-pokemon .nombre-pokemon {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: capitalize;
+  color: var(--blanco);
+  text-align: center;
+}
+
+/* ============================================
+   DETALLES DEL EQUIPO
+   ============================================ */
+#detalles-equipo {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.tarjeta-detalle {
+  background: rgba(26, 48, 128, 0.45);
+  border: 2px solid rgba(79, 195, 247, 0.12);
+  border-radius: 4px;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tarjeta-detalle::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--magenta);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.3s ease;
+}
+
+.tarjeta-detalle:hover {
+  transform: translateX(4px);
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+.tarjeta-detalle:hover::before {
+  transform: scaleY(1);
+}
+
+.tarjeta-detalle img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 8px rgba(255, 45, 120, 0.35));
+}
+
+.tarjeta-detalle p {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--azul-claro);
+  opacity: 0.85;
+  line-height: 1.6;
+  text-transform: capitalize;
+}
+
+.tarjeta-detalle p:first-child {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  color: var(--blanco);
+  opacity: 1;
+}
+
+/* ============================================
+   BOTÓN PERSONALIZAR (dentro de tarjeta-detalle)
+   ============================================ */
+.boton-personalizar {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.4rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--magenta);
+  background: transparent;
+  color: var(--magenta);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.boton-personalizar:hover {
+  background: var(--magenta);
+  color: var(--azul-marino);
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 0 16px var(--sombra);
+}
+
+/* ============================================
+   ANIMACIÓN DE ENTRADA
+   ============================================ */
+@keyframes deslizar-arriba {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 1.5rem;
+  }
+
+  .contenedor-principal {
+    padding: 1.5rem;
+  }
+
+  .tarjeta-detalle {
+    grid-template-columns: 70px 1fr;
+  }
+
+  .boton-personalizar {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
+}
 #cartas-pokemon {
   display: grid;
   grid-template-columns: repeat(6, 1fr);

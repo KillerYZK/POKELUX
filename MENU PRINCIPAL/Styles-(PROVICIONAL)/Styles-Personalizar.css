@@ -1,0 +1,440 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800&display=swap');
+
+/* ============================================
+   VARIABLES
+   ============================================ */
+:root {
+  --magenta:      #FF2D78;
+  --magenta-dark: #C4005A;
+  --azul-marino:  #0D1B4B;
+  --azul-medio:   #1A3080;
+  --azul-claro:   #4FC3F7;
+  --blanco:       #F0F4FF;
+  --sombra:       rgba(255, 45, 120, 0.35);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--azul-marino);
+  color: var(--blanco);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg,
+      transparent, transparent 80px,
+      rgba(79,195,247,0.03) 80px,
+      rgba(79,195,247,0.03) 81px),
+    repeating-linear-gradient(180deg,
+      transparent, transparent 80px,
+      rgba(79,195,247,0.03) 80px,
+      rgba(79,195,247,0.03) 81px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Destello magenta esquina superior derecha */
+body::after {
+  content: '';
+  position: fixed;
+  top: -150px;
+  right: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255,45,120,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: pulso 5s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13, 27, 75, 0.93);
+  backdrop-filter: blur(10px);
+  padding: 1rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  animation: deslizar-arriba 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+}
+
+.titulo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.06em;
+  color: var(--blanco);
+  text-shadow: 3px 3px 0px var(--magenta);
+}
+
+.subtitulo {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--azul-claro);
+  opacity: 0.7;
+}
+
+.navbar { display: flex; gap: 0.8rem; }
+
+.separador {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, var(--magenta) 0%, var(--azul-claro) 40%, transparent 100%);
+}
+
+.boton-menu {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  color: var(--blanco);
+  background: transparent;
+  border: 2px solid rgba(79, 195, 247, 0.25);
+  border-radius: 3px;
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.boton-menu:hover {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: var(--azul-marino);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--sombra);
+}
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+.contenedor-principal {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 2.5rem 3rem;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 1.5rem 2.5rem;
+  align-items: start;
+  animation: deslizar-arriba 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================
+   TARJETA PRINCIPAL DEL POKEMON
+   ============================================ */
+#tarjetas-personalizar {
+  grid-row: 1 / 3;
+  background: rgba(26, 48, 128, 0.5);
+  border: 2px solid rgba(79, 195, 247, 0.15);
+  border-radius: 4px;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Línea magenta superior */
+#tarjetas-personalizar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--magenta), var(--azul-claro));
+}
+
+#nombre-pokemon {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.1em;
+  text-transform: capitalize;
+  color: var(--blanco);
+  text-shadow: 2px 2px 0 var(--magenta);
+  text-align: center;
+}
+
+#imagen-pokemon {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 16px rgba(255, 45, 120, 0.5));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+#imagen-pokemon:hover {
+  transform: scale(1.08) translateY(-4px);
+  filter: drop-shadow(0 8px 24px rgba(255, 45, 120, 0.7));
+}
+
+/* ============================================
+   INPUTS COMPARTIDOS
+   ============================================ */
+input[type="text"],
+input[type="number"],
+select {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--blanco);
+  background: rgba(13, 27, 75, 0.7);
+  border: 2px solid rgba(79, 195, 247, 0.2);
+  border-radius: 3px;
+  padding: 0.6rem 1rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+  color: rgba(240, 244, 255, 0.3);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: var(--magenta);
+  box-shadow: 0 0 0 3px rgba(255, 45, 120, 0.15);
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234FC3F7' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+select option {
+  background: var(--azul-medio);
+  color: var(--blanco);
+}
+
+/* ============================================
+   CHECKBOX SHINY
+   ============================================ */
+label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--azul-claro);
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(79, 195, 247, 0.4);
+  border-radius: 3px;
+  background: rgba(13, 27, 75, 0.7);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+  background: var(--magenta);
+  border-color: var(--magenta);
+}
+
+input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--blanco);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+/* ============================================
+   MOVIMIENTOS
+   ============================================ */
+#movimientos-personalizar {
+  background: rgba(26, 48, 128, 0.45);
+  border: 2px solid rgba(79, 195, 247, 0.12);
+  border-radius: 4px;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  position: relative;
+  overflow: hidden;
+}
+
+#movimientos-personalizar::before {
+  content: 'MOVIMIENTOS';
+  position: absolute;
+  top: -1px;
+  left: 1rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--magenta);
+  background: rgba(26, 48, 128, 0.45);
+  padding: 0 0.4rem;
+}
+
+/* ============================================
+   STATS
+   ============================================ */
+#stats {
+  grid-column: 2;
+  background: rgba(26, 48, 128, 0.45);
+  border: 2px solid rgba(79, 195, 247, 0.12);
+  border-radius: 4px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  position: relative;
+}
+
+#stats::before {
+  content: 'ESTADÍSTICAS';
+  position: absolute;
+  top: -1px;
+  left: 1rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--magenta);
+  background: rgba(26, 48, 128, 0.45);
+  padding: 0 0.4rem;
+}
+
+/* Párrafos de stat generados por JS */
+#stats p {
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--azul-claro);
+  padding: 0.45rem 0.8rem;
+  background: rgba(13, 27, 75, 0.5);
+  border-radius: 3px;
+  border-left: 3px solid var(--magenta);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Resalta el número al final de cada stat */
+#stats p::after {
+  content: attr(data-valor);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  color: var(--blanco);
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   BOTÓN GUARDAR
+   ============================================ */
+#guardar {
+  grid-column: 1 / -1;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.15em;
+  color: var(--azul-marino);
+  background: var(--magenta);
+  border: none;
+  border-radius: 3px;
+  padding: 0.8rem 3rem;
+  cursor: pointer;
+  justify-self: start;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 0 var(--magenta-dark), 0 6px 20px var(--sombra);
+}
+
+#guardar:hover {
+  background: #ff4d8d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--magenta-dark), 0 12px 28px var(--sombra);
+}
+
+#guardar:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--magenta-dark);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes deslizar-arriba {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  .contenedor-principal {
+    grid-template-columns: 1fr;
+  }
+
+  #tarjetas-personalizar {
+    grid-row: auto;
+  }
+
+  #stats {
+    grid-column: 1;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 1.5rem;
+  }
+
+  .contenedor-principal { padding: 1.5rem; }
+}
