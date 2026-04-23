@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBq13g3hXl4a3T0VLeHPBnPDZB7BgxW1xY",
@@ -12,6 +13,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
 // Función para validar ID de 6 dígitos
 function validarId6Digitos(id) {
@@ -45,6 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             
             try {
+                console.log("Autenticando...");
+                const userCredential = await signInAnonymously(auth);
+                console.log("Autenticado:", userCredential.user.uid);
+                
                 console.log("Buscando partida con ID:", idPartida);
                 
                 // Obtener referencia a la partida
@@ -94,12 +100,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 console.log("Agregando jugador a la partida...");
                 
-                // Agregar jugador a la partida
+                // ✅ AGREGAR JUGADOR CORRECTAMENTE (como OBJETO con todas las propiedades)
                 const nuevoJugadorRef = ref(db, `partidas/${idPartida}/jugadores/${nombreJugador}`);
                 await set(nuevoJugadorRef, {
                     equipo: [],
                     listo: false,
-                    esHost: false
+                    esHost: false,
+                    uid: userCredential.user.uid,
+                    nombre: nombreJugador  // ← IMPORTANTE: añadir nombre
                 });
                 
                 console.log("Jugador agregado exitosamente");

@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { mostrarLoading, ocultarLoading } from "./LoadingScreen.js";
 import {
   getDatabase, ref, set, get, update, onValue
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ── CONFIG FIREBASE ──────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyBq13g3hXl4a3T0VLeHPBnPDZB7BgxW1xY",
   authDomain: "pokelux.firebaseapp.com",
@@ -17,13 +17,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ── DATOS DEL JUGADOR LOCAL ──────────────────────────────────
 const params = new URLSearchParams(window.location.search);
 const partidaId = params.get("id");
 const miNombre = localStorage.getItem("nombreJugador");
 const esHost = localStorage.getItem("esHost") === "true";
 
-// ── TABLA DE TIPOS ───────────────────────────────────────────
 const TIPO_CHART = {
   normal: { fighting: 2, ghost: 0 },
   fire: { water: 2, rock: 2, grass: 0.5, ice: 0.5, bug: 0.5, steel: 0.5 },
@@ -45,52 +43,37 @@ const TIPO_CHART = {
   fairy: { poison: 2, steel: 2, fighting: 0.5, bug: 0.5, dark: 0.5, dragon: 0 }
 };
 
-// ── CONSTANTES ───────────────────────────────────────────────
 const SPRITE_BASE = {
   front: "https://play.pokemonshowdown.com/sprites/ani/",
   back: "https://play.pokemonshowdown.com/sprites/ani-back/"
 };
 
-// ── CAMPOS DE BATALLA ──────────────────────────────────────────
+// ── CAMPOS DE BATALLA ────────────────────────────────────────
 function actualizarCampoPorTipo(tipos) {
   const campo = document.querySelector('.combate-campo');
   if (!campo) return;
   
   const tipoAClase = {
-    fire: 'fuego',
-    water: 'agua',
-    grass: 'planta',
-    electric: 'electrico',
-    rock: 'roca',
-    ground: 'roca',
-    ice: 'hielo',
-    psychic: 'psiquico',
-    dark: 'siniestro',
-    dragon: 'dragon',
-    fairy: 'hada',
-    fighting: 'estandar',
-    flying: 'monte',
-    poison: 'bosque',
-    bug: 'bosque',
-    ghost: 'siniestro',
-    steel: 'gimnasio',
-    normal: 'estandar'
+    fire: 'fuego', water: 'agua', grass: 'planta', electric: 'electrico',
+    rock: 'roca', ground: 'tierra', ice: 'hielo', psychic: 'psiquico',
+    ghost: 'fantasma', dark: 'siniestro', dragon: 'dragon', fairy: 'hada',
+    steel: 'acero', flying: 'volador', poison: 'veneno', bug: 'bicho',
+    fighting: 'lucha', normal: 'estandar'
   };
   
-  const clasesCampo = ['fuego', 'agua', 'planta', 'electrico', 'roca', 'hielo', 
-                       'psiquico', 'siniestro', 'dragon', 'hada', 'gimnasio', 
-                       'monte', 'ciudad', 'bosque', 'desierto', 'volcan', 'cueva'];
-  campo.classList.remove(...clasesCampo);
+  const clasesCampo = ['fuego','agua','planta','electrico','roca','tierra','hielo',
+    'psiquico','fantasma','siniestro','dragon','hada','acero','volador',
+    'veneno','bicho','lucha','estandar'];
   
-  const tipoPrincipal = tipos[0];
-  const nuevaClase = tipoAClase[tipoPrincipal] || 'estandar';
+  campo.classList.remove(...clasesCampo);
+  const nuevaClase = tipoAClase[tipos[0]] || 'estandar';
   campo.classList.add(nuevaClase);
 }
 
 function aplicarClima(tipoClima) {
   const campo = document.querySelector('.combate-campo');
   if (!campo) return;
-  const climas = ['lluvia', 'sol', 'tormenta-arena', 'granizo'];
+  const climas = ['lluvia','sol','tormenta-arena','granizo'];
   campo.classList.remove(...climas);
   if (tipoClima) campo.classList.add(tipoClima);
 }
@@ -107,6 +90,7 @@ let esperandoCambio = false;
 let cambisForzado = false;
 let animacionEnProceso = false;
 let ultimoLog = "";
+let listenerActivo = false;
 
 const pokemonCache = new Map();
 
@@ -119,10 +103,18 @@ const btnLuchar = document.getElementById("btn-luchar");
 const btnVolver = document.getElementById("btn-volver");
 const btnPokemon = document.getElementById("btn-pokemon");
 
+// ── FUNCIÓN PARA REINICIAR ESTADOS ───────────────────────────
+function reiniciarEstadosLocales() {
+  animacionEnProceso = false;
+  esperandoCambio = false;
+  cambisForzado = false;
+}
+
 // ── INICIALIZAR ──────────────────────────────────────────────
 async function iniciarCombate() {
   if (!partidaId || !miNombre) {
     log("Error: no se encontró la partida.");
+    await ocultarLoading();
     return;
   }
 
@@ -132,6 +124,7 @@ async function iniciarCombate() {
 
     if (!data?.jugadores) {
       log("Error: partida no encontrada.");
+      await ocultarLoading();
       return;
     }
 
@@ -140,38 +133,88 @@ async function iniciarCombate() {
 
     if (!rivalNombreGlobal) {
       log("Error: rival no encontrado.");
+      await ocultarLoading();
       return;
     }
 
     log("Cargando equipos...");
-    [miEquipo, equipoRival] = await Promise.all([
-      cargarEquipo(data.jugadores[miNombre].equipo),
-      cargarEquipo(data.jugadores[rivalNombreGlobal].equipo)
-    ]);
 
-    if (miEquipo.length === 0 || equipoRival.length === 0) {
-      log("Error: uno de los equipos no está cargado.");
+    const equipoMiData = data.jugadores[miNombre]?.equipo;
+    const equipoRivalData = data.jugadores[rivalNombreGlobal]?.equipo;
+
+    if (!equipoMiData || !equipoRivalData) {
+      log("Error: equipos no encontrados.");
+      await ocultarLoading();
       return;
     }
 
-    if (!data.combate && esHost) {
-      await inicializarCombateEnFirebase();
+    [miEquipo, equipoRival] = await Promise.all([
+      cargarEquipo(equipoMiData),
+      cargarEquipo(equipoRivalData)
+    ]);
+
+    if (miEquipo.length === 0 || equipoRival.length === 0) {
+      log("Error: no se pudieron cargar los equipos.");
+      await ocultarLoading();
+      return;
     }
 
-    onValue(ref(db, `partidas/${partidaId}/combate`), (snapshot) => {
-      estadoCombate = snapshot.val();
-      if (estadoCombate) renderEstado(estadoCombate);
-    });
+    const combateRef = ref(db, `partidas/${partidaId}/combate`);
+    
+    // ✅ LISTENER - SOLO UNO, SIEMPRE ACTIVO
+    if (!listenerActivo) {
+      listenerActivo = true;
+      onValue(combateRef, (snapshot) => {
+        const nuevoEstado = snapshot.val();
+        if (nuevoEstado) {
+          console.log("🔔 [LISTENER] Estado actualizado");
+          estadoCombate = nuevoEstado;
+          // ✅ Reiniciar animación antes de renderizar
+          reiniciarEstadosLocales();
+          renderEstado(estadoCombate);
+        }
+      });
+    }
+
+    const combateSnap = await get(combateRef);
+
+    if (!combateSnap.exists()) {
+      if (esHost) {
+        await inicializarCombateEnFirebase();
+      } else {
+        let espera = true;
+        for (let i = 0; i < 30 && espera; i++) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          const check = await get(combateRef);
+          if (check.exists()) espera = false;
+        }
+        if (espera) {
+          log("Error: timeout esperando al host.");
+          await ocultarLoading();
+          return;
+        }
+      }
+    }
+
+    const estadoInicial = await get(combateRef);
+    if (estadoInicial.exists()) {
+      estadoCombate = estadoInicial.val();
+      renderEstado(estadoCombate);
+    }
+
+    log("¡Combate listo!");
+    await ocultarLoading();
 
   } catch (err) {
     console.error("[INIT]", err);
-    log("Error al conectar con Firebase.");
+    log("Error al conectar con Firebase: " + err.message);
+    await ocultarLoading();
   }
 }
 
 async function inicializarCombateEnFirebase() {
   const turnoInicial = calcularQuienEmpieza();
-  const estadoInicial = {
+  await set(ref(db, `partidas/${partidaId}/combate`), {
     turno: turnoInicial,
     fase: "elegir",
     indexActivo: { [miNombre]: 0, [rivalNombreGlobal]: 0 },
@@ -196,8 +239,7 @@ async function inicializarCombateEnFirebase() {
     clima: null,
     turnoClima: 0,
     campo: { reflejo: null, muroLuz: null, velocidad: null }
-  };
-  await set(ref(db, `partidas/${partidaId}/combate`), estadoInicial);
+  });
 }
 
 function calcularQuienEmpieza() {
@@ -209,98 +251,145 @@ function calcularQuienEmpieza() {
 
 // ── CARGAR EQUIPO ────────────────────────────────────────────
 async function cargarEquipo(listaEquipo) {
-  return Promise.all(listaEquipo.map(async (entry) => {
-    const nombre = String(typeof entry === "string" ? entry : entry.id);
-    
-    if (pokemonCache.has(nombre)) {
-      return structuredClone(pokemonCache.get(nombre));
-    }
+  if (!listaEquipo || listaEquipo.length === 0) return [];
 
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${nombre.toLowerCase()}`);
-    const data = await res.json();
+  try {
+    return await Promise.all(listaEquipo.map(async (entry) => {
+      const nombre = String(typeof entry === "string" ? entry : entry.id);
+      if (!nombre || nombre === "undefined") return crearPokemonPorDefecto("Unknown");
+      if (pokemonCache.has(nombre)) return structuredClone(pokemonCache.get(nombre));
 
-    const stats = {
-      hp: data.stats.find(s => s.stat.name === "hp").base_stat,
-      atk: data.stats.find(s => s.stat.name === "attack").base_stat,
-      def: data.stats.find(s => s.stat.name === "defense").base_stat,
-      spAtk: data.stats.find(s => s.stat.name === "special-attack").base_stat,
-      spDef: data.stats.find(s => s.stat.name === "special-defense").base_stat,
-      spd: data.stats.find(s => s.stat.name === "speed").base_stat
-    };
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${nombre.toLowerCase()}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!res.ok) return crearPokemonPorDefecto(nombre);
 
-    const movimientos = await Promise.all(
-      data.moves.slice(0, 4).map(async (m) => {
-        const mRes = await fetch(m.move.url);
-        const mData = await mRes.json();
-        return {
-          nombre: mData.name.replace(/-/g, " "),
-          tipo: mData.type.name,
-          poder: mData.power || 0,
-          pp: mData.pp,
-          ppMax: mData.pp,
-          clase: mData.damage_class.name,
-          precision: mData.accuracy || 100,
-          efecto: mData.effect_entries.find(e => e.language.name === "en")?.effect || ""
+        const data = await res.json();
+        const stats = {
+          hp: data.stats.find(s => s.stat.name === "hp")?.base_stat || 50,
+          atk: data.stats.find(s => s.stat.name === "attack")?.base_stat || 50,
+          def: data.stats.find(s => s.stat.name === "defense")?.base_stat || 50,
+          spAtk: data.stats.find(s => s.stat.name === "special-attack")?.base_stat || 50,
+          spDef: data.stats.find(s => s.stat.name === "special-defense")?.base_stat || 50,
+          spd: data.stats.find(s => s.stat.name === "speed")?.base_stat || 50
         };
-      })
-    );
 
-    const pokemonData = {
-      nombre: data.name,
-      hpMax: stats.hp,
-      stats,
-      movimientos,
-      tipos: data.types.map(t => t.type.name)
-    };
-    
-    pokemonCache.set(nombre, structuredClone(pokemonData));
-    return pokemonData;
-  }));
+        const movimientos = await Promise.all(
+          (data.moves || []).slice(0, 4).map(async (m) => {
+            try {
+              const c2 = new AbortController();
+              const t2 = setTimeout(() => c2.abort(), 4000);
+              const mRes = await fetch(m.move.url, { signal: c2.signal });
+              clearTimeout(t2);
+              if (!mRes.ok) throw new Error("failed");
+              const mData = await mRes.json();
+              return {
+                nombre: mData.name.replace(/-/g, " "),
+                tipo: mData.type?.name || "normal",
+                poder: mData.power || 0,
+                pp: mData.pp || 20,
+                ppMax: mData.pp || 20,
+                clase: mData.damage_class?.name || "physical",
+                precision: mData.accuracy || 100,
+                efecto: mData.effect_entries?.find(e => e.language.name === "en")?.effect || ""
+              };
+            } catch {
+              return { nombre: m.move.name.replace(/-/g, " "), tipo: "normal", poder: 40, pp: 20, ppMax: 20, clase: "physical", precision: 100, efecto: "" };
+            }
+          })
+        );
+
+        const pokemonData = {
+          nombre: data.name || nombre,
+          hpMax: stats.hp,
+          stats,
+          movimientos: movimientos.length > 0 ? movimientos : [
+            { nombre: "Ataque Rápido", tipo: "normal", poder: 40, pp: 30, ppMax: 30, clase: "physical", precision: 100, efecto: "" }
+          ],
+          tipos: data.types?.map(t => t.type.name) || ["normal"]
+        };
+
+        pokemonCache.set(nombre, structuredClone(pokemonData));
+        return pokemonData;
+
+      } catch (err) {
+        console.error(`[EQUIPO] Error cargando ${nombre}:`, err.message);
+        return crearPokemonPorDefecto(nombre);
+      }
+    }));
+  } catch (err) {
+    console.error("[EQUIPO] Error:", err.message);
+    return [crearPokemonPorDefecto("Fallback1"), crearPokemonPorDefecto("Fallback2")];
+  }
+}
+
+function crearPokemonPorDefecto(nombre) {
+  return {
+    nombre: nombre || "Pokemon",
+    hpMax: 50,
+    stats: { hp: 50, atk: 50, def: 50, spAtk: 50, spDef: 50, spd: 50 },
+    movimientos: [{ nombre: "Ataque Rápido", tipo: "normal", poder: 40, pp: 30, ppMax: 30, clase: "physical", precision: 100, efecto: "" }],
+    tipos: ["normal"]
+  };
 }
 
 // ── RENDERIZAR ───────────────────────────────────────────────
 function renderEstado(estado) {
-  if (animacionEnProceso) return;
+  // ✅ Eliminamos el bloqueo por animacionEnProceso
+  if (!estado || !estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) return;
 
   const rivalNombre = rivalNombreGlobal;
+  if (!rivalNombre) return;
+  if (estado.indexActivo[miNombre] === undefined || estado.indexActivo[rivalNombre] === undefined) return;
+
   esMiTurno = estado.turno === miNombre;
   miIndexActivo = estado.indexActivo[miNombre];
   rivalIndexActivo = estado.indexActivo[rivalNombre];
 
+  if (!miEquipo[miIndexActivo] || !equipoRival[rivalIndexActivo]) return;
+
   const miPoke = miEquipo[miIndexActivo];
   const rivalPoke = equipoRival[rivalIndexActivo];
-  
-  // Actualizar campo según tipo del Pokémon activo
+  const miHPActual = estado.hp[miNombre]?.[miIndexActivo];
+  const rivalHPActual = estado.hp[rivalNombre]?.[rivalIndexActivo];
+  if (miHPActual === undefined || rivalHPActual === undefined) return;
+
+  const miEstado = estado.estados[miNombre]?.[miIndexActivo] || { nombre: null, turnosRestantes: 0, acumulador: 0 };
+  const rivalEstado = estado.estados[rivalNombre]?.[rivalIndexActivo] || { nombre: null, turnosRestantes: 0, acumulador: 0 };
+
   actualizarCampoPorTipo(miPoke.tipos);
   if (estado.clima) aplicarClima(estado.clima);
-  
-  const miHPActual = estado.hp[miNombre][miIndexActivo];
-  const rivalHPActual = estado.hp[rivalNombre][rivalIndexActivo];
-  const miEstado = estado.estados[miNombre][miIndexActivo];
-  const rivalEstado = estado.estados[rivalNombre][rivalIndexActivo];
 
   actualizarSprite("jugador-sprite", miPoke.nombre, "back");
   actualizarSprite("enemigo-sprite", rivalPoke.nombre, "front");
   actualizarInfobar("jugador", miPoke, miHPActual, miEstado);
   actualizarInfobar("enemigo", rivalPoke, rivalHPActual, rivalEstado);
-  actualizarPokeballs("equipo-jugador", estado.hp[miNombre], miEquipo, "jg", estado.estados[miNombre], miIndexActivo);
-  actualizarPokeballs("equipo-enemigo", estado.hp[rivalNombre], equipoRival, "en", estado.estados[rivalNombre], rivalIndexActivo);
+
+  if (estado.hp[miNombre] && estado.estados[miNombre]) {
+    actualizarPokeballs("equipo-jugador", estado.hp[miNombre], miEquipo, "jg", estado.estados[miNombre], miIndexActivo);
+  }
+  if (estado.hp[rivalNombre] && estado.estados[rivalNombre]) {
+    actualizarPokeballs("equipo-enemigo", estado.hp[rivalNombre], equipoRival, "en", estado.estados[rivalNombre], rivalIndexActivo);
+  }
 
   if (estado.log && estado.log !== ultimoLog) {
     log(estado.log);
     ultimoLog = estado.log;
   }
 
-  if (estado.fase === "fin") {
-    mostrarFinCombate(estado.ganador);
-    return;
+ if (estado.fase === "fin") { 
+  finalizarCombate(estado.ganador); 
+  return; 
+}
+  
+  //  Ambos jugadores pueden ver la resolución, pero solo el host la ejecuta
+  if (estado.fase === "resolver" && esHost && !animacionEnProceso) { 
+    resolverAtaque(estado); 
+    return; 
   }
-
-  if (estado.fase === "resolver" && esHost && !animacionEnProceso) {
-    resolverAtaque(estado);
-    return;
-  }
-
+  
   if (estado.fase === "cambio" && estado.turno === miNombre && !esperandoCambio) {
     cambisForzado = true;
     mostrarSelectorPokemon();
@@ -309,7 +398,7 @@ function renderEstado(estado) {
 
   if (esMiTurno && estado.fase === "elegir" && !esperandoCambio) {
     mostrarMenuPrincipal();
-    cargarMovimientos(miPoke, estado.pp[miNombre][miIndexActivo]);
+    if (estado.pp[miNombre]?.[miIndexActivo]) cargarMovimientos(miPoke, estado.pp[miNombre][miIndexActivo]);
   } else {
     ocultarMenus();
     if (!esMiTurno && estado.fase === "elegir") log("Esperando al rival...");
@@ -318,6 +407,8 @@ function renderEstado(estado) {
 
 // ── RESOLVER ATAQUE ──────────────────────────────────────────
 async function resolverAtaque(estado) {
+  if (animacionEnProceso) return;
+  
   try {
     const accion = estado.accion;
     if (!accion) return;
@@ -340,26 +431,25 @@ async function resolverAtaque(estado) {
     let nuevosEstados = structuredClone(estado.estados);
     let nuevosStats = structuredClone(estado.estadisticas);
 
-    // Restar PP
     nuevosPP[atacante][indexAtacante][accion.movIndex] = Math.max(0,
       nuevosPP[atacante][indexAtacante][accion.movIndex] - 1
     );
 
-    // Verificar estado pre-acción
     const { puedeActuar, nuevosEstadosPost } = verificarEstadoPreAccion(nuevosEstados, atacante, indexAtacante);
     nuevosEstados = nuevosEstadosPost;
 
     if (!puedeActuar) {
       await commitTurno({ hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados, estadisticas: nuevosStats,
         turno: defensor, fase: "elegir", log: `¡${pokeAtacante.nombre} no puede moverse!`, accion: null });
+      animacionEnProceso = false;
       return;
     }
 
-    // Precisión
     const precisionMod = obtenerModificadorPrecision(nuevosStats, atacante, indexAtacante);
     if (Math.random() * 100 >= movimiento.precision * precisionMod) {
       await commitTurno({ hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados, estadisticas: nuevosStats,
         turno: defensor, fase: "elegir", log: `¡${pokeAtacante.nombre} falló!`, accion: null });
+      animacionEnProceso = false;
       return;
     }
 
@@ -375,7 +465,7 @@ async function resolverAtaque(estado) {
       logMsg = result.logMsg;
       nuevosHP = result.nuevosHP;
       nuevosStats = result.nuevosStatsResult;
-      
+
       if (movimiento.efecto && result.dano > 0 && Math.random() < 0.3) {
         const secResult = aplicarEfectoSecundario(movimiento, pokeDefensor, nuevosStats, defensor, indexDefensor);
         if (secResult.mensaje) logMsg += " " + secResult.mensaje;
@@ -383,41 +473,35 @@ async function resolverAtaque(estado) {
       }
     }
 
-    // Daño post-acción
     const postResult = aplicarDañoPostAccion(nuevosHP, nuevosEstados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor);
     nuevosHP = postResult.nuevosHPPost;
     nuevosEstados = postResult.nuevosEstadosPost2;
     if (postResult.mensaje) logMsg += " " + postResult.mensaje;
 
-    // Verificar desmayos
     let nuevaFase = "elegir";
     let nuevoTurno = defensor;
-    
+
     if (nuevosHP[defensor][indexDefensor] <= 0) {
       nuevosHP[defensor][indexDefensor] = 0;
       logMsg += ` ¡${pokeDefensor.nombre} se debilitó!`;
-      
-      const sigIndex = encontrarSiguientePokemon(nuevosHP[defensor]);
-      if (sigIndex === -1) {
+      if (encontrarSiguientePokemon(nuevosHP[defensor]) === -1) {
         await commitTurno({ hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados, estadisticas: nuevosStats,
-          turno: atacante, fase: "fin", ganador: atacante,
-          log: `¡${atacante} ha ganado el combate!`, accion: null });
+          turno: atacante, fase: "fin", ganador: atacante, log: `¡${atacante} ha ganado el combate!`, accion: null });
+        animacionEnProceso = false;
         return;
       }
       nuevaFase = "cambio";
       nuevoTurno = defensor;
       logMsg += " Elige tu siguiente Pokémon.";
     }
-    
+
     if (nuevosHP[atacante][indexAtacante] <= 0) {
       nuevosHP[atacante][indexAtacante] = 0;
       logMsg += ` ¡${pokeAtacante.nombre} se debilitó!`;
-      
-      const sigIndex = encontrarSiguientePokemon(nuevosHP[atacante]);
-      if (sigIndex === -1) {
+      if (encontrarSiguientePokemon(nuevosHP[atacante]) === -1) {
         await commitTurno({ hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados, estadisticas: nuevosStats,
-          turno: defensor, fase: "fin", ganador: defensor,
-          log: `¡${defensor} ha ganado el combate!`, accion: null });
+          turno: defensor, fase: "fin", ganador: defensor, log: `¡${defensor} ha ganado el combate!`, accion: null });
+        animacionEnProceso = false;
         return;
       }
       nuevaFase = "cambio";
@@ -430,82 +514,63 @@ async function resolverAtaque(estado) {
 
   } catch (err) {
     console.error("[RESOLVER]", err);
+  } finally {
     animacionEnProceso = false;
   }
 }
 
 function calcularDano(movimiento, atacante, defensor, estadisticas, estados,
   atacanteNombre, defensorNombre, indexAtacante, indexDefensor, clima, nuevosHP) {
-  
+
   let attackStat = movimiento.clase === "special" ? atacante.stats.spAtk : atacante.stats.atk;
   let defenseStat = movimiento.clase === "special" ? defensor.stats.spDef : defensor.stats.def;
 
   const sA = estadisticas[atacanteNombre][indexAtacante];
   const sD = estadisticas[defensorNombre][indexDefensor];
-  
   const atkMod = Math.max(-6, Math.min(6, sA[movimiento.clase === "special" ? "spAtk" : "atk"]));
   const defMod = Math.max(-6, Math.min(6, sD[movimiento.clase === "special" ? "spDef" : "def"]));
-  
+
   attackStat *= atkMod >= 0 ? (2 + atkMod) / 2 : 2 / (2 - atkMod);
   defenseStat *= defMod >= 0 ? (2 + defMod) / 2 : 2 / (2 - defMod);
-  
-  if (estados[atacanteNombre][indexAtacante].nombre === "QUEMADO" && movimiento.clase === "physical") {
-    attackStat *= 0.5;
-  }
-  
+
+  if (estados[atacanteNombre][indexAtacante].nombre === "QUEMADO" && movimiento.clase === "physical") attackStat *= 0.5;
+
   const stab = atacante.tipos.includes(movimiento.tipo) ? 1.5 : 1;
-  
   let effectiveness = 1;
-  for (const tipo of defensor.tipos) {
-    effectiveness *= TIPO_CHART[movimiento.tipo]?.[tipo] ?? 1;
-  }
-  
+  for (const tipo of defensor.tipos) effectiveness *= TIPO_CHART[movimiento.tipo]?.[tipo] ?? 1;
+
   let weatherMod = 1;
-  if (clima === "lluvia") {
-    if (movimiento.tipo === "water") weatherMod = 1.5;
-    if (movimiento.tipo === "fire") weatherMod = 0.5;
-  }
-  if (clima === "sol") {
-    if (movimiento.tipo === "fire") weatherMod = 1.5;
-    if (movimiento.tipo === "water") weatherMod = 0.5;
-  }
-  
+  if (clima === "lluvia") { if (movimiento.tipo === "water") weatherMod = 1.5; if (movimiento.tipo === "fire") weatherMod = 0.5; }
+  if (clima === "sol") { if (movimiento.tipo === "fire") weatherMod = 1.5; if (movimiento.tipo === "water") weatherMod = 0.5; }
+
   const level = 50;
   let damage = Math.floor((((2 * level / 5 + 2) * movimiento.poder * attackStat / defenseStat) / 50) + 2);
   damage = Math.floor(damage * stab * effectiveness * weatherMod * (0.85 + Math.random() * 0.15));
-  
+
   let logMsg = `${atacante.nombre} usó ${movimiento.nombre}!`;
   if (stab > 1) logMsg += " ¡STAB!";
   if (effectiveness > 1) logMsg += " ¡Es muy eficaz!";
   if (effectiveness < 1 && effectiveness > 0) logMsg += " No es muy eficaz...";
-  if (effectiveness === 0) {
-    logMsg += " ¡No afecta!";
-    damage = 0;
-  }
+  if (effectiveness === 0) { logMsg += " ¡No afecta!"; damage = 0; }
   if (damage > 0) {
     logMsg += ` (-${damage} HP)`;
     nuevosHP[defensorNombre][indexDefensor] = Math.max(0, nuevosHP[defensorNombre][indexDefensor] - damage);
   }
-  
+
   return { dano: damage, logMsg, nuevosHP, nuevosStatsResult: estadisticas };
 }
 
 function obtenerModificadorPrecision(estadisticas, jugador, index) {
   const s = estadisticas[jugador][index];
-  const precisionMod = Math.max(-6, Math.min(6, s.precision));
-  const evasionMod = Math.max(-6, Math.min(6, s.evasion));
-  return (1 + precisionMod * 0.1) / (1 + evasionMod * 0.1);
+  return (1 + Math.max(-6, Math.min(6, s.precision)) * 0.1) / (1 + Math.max(-6, Math.min(6, s.evasion)) * 0.1);
 }
 
 function verificarEstadoPreAccion(estados, jugador, index) {
   const nuevosEstados = structuredClone(estados);
   const estadoPoke = nuevosEstados[jugador][index];
-  
   if (!estadoPoke.nombre) return { puedeActuar: true, nuevosEstadosPost: nuevosEstados };
-  
   switch (estadoPoke.nombre) {
-    case "PARALIZIS":
-      return { puedeActuar: Math.random() > 0.25, nuevosEstadosPost: nuevosEstados };
+    case "PARALIZIS": return { puedeActuar: Math.random() > 0.25, nuevosEstadosPost: nuevosEstados };
     case "DORMIDO":
       if (estadoPoke.turnosRestantes <= 0) {
         nuevosEstados[jugador][index] = { nombre: null, turnosRestantes: 0, acumulador: 0 };
@@ -519,8 +584,7 @@ function verificarEstadoPreAccion(estados, jugador, index) {
         return { puedeActuar: true, nuevosEstadosPost: nuevosEstados };
       }
       return { puedeActuar: false, nuevosEstadosPost: nuevosEstados };
-    default:
-      return { puedeActuar: true, nuevosEstadosPost: nuevosEstados };
+    default: return { puedeActuar: true, nuevosEstadosPost: nuevosEstados };
   }
 }
 
@@ -528,98 +592,54 @@ function aplicarDañoPostAccion(hp, estados, atacante, defensor, indexAtacante, 
   const nuevosHP = structuredClone(hp);
   const nuevosEstados = structuredClone(estados);
   const mensajes = [];
-  
-  const estadoAtacante = nuevosEstados[atacante][indexAtacante];
-  
-  if (estadoAtacante.nombre === "QUEMADO") {
-    const daño = Math.max(1, Math.floor(pokeAtacante.hpMax * 0.0625));
-    nuevosHP[atacante][indexAtacante] = Math.max(0, nuevosHP[atacante][indexAtacante] - daño);
-    mensajes.push(`${pokeAtacante.nombre} sufrió daño por quemadura (-${daño} HP)`);
-  } else if (estadoAtacante.nombre === "VENENO") {
-    const daño = Math.max(1, Math.floor(pokeAtacante.hpMax * 0.125));
-    nuevosHP[atacante][indexAtacante] = Math.max(0, nuevosHP[atacante][indexAtacante] - daño);
-    mensajes.push(`${pokeAtacante.nombre} sufrió daño por veneno (-${daño} HP)`);
-  } else if (estadoAtacante.nombre === "VENENO_GRAVE") {
-    const acum = estadoAtacante.acumulador || 1;
-    const daño = Math.max(1, Math.floor(pokeAtacante.hpMax * 0.0625 * acum));
-    nuevosHP[atacante][indexAtacante] = Math.max(0, nuevosHP[atacante][indexAtacante] - daño);
+  const eAtacante = nuevosEstados[atacante][indexAtacante];
+
+  if (eAtacante.nombre === "QUEMADO") {
+    const d = Math.max(1, Math.floor(pokeAtacante.hpMax * 0.0625));
+    nuevosHP[atacante][indexAtacante] = Math.max(0, nuevosHP[atacante][indexAtacante] - d);
+    mensajes.push(`${pokeAtacante.nombre} sufrió daño por quemadura (-${d} HP)`);
+  } else if (eAtacante.nombre === "VENENO") {
+    const d = Math.max(1, Math.floor(pokeAtacante.hpMax * 0.125));
+    nuevosHP[atacante][indexAtacante] = Math.max(0, nuevosHP[atacante][indexAtacante] - d);
+    mensajes.push(`${pokeAtacante.nombre} sufrió daño por veneno (-${d} HP)`);
+  } else if (eAtacante.nombre === "VENENO_GRAVE") {
+    const acum = eAtacante.acumulador || 1;
+    const d = Math.max(1, Math.floor(pokeAtacante.hpMax * 0.0625 * acum));
+    nuevosHP[atacante][indexAtacante] = Math.max(0, nuevosHP[atacante][indexAtacante] - d);
     nuevosEstados[atacante][indexAtacante].acumulador = acum + 1;
-    mensajes.push(`${pokeAtacante.nombre} sufrió daño por veneno grave (-${daño} HP)`);
+    mensajes.push(`${pokeAtacante.nombre} sufrió daño por veneno grave (-${d} HP)`);
   }
-  
+
   return { mensaje: mensajes.join(" "), nuevosHPPost: nuevosHP, nuevosEstadosPost2: nuevosEstados };
 }
 
 function aplicarMovimientoStatus(movimiento, atacante, defensor, estados, defensorNombre, indexDefensor) {
   const nuevosEstados = structuredClone(estados);
   const efecto = movimiento.efecto.toLowerCase();
-  
-  const estadoMap = {
-    "badly poison": "VENENO_GRAVE",
-    "paralyze": "PARALIZIS",
-    "sleep": "DORMIDO",
-    "burn": "QUEMADO",
-    "freeze": "CONGELADO",
-    "poison": "VENENO"
-  };
-  
+  const estadoMap = { "badly poison": "VENENO_GRAVE", "paralyze": "PARALIZIS", "sleep": "DORMIDO", "burn": "QUEMADO", "freeze": "CONGELADO", "poison": "VENENO" };
   let estadoAplicar = null;
-  for (const [key, value] of Object.entries(estadoMap)) {
-    if (efecto.includes(key)) {
-      estadoAplicar = value;
-      break;
-    }
-  }
-  
+  for (const [key, value] of Object.entries(estadoMap)) { if (efecto.includes(key)) { estadoAplicar = value; break; } }
   if (estadoAplicar && !nuevosEstados[defensorNombre][indexDefensor].nombre) {
     nuevosEstados[defensorNombre][indexDefensor] = {
       nombre: estadoAplicar,
       turnosRestantes: estadoAplicar === "DORMIDO" ? Math.floor(Math.random() * 3) + 1 : 0,
       acumulador: estadoAplicar === "VENENO_GRAVE" ? 1 : 0
     };
-    return {
-      mensaje: `${defensor.nombre} quedó ${estadoAplicar}!`,
-      nuevosEstadosResult: nuevosEstados
-    };
+    return { mensaje: `${defensor.nombre} quedó ${estadoAplicar}!`, nuevosEstadosResult: nuevosEstados };
   }
-  
-  return {
-    mensaje: `${atacante.nombre} usó ${movimiento.nombre}, pero no tuvo efecto.`,
-    nuevosEstadosResult: nuevosEstados
-  };
+  return { mensaje: `${atacante.nombre} usó ${movimiento.nombre}, pero no tuvo efecto.`, nuevosEstadosResult: nuevosEstados };
 }
 
 function aplicarEfectoSecundario(movimiento, objetivo, estadisticas, jugador, index) {
   const nuevosStats = structuredClone(estadisticas);
   const efecto = movimiento.efecto.toLowerCase();
-  
-  const statMap = {
-    "special attack": "spAtk",
-    "special defense": "spDef",
-    "attack": "atk",
-    "defense": "def",
-    "speed": "spd"
-  };
-  
+  const statMap = { "special attack": "spAtk", "special defense": "spDef", "attack": "atk", "defense": "def", "speed": "spd" };
   let stat = null;
-  for (const [key, value] of Object.entries(statMap)) {
-    if (efecto.includes(key)) {
-      stat = value;
-      break;
-    }
-  }
-  
+  for (const [key, value] of Object.entries(statMap)) { if (efecto.includes(key)) { stat = value; break; } }
   if (stat) {
-    if (efecto.includes("lower")) {
-      nuevosStats[jugador][index][stat] = Math.max(-6, nuevosStats[jugador][index][stat] - 1);
-      return { mensaje: `¡El ${stat} de ${objetivo.nombre} bajó!`, nuevosStatsResult: nuevosStats };
-    }
-    if (efecto.includes("raise")) {
-      nuevosStats[jugador][index][stat] = Math.min(6, nuevosStats[jugador][index][stat] + 1);
-      return { mensaje: `¡El ${stat} de ${objetivo.nombre} subió!`, nuevosStatsResult: nuevosStats };
-    }
+    if (efecto.includes("lower")) { nuevosStats[jugador][index][stat] = Math.max(-6, nuevosStats[jugador][index][stat] - 1); return { mensaje: `¡El ${stat} de ${objetivo.nombre} bajó!`, nuevosStatsResult: nuevosStats }; }
+    if (efecto.includes("raise")) { nuevosStats[jugador][index][stat] = Math.min(6, nuevosStats[jugador][index][stat] + 1); return { mensaje: `¡El ${stat} de ${objetivo.nombre} subió!`, nuevosStatsResult: nuevosStats }; }
   }
-  
   return { mensaje: "", nuevosStatsResult: nuevosStats };
 }
 
@@ -634,57 +654,48 @@ async function commitTurno(payload) {
 
 // ── ACCIONES DEL JUGADOR ─────────────────────────────────────
 async function elegirAtaque(mov, index) {
-  if (!esMiTurno || animacionEnProceso || esperandoCambio) return;
+  console.log("⚔️ [ATAQUE] Elegido:", mov.nombre);
   
-  const ppActual = estadoCombate.pp[miNombre][miIndexActivo][index];
-  if (ppActual <= 0) {
-    log(`¡No quedan PP para ${mov.nombre}!`);
+  if (!esMiTurno || animacionEnProceso || esperandoCambio) {
+    console.log("❌ [ATAQUE] No se puede atacar - no es tu turno o hay animación");
     return;
+  }
+
+  const ppActual = estadoCombate.pp[miNombre][miIndexActivo][index];
+  if (ppActual <= 0) { 
+    log(`¡No quedan PP para ${mov.nombre}!`); 
+    return; 
   }
   
   animacionEnProceso = true;
   ocultarMenus();
   
   await update(ref(db, `partidas/${partidaId}/combate`), {
-    accion: {
-      jugador: miNombre,
-      movIndex: index,
-      movNombre: mov.nombre,
-      movPoder: mov.poder,
-      movTipo: mov.tipo,
-      movClase: mov.clase,
-      movPrecision: mov.precision
-    },
+    accion: { jugador: miNombre, movIndex: index, movNombre: mov.nombre, movPoder: mov.poder, movTipo: mov.tipo, movClase: mov.clase, movPrecision: mov.precision },
     fase: "resolver"
   });
+  
+  console.log("✅ [ATAQUE] Acción enviada a Firebase");
 }
 
 function mostrarSelectorPokemon() {
   esperandoCambio = true;
   log(cambisForzado ? "¡Elige tu siguiente Pokémon!" : "Elige un Pokémon:");
-  
   if (!menuCambio) return;
-  
   menuCambio.innerHTML = "<h3 style='color:#ffcb05;margin-bottom:12px;text-align:center'>ELIGE POKÉMON</h3>";
   menuCambio.classList.remove("oculto");
   menuPrincipal?.classList.add("oculto");
   menuMovimientos?.classList.add("oculto");
-  
   miEquipo.forEach((poke, i) => {
     const hpActual = estadoCombate.hp[miNombre][i];
     const estadoPoke = estadoCombate.estados[miNombre][i];
     if (hpActual <= 0 || i === miIndexActivo) return;
-    
     const btn = document.createElement("button");
     btn.className = "combate-opcion cambio-pokemon-btn";
-    btn.innerHTML = `
-      <div class="poke-nombre">${poke.nombre.toUpperCase()}${estadoPoke.nombre ? ` [${estadoPoke.nombre}]` : ""}</div>
-      <div class="poke-hp">❤️ ${hpActual}/${poke.hpMax} HP</div>
-    `;
+    btn.innerHTML = `<div class="poke-nombre">${poke.nombre.toUpperCase()}${estadoPoke.nombre ? ` [${estadoPoke.nombre}]` : ""}</div><div class="poke-hp">❤️ ${hpActual}/${poke.hpMax} HP</div>`;
     btn.onclick = () => confirmarCambio(i);
     menuCambio.appendChild(btn);
   });
-  
   if (!cambisForzado) {
     const btnCancelar = document.createElement("button");
     btnCancelar.className = "combate-opcion";
@@ -729,20 +740,21 @@ function actualizarSprite(id, nombre, lado) {
 function actualizarInfobar(lado, pokemon, hpActual, estado) {
   const pct = Math.max(0, (hpActual / pokemon.hpMax) * 100);
   const fill = document.getElementById(`${lado}-hp-fill`);
-  if (fill) {
-    fill.style.width = `${pct}%`;
-    fill.className = `combate-hpbar-fill${pct > 50 ? "" : pct > 20 ? " hp-mid" : " hp-low"}`;
+  if (fill) { 
+    fill.style.width = `${pct}%`; 
+    fill.className = `combate-hpbar-fill${pct > 50 ? "" : pct > 20 ? " hp-mid" : " hp-low"}`; 
   }
-  
   const nomEl = document.getElementById(`${lado}-nombre`);
-  if (nomEl) {
-    const estadoTexto = estado?.nombre ? ` [${estado.nombre}]` : "";
-    nomEl.textContent = pokemon.nombre.toUpperCase() + estadoTexto;
-  }
-  
+  if (nomEl) nomEl.textContent = pokemon.nombre.toUpperCase() + (estado?.nombre ? ` [${estado.nombre}]` : "");
   if (lado === "jugador") {
     const hpNum = document.getElementById("jugador-hp-actual");
     const hpMax = document.getElementById("jugador-hp-max");
+    if (hpNum) hpNum.textContent = hpActual;
+    if (hpMax) hpMax.textContent = pokemon.hpMax;
+  }
+  if (lado === "enemigo") {
+    const hpNum = document.getElementById("enemigo-hp-actual");
+    const hpMax = document.getElementById("enemigo-hp-max");
     if (hpNum) hpNum.textContent = hpActual;
     if (hpMax) hpMax.textContent = pokemon.hpMax;
   }
@@ -762,23 +774,15 @@ function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray
 function cargarMovimientos(pokemon, ppActuales) {
   const contenedor = document.querySelector(".movimientos-grid");
   if (!contenedor) return;
-  
   contenedor.innerHTML = "";
-  
   pokemon.movimientos.forEach((mov, i) => {
     const btn = document.createElement("button");
     btn.className = "combate-movimiento";
     btn.disabled = ppActuales[i] <= 0;
-    btn.innerHTML = `
-      <span class="mov-nombre">${mov.nombre.toUpperCase()}</span>
-      <span class="mov-tipo tipo-${mov.tipo}">${mov.tipo.toUpperCase()}</span>
-      <span class="mov-pp">PP: ${ppActuales[i]}/${mov.ppMax}</span>
-      <span class="mov-poder">POD: ${mov.poder || "--"}</span>
-    `;
+    btn.innerHTML = `<span class="mov-nombre">${mov.nombre.toUpperCase()}</span><span class="mov-tipo tipo-${mov.tipo}">${mov.tipo.toUpperCase()}</span><span class="mov-pp">PP: ${ppActuales[i]}/${mov.ppMax}</span><span class="mov-poder">POD: ${mov.poder || "--"}</span>`;
     if (!btn.disabled) btn.onclick = () => elegirAtaque(mov, i);
     contenedor.appendChild(btn);
   });
-  
   const btnV = document.createElement("button");
   btnV.className = "combate-opcion combate-volver";
   btnV.textContent = "VOLVER";
@@ -822,6 +826,195 @@ btnPokemon?.addEventListener("click", () => {
   cambisForzado = false;
   mostrarSelectorPokemon();
 });
+
+// ── FIN DEL COMBATE ─────────────────────────────────────────
+async function finalizarCombate(ganador) {
+  // Evitar múltiples llamadas
+  if (window.combateFinalizado) return;
+  window.combateFinalizado = true;
+  
+  ocultarMenus();
+  
+  const esVictoria = ganador === miNombre;
+  const perdedor = esVictoria ? rivalNombreGlobal : miNombre;
+  
+  // 1. Mostrar pantalla de fin de combate
+  mostrarPantallaFin(esVictoria, ganador);
+  
+  // 2. Guardar resultado en Firebase
+  try {
+    await update(ref(db, `partidas/${partidaId}`), {
+      estado: "finalizado",
+      ganador: ganador,
+      perdedor: perdedor,
+      fechaFin: Date.now()
+    });
+    
+    // 3. Guardar estadísticas del jugador (opcional)
+    const statsRef = ref(db, `estadisticas/${miNombre}`);
+    const statsSnap = await get(statsRef);
+    const statsActuales = statsSnap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
+    
+    await set(statsRef, {
+      victorias: statsActuales.victorias + (esVictoria ? 1 : 0),
+      derrotas: statsActuales.derrotas + (esVictoria ? 0 : 1),
+      batallas: (statsActuales.batallas || 0) + 1,
+      ultimaBatalla: Date.now()
+    });
+    
+  } catch (err) {
+    console.error("[FIN] Error guardando resultado:", err);
+  }
+  
+  // 4. Reproducir sonido de victoria/derrota (opcional)
+  // reproducirSonido(esVictoria ? "victoria.mp3" : "derrota.mp3");
+}
+
+function mostrarPantallaFin(esVictoria, ganador) {
+  // Crear overlay si no existe
+  let overlay = document.getElementById("fin-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "fin-overlay";
+    document.body.appendChild(overlay);
+    
+    // Estilos del overlay
+    const style = document.createElement("style");
+    style.textContent = `
+      #fin-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(13, 27, 75, 0.95);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(8px);
+        animation: finAparecer 0.5s ease;
+      }
+      
+      @keyframes finAparecer {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      
+      .fin-contenido {
+        text-align: center;
+        background: linear-gradient(135deg, #1a3080, #0d1b4b);
+        padding: 40px 60px;
+        border-radius: 20px;
+        border: 3px solid var(--magenta, #ff2d78);
+        box-shadow: 0 0 50px rgba(255, 45, 120, 0.35);
+      }
+      
+      .fin-titulo {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 3rem;
+        letter-spacing: 0.1em;
+        margin-bottom: 20px;
+      }
+      
+      .fin-titulo.victoria {
+        color: #55197e;
+        text-shadow: 0 0 20px #20a4d8;
+      }
+      
+      .fin-titulo.derrota {
+        color: #c02a93;
+        text-shadow: 0 0 20px #ce03ce;
+      }
+      
+      .fin-mensaje {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        color: #f0f4ff;
+      }
+      
+      .fin-stats {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        padding: 15px;
+        margin: 20px 0;
+        font-size: 0.9rem;
+      }
+      
+      .fin-stats p {
+        margin: 5px 0;
+      }
+      
+      .fin-boton {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.2rem;
+        letter-spacing: 0.08em;
+        color: #0d1b4b;
+        background: #ff2d78;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 30px;
+        margin: 0 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .fin-boton:hover {
+        transform: scale(1.05);
+        background: #ff4d8d;
+      }
+      
+      .fin-boton.secondary {
+        background: #4fc3f7;
+        color: #0d1b4b;
+      }
+      
+      .fin-boton.secondary:hover {
+        background: #74d4f9;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  // Obtener estadísticas
+  const statsRef = ref(db, `estadisticas/${miNombre}`);
+  get(statsRef).then((snap) => {
+    const stats = snap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
+    const statsHtml = `
+      <div class="fin-stats">
+        <p> Victorias: ${stats.victorias || 0}</p>
+        <p> Derrotas: ${stats.derrotas || 0}</p>
+        <p> Batallas totales: ${stats.batallas || 0}</p>
+      </div>
+    `;
+    
+    overlay.innerHTML = `
+      <div class="fin-contenido">
+        <h1 class="fin-titulo ${esVictoria ? 'victoria' : 'derrota'}">
+          ${esVictoria ? '¡VICTORIA!' : '¡DERROTA!'}
+        </h1>
+        <p class="fin-mensaje">
+          ${esVictoria 
+            ? `¡Felicidades! Has derrotado a ${rivalNombreGlobal}` 
+            : `${ganador} te ha derrotado`}
+        </p>
+        ${statsHtml}
+        <div>
+          <button class="fin-boton" id="fin-volver-menu">VOLVER AL MENÚ</button>
+          <button class="fin-boton secondary" id="fin-ver-estadisticas">VER ESTADÍSTICAS</button>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById("fin-volver-menu")?.addEventListener("click", () => {
+    window.location.href = `../HTML/Juego-Lobby.html?id=${partidaId}`;
+  });
+    
+    document.getElementById("fin-ver-estadisticas")?.addEventListener("click", () => {
+      window.location.href = "Estadisticas.html";
+    });
+  });
+}
 
 // ── ARRANCAR ─────────────────────────────────────────────────
 iniciarCombate();

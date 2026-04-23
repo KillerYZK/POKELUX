@@ -6,10 +6,12 @@ import {
   set,
   remove,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { mostrarLoading, ocultarLoading } from "./LoadingScreen.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBq13g3hXl4a3T0VLeHPBnPDZB7BgxW1xY",
   authDomain: "pokelux.firebaseapp.com",
+  databaseURL: "https://pokelux-default-rtdb.firebaseio.com",
   projectId: "pokelux",
   storageBucket: "pokelux.firebasestorage.app",
   messagingSenderId: "225576483117",
@@ -24,10 +26,11 @@ let idPartida = null;
 let nombreJugadorLocal = null;
 let esHostLocal = null;
 let datosPartidaActual = null;
+let chatListenerActivo = false;
+let redirigiendo = false;
 
 // ==================== INICIALIZACIÓN ====================
 document.addEventListener("DOMContentLoaded", () => {
-  // Obtener ID de la partida de la URL
   const params = new URLSearchParams(window.location.search);
   idPartida = params.get("id");
   nombreJugadorLocal = localStorage.getItem("nombreJugador");
@@ -35,14 +38,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!idPartida || !nombreJugadorLocal) {
     alert("Información de la partida incompleta.");
-    window.location.href = "../MENU PRINCIPAL/Menu-Inicio.html";
+    window.location.href = "../MENU PRINCIPAL/MenuJuego-Interfaz.html";
     return;
   }
 
-  // Cargar datos de la partida en tiempo real
   cargarDatosPartida();
+  escucharEstadoPartida();
+  cargarChat();
 
-  // Configurar botones
+  document
+    .getElementById("btn-cargar-equipo")
+    .addEventListener("click", async () => {
+      const equipoIDs = JSON.parse(localStorage.getItem("equipo"));
+      const equipoCompleto = [];
+
+      for (const id of equipoIDs) {
+        const configuracion =
+          JSON.parse(localStorage.getItem(`configuracion-${id}`)) || {};
+        equipoCompleto.push({ id, configuracion });
+      }
+
+      await set(
+        ref(db, `partidas/${idPartida}/jugadores/${nombreJugadorLocal}/equipo`),
+        equipoCompleto,
+      );
+
+      await set(
+        ref(db, `partidas/${idPartida}/jugadores/${nombreJugadorLocal}/listo`),
+        true,
+      );
+
+      alert("Equipo cargado en la partida.");
+    });
+
   document
     .getElementById("btn-iniciar")
     .addEventListener("click", iniciarPartida);
@@ -53,58 +81,45 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("btn-enviar-chat")
     .addEventListener("click", enviarMensaje);
 
-  // Permitir enviar mensaje con Enter
   document.getElementById("chat-input").addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       enviarMensaje();
     }
   });
 
-  // Mostrar botón iniciar solo si es host
   if (!esHostLocal) {
     document.getElementById("btn-iniciar").style.display = "none";
   }
 });
 
-document
-  .getElementById("btn-cargar-equipo")
-  .addEventListener("click", async () => {
-    const equipoIDs = JSON.parse(localStorage.getItem("equipo"));
-    const equipoCompleto = [];
-
-    for (const id of equipoIDs) {
-      const configuracion =
-        JSON.parse(localStorage.getItem(`configuracion-${id}`)) || {};
-      equipoCompleto.push({ id, configuracion });
+// Escuchar estado de la partida
+function escucharEstadoPartida() {
+  onValue(ref(db, `partidas/${idPartida}/estado`), async (snapshot) => {
+    if (snapshot.val() === "en_progreso" && !redirigiendo) {
+      redirigiendo = true;
+      
+      if (!esHostLocal) {
+        await mostrarLoading();
+      }
+      
+      window.location.href = `Juego-Combate.html?id=${idPartida}`;
     }
-
-    await set(
-      ref(db, `partidas/${idPartida}/jugadores/${nombreJugadorLocal}/equipo`),
-      equipoCompleto,
-    );
-
-    await set(
-      ref(db, `partidas/${idPartida}/jugadores/${nombreJugadorLocal}/listo`),
-      true,
-    );
-
-    alert("Equipo cargado en la partida.");
   });
+}
 
-// Cargar datos de la partida en tiempo real
+// Cargar datos de la partida
 function cargarDatosPartida() {
   const partidaRef = ref(db, `partidas/${idPartida}`);
 
   onValue(partidaRef, (snapshot) => {
     if (!snapshot.exists()) {
       alert("La partida fue eliminada.");
-      window.location.href = "MenuJuego-Interfaz.html";
+      window.location.href = "../MENU PRINCIPAL/MenuJuego-Interfaz.html";
       return;
     }
 
     datosPartidaActual = snapshot.val();
 
-    // Actualizar información de la partida
     document.getElementById("partida-nombre").textContent =
       datosPartidaActual.nombre;
     document.getElementById("partida-descripcion").textContent =
@@ -117,95 +132,39 @@ function cargarDatosPartida() {
         ? "Esperando jugadores..."
         : "En progreso";
 
-    // Actualizar jugadores
     actualizarJugadores();
 
-    // Cargar chat
-    cargarChat();
-
-    // Verificar si ambos jugadores están listos para habilitar el botón iniciar
     if (esHostLocal) {
       verificarJugadoresListo();
     }
   });
 }
 
-// Actualizar la sección de jugadores en la sala de espera
+// Actualizar jugadores
 function actualizarJugadores() {
   const jugadores = datosPartidaActual.jugadores;
-
-  let hostData = null;
-  let guestData = null;
+  if (!jugadores) return;
 
   for (const [nombre, data] of Object.entries(jugadores)) {
-    if (data.esHostLocal) {
-      hostData = { nombre, ...data };
-    } else {
-      guestData = { nombre, ...data };
+    const lado = data.esHost === true ? "host" : "guest";
+
+    const nomEl = document.getElementById(`nombre-${lado}`);
+    if (nomEl) nomEl.textContent = nombre;
+
+    const estadoSpan = document.getElementById(`estado-${lado}`);
+    if (estadoSpan) {
+      estadoSpan.className = `sala-jugador-estado ${data.listo ? "listo" : "esperando"}`;
+      estadoSpan.textContent = data.listo
+        ? "● Listo"
+        : "● Preparando equipo";
     }
-  }
 
-  /* DATOS HOST */
+    const slotsLado = document.querySelectorAll(`#equipo-${lado} .sala-slot`);
+    const equipoLado = data.equipo || [];
 
-  if (hostData) {
-    document.getElementById("nombre-host").textContent = hostData.nombre;
-    const estadoHostSpan = document.getElementById("estado-host");
-    estadoHostSpan.className = `sala-jugador-estado ${hostData.listo ? "listo" : "esperando"}`;
-    estadoHostSpan.textContent = hostData.listo
-      ? "● Listo"
-      : "● Preparando equipo";
-
-    const slotsHost = document.querySelectorAll("#equipo-host .sala-slot");
-    const equipoHost = hostData.equipo || [];
-
-    for (let i = 0; i < slotsHost.length; i++) {
-      const slot = slotsHost[i];
-      const pokemon = equipoHost[i];
-
-      if (pokemon && pokemon.id) {
-        slot.classList.remove("vacio");
-        const img = slot.querySelector("img");
-        const nombreSpan = slot.querySelector("span");
-
-        let spriteURL = "";
-        if (pokemon.configuracion?.shiny) {
-          spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`;
-        } else {
-          spriteURL =
-            pokemon.configuracion?.sprite ||
-            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-        }
-
-        img.src = spriteURL;
-        img.alt = pokemon.id;
-
-        nombreSpan.textContent =
-          pokemon.configuracion?.apodo ||
-          (pokemon.nombre ? pokemon.nombre : `#${pokemon.id}`);
-      } else {
-        slot.classList.add("vacio");
-        slot.querySelector("img").src = "";
-        slot.querySelector("span").textContent = "---";
-      }
-    }
-  }
-
-  /* DATOS GUEST */
-
-  if (guestData) {
-    document.getElementById("nombre-guest").textContent = guestData.nombre;
-    const estadoGuestSpan = document.getElementById("estado-guest");
-    estadoGuestSpan.className = `sala-jugador-estado ${guestData.listo ? "listo" : "esperando"}`;
-    estadoGuestSpan.textContent = guestData.listo
-      ? "● Listo"
-      : "● Preparando equipo";
-
-    const slotsGuest = document.querySelectorAll("#equipo-guest .sala-slot");
-    const equipoGuest = guestData.equipo || [];
-
-    for (let i = 0; i < slotsGuest.length; i++) {
-      const slot = slotsGuest[i];
-      const pokemon = equipoGuest[i];
+    for (let i = 0; i < slotsLado.length; i++) {
+      const slot = slotsLado[i];
+      const pokemon = equipoLado[i];
 
       if (pokemon && pokemon.id) {
         slot.classList.remove("vacio");
@@ -236,7 +195,7 @@ function actualizarJugadores() {
   }
 }
 
-// Verificar si ambos jugadores están listos para habilitar el botón iniciar
+// Verificar si ambos jugadores están listos
 function verificarJugadoresListo() {
   const jugadores = Object.values(datosPartidaActual.jugadores);
   const todosListos = jugadores.length === 2 && jugadores.every((j) => j.listo);
@@ -248,21 +207,22 @@ function verificarJugadoresListo() {
     : "Esperando a que todos estén listos...";
 }
 
-// funcion para iniciar la partida
+// Iniciar partida
 async function iniciarPartida() {
+  if (redirigiendo) return;
+  redirigiendo = true;
+  
   try {
-    const estadoRef = ref(db, `partidas/${idPartida}/estado`);
-    await set(estadoRef, "en_progreso");
-
-    // Redirigir a la pantalla de combate
-    window.location.href = `Juego-Combate.html?id=${idPartida}`;
+    await mostrarLoading();
+    await set(ref(db, `partidas/${idPartida}/estado`), "en_progreso");
   } catch (error) {
     console.error("Error al iniciar partida:", error);
     alert("Error al iniciar la partida.");
+    redirigiendo = false;
   }
 }
 
-//funcion para salir de la partida
+// FUNCIÓN SALIR DE LA PARTIDA - CORREGIDA
 async function salirDelaPartida() {
   try {
     const jugadorRef = ref(
@@ -271,26 +231,26 @@ async function salirDelaPartida() {
     );
     await remove(jugadorRef);
 
-    // Si es el host, eliminar toda la partida
     if (esHostLocal) {
       const partidaRef = ref(db, `partidas/${idPartida}`);
       await remove(partidaRef);
     }
 
-    window.location.href = "../../MENU PRINCIPAL/Combate.html";
+    //  Ruta corregida
+    window.location.href = "/MENU PRINCIPAL/Menu-Inicio.html";
   } catch (error) {
     console.error("Error al salir:", error);
     alert("Error al salir de la partida.");
   }
 }
 
-//Funcion de chat
+// Función de chat
 function cargarChat() {
   const chatRef = ref(db, `partidas/${idPartida}/chat`);
 
   onValue(chatRef, (snapshot) => {
     const chatContainer = document.getElementById("chat-mensajes");
-    chatContainer.innerHTML = ""; // Limpiar mensajes anteriores
+    chatContainer.innerHTML = "";
 
     if (snapshot.exists()) {
       const mensajes = snapshot.val();
@@ -299,7 +259,6 @@ function cargarChat() {
       }
     }
 
-    // Scroll al último mensaje
     chatContainer.scrollTop = chatContainer.scrollHeight;
   });
 }
@@ -319,7 +278,6 @@ async function enviarMensaje() {
   if (!texto) return;
 
   try {
-    const chatRef = ref(db, `partidas/${idPartida}/chat`);
     const nuevoMensajeRef = ref(db, `partidas/${idPartida}/chat/${Date.now()}`);
 
     await set(nuevoMensajeRef, {
@@ -345,5 +303,4 @@ function copiarID() {
   });
 }
 
-// Hacer copiarID disponible globalmente
 window.copiarID = copiarID;
