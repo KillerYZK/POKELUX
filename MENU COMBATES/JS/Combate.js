@@ -110,10 +110,13 @@ function reiniciarEstadosLocales() {
   cambisForzado = false;
 }
 
-// ── INICIALIZAR ──────────────────────────────────────────────
-
-// ── INICIALIZAR ──────────────────────────────────────────────
+// ── INICIALIZAR COMBATE ──────────────────────────────────────────────
 async function iniciarCombate() {
+  console.log("[COMBATE] iniciarCombate() llamado");
+
+  //  Mostrar loading al inicio
+  await mostrarLoading();
+
   if (!partidaId || !miNombre) {
     log("Error: no se encontró la partida.");
     await ocultarLoading();
@@ -196,15 +199,24 @@ async function iniciarCombate() {
       }
     }
 
-      const estadoInicial = await get(combateRef);
+       const estadoInicial = await get(combateRef);
+    console.log("🔥 [COMBATE] estadoInicial.exists() =", estadoInicial.exists());
+    
     if (estadoInicial.exists()) {
       estadoCombate = estadoInicial.val();
+      console.log("🔥 [COMBATE] estadoCombate obtenido:", estadoCombate);
+      console.log("🔥 [COMBATE] fase:", estadoCombate?.fase);
+      console.log("🔥 [COMBATE] turno:", estadoCombate?.turno);
+      console.log("🔥 [COMBATE] miNombre:", miNombre);
+      console.log("🔥 [COMBATE] rivalNombreGlobal:", rivalNombreGlobal);
       renderEstado(estadoCombate);
+    } else {
+      console.log("🔥 [COMBATE] estadoInicial NO existe - esto es un problema!");
     }
 
-     log("¡Combate listo!");
-    
-    //  OCULTAR ANIMACIÓN - LOS BLOQUES SE VACÍAN
+        renderEstado(estadoCombate);
+    log("¡Combate listo!");
+
     await ocultarLoading();
 
   } catch (err) {
@@ -339,16 +351,46 @@ function crearPokemonPorDefecto(nombre) {
 
 // ── RENDERIZAR ───────────────────────────────────────────────
 function renderEstado(estado) {
-  // ✅ Eliminamos el bloqueo por animacionEnProceso
-  if (!estado || !estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) return;
-
+  console.log("🎨 [RENDER] renderEstado llamado, estado:", estado);
+  
+  if (!estado) {
+    console.log("🎨 [RENDER] estado es null, saliendo");
+    return;
+  }
+  
+  if (!estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) {
+    console.log("🎨 [RENDER] estado incompleto, saliendo");
+    return;
+  }
+  
   const rivalNombre = rivalNombreGlobal;
-  if (!rivalNombre) return;
-  if (estado.indexActivo[miNombre] === undefined || estado.indexActivo[rivalNombre] === undefined) return;
-
+  if (!rivalNombre) {
+    console.log("🎨 [RENDER] rivalNombreGlobal es null");
+    return;
+  }
+  
+  // ✅ LOGS PARA VERIFICAR EQUIPOS
+  console.log("🎨 [RENDER] miEquipo:", miEquipo);
+  console.log("🎨 [RENDER] equipoRival:", equipoRival);
+  console.log("🎨 [RENDER] miIndexActivo:", estado.indexActivo[miNombre]);
+  console.log("🎨 [RENDER] rivalIndexActivo:", estado.indexActivo[rivalNombre]);
+  
   esMiTurno = estado.turno === miNombre;
   miIndexActivo = estado.indexActivo[miNombre];
   rivalIndexActivo = estado.indexActivo[rivalNombre];
+
+  if (!miEquipo[miIndexActivo]) {
+    console.log("🎨 [RENDER] ERROR: miEquipo[" + miIndexActivo + "] no existe");
+    console.log("🎨 [RENDER] miEquipo.length:", miEquipo.length);
+    return;
+  }
+  
+  if (!equipoRival[rivalIndexActivo]) {
+    console.log("🎨 [RENDER] ERROR: equipoRival[" + rivalIndexActivo + "] no existe");
+    console.log("🎨 [RENDER] equipoRival.length:", equipoRival.length);
+    return;
+  }
+
 
   if (!miEquipo[miIndexActivo] || !equipoRival[rivalIndexActivo]) return;
 
@@ -381,12 +423,11 @@ function renderEstado(estado) {
     ultimoLog = estado.log;
   }
 
- if (estado.fase === "fin") { 
-  finalizarCombate(estado.ganador); 
-  return; 
-}
+  if (estado.fase === "fin") { 
+    finalizarCombate(estado.ganador); 
+    return; 
+  }
   
-  //  Ambos jugadores pueden ver la resolución, pero solo el host la ejecuta
   if (estado.fase === "resolver" && esHost && !animacionEnProceso) { 
     resolverAtaque(estado); 
     return; 
@@ -656,10 +697,10 @@ async function commitTurno(payload) {
 
 // ── ACCIONES DEL JUGADOR ─────────────────────────────────────
 async function elegirAtaque(mov, index) {
-  console.log(" [ATAQUE] Elegido:", mov.nombre);
+  console.log("⚔️ [ATAQUE] Elegido:", mov.nombre);
   
   if (!esMiTurno || animacionEnProceso || esperandoCambio) {
-    console.log(" [ATAQUE] No se puede atacar - no es tu turno o hay animación");
+    console.log("❌ [ATAQUE] No se puede atacar - no es tu turno o hay animación");
     return;
   }
 
@@ -831,7 +872,6 @@ btnPokemon?.addEventListener("click", () => {
 
 // ── FIN DEL COMBATE ─────────────────────────────────────────
 async function finalizarCombate(ganador) {
-  // Evitar múltiples llamadas
   if (window.combateFinalizado) return;
   window.combateFinalizado = true;
   
@@ -840,10 +880,8 @@ async function finalizarCombate(ganador) {
   const esVictoria = ganador === miNombre;
   const perdedor = esVictoria ? rivalNombreGlobal : miNombre;
   
-  // 1. Mostrar pantalla de fin de combate
   mostrarPantallaFin(esVictoria, ganador);
   
-  // 2. Guardar resultado en Firebase
   try {
     await update(ref(db, `partidas/${partidaId}`), {
       estado: "finalizado",
@@ -852,7 +890,6 @@ async function finalizarCombate(ganador) {
       fechaFin: Date.now()
     });
     
-    // 3. Guardar estadísticas del jugador (opcional)
     const statsRef = ref(db, `estadisticas/${miNombre}`);
     const statsSnap = await get(statsRef);
     const statsActuales = statsSnap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
@@ -867,20 +904,15 @@ async function finalizarCombate(ganador) {
   } catch (err) {
     console.error("[FIN] Error guardando resultado:", err);
   }
-  
-  // 4. Reproducir sonido de victoria/derrota (opcional)
-  // reproducirSonido(esVictoria ? "victoria.mp3" : "derrota.mp3");
 }
 
 function mostrarPantallaFin(esVictoria, ganador) {
-  // Crear overlay si no existe
   let overlay = document.getElementById("fin-overlay");
   if (!overlay) {
     overlay = document.createElement("div");
     overlay.id = "fin-overlay";
     document.body.appendChild(overlay);
     
-    // Estilos del overlay
     const style = document.createElement("style");
     style.textContent = `
       #fin-overlay {
@@ -897,56 +929,28 @@ function mostrarPantallaFin(esVictoria, ganador) {
         backdrop-filter: blur(8px);
         animation: finAparecer 0.5s ease;
       }
-      
       @keyframes finAparecer {
         from { opacity: 0; transform: scale(0.9); }
         to { opacity: 1; transform: scale(1); }
       }
-      
       .fin-contenido {
         text-align: center;
         background: linear-gradient(135deg, #1a3080, #0d1b4b);
         padding: 40px 60px;
         border-radius: 20px;
-        border: 3px solid var(--magenta, #ff2d78);
+        border: 3px solid #ff2d78;
         box-shadow: 0 0 50px rgba(255, 45, 120, 0.35);
       }
-      
       .fin-titulo {
         font-family: "Bebas Neue", sans-serif;
         font-size: 3rem;
         letter-spacing: 0.1em;
         margin-bottom: 20px;
       }
-      
-      .fin-titulo.victoria {
-        color: #55197e;
-        text-shadow: 0 0 20px #20a4d8;
-      }
-      
-      .fin-titulo.derrota {
-        color: #c02a93;
-        text-shadow: 0 0 20px #ce03ce;
-      }
-      
-      .fin-mensaje {
-        font-size: 1.2rem;
-        margin-bottom: 20px;
-        color: #f0f4ff;
-      }
-      
-      .fin-stats {
-        background: rgba(0, 0, 0, 0.5);
-        border-radius: 10px;
-        padding: 15px;
-        margin: 20px 0;
-        font-size: 0.9rem;
-      }
-      
-      .fin-stats p {
-        margin: 5px 0;
-      }
-      
+      .fin-titulo.victoria { color: #4caf50; text-shadow: 0 0 20px #4caf50; }
+      .fin-titulo.derrota { color: #f44336; text-shadow: 0 0 20px #f44336; }
+      .fin-mensaje { font-size: 1.2rem; margin-bottom: 20px; color: #f0f4ff; }
+      .fin-stats { background: rgba(0,0,0,0.5); border-radius: 10px; padding: 15px; margin: 20px 0; font-size: 0.9rem; }
       .fin-boton {
         font-family: "Bebas Neue", sans-serif;
         font-size: 1.2rem;
@@ -960,47 +964,26 @@ function mostrarPantallaFin(esVictoria, ganador) {
         cursor: pointer;
         transition: all 0.2s ease;
       }
-      
-      .fin-boton:hover {
-        transform: scale(1.05);
-        background: #ff4d8d;
-      }
-      
-      .fin-boton.secondary {
-        background: #4fc3f7;
-        color: #0d1b4b;
-      }
-      
-      .fin-boton.secondary:hover {
-        background: #74d4f9;
-      }
+      .fin-boton:hover { transform: scale(1.05); background: #ff4d8d; }
+      .fin-boton.secondary { background: #4fc3f7; color: #0d1b4b; }
     `;
     document.head.appendChild(style);
   }
   
-  // Obtener estadísticas
   const statsRef = ref(db, `estadisticas/${miNombre}`);
   get(statsRef).then((snap) => {
     const stats = snap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
-    const statsHtml = `
-      <div class="fin-stats">
-        <p> Victorias: ${stats.victorias || 0}</p>
-        <p> Derrotas: ${stats.derrotas || 0}</p>
-        <p> Batallas totales: ${stats.batallas || 0}</p>
-      </div>
-    `;
-    
     overlay.innerHTML = `
       <div class="fin-contenido">
         <h1 class="fin-titulo ${esVictoria ? 'victoria' : 'derrota'}">
           ${esVictoria ? '¡VICTORIA!' : '¡DERROTA!'}
         </h1>
-        <p class="fin-mensaje">
-          ${esVictoria 
-            ? `¡Felicidades! Has derrotado a ${rivalNombreGlobal}` 
-            : `${ganador} te ha derrotado`}
-        </p>
-        ${statsHtml}
+        <p class="fin-mensaje">${esVictoria ? `¡Felicidades! Has derrotado a ${rivalNombreGlobal}` : `${ganador} te ha derrotado`}</p>
+        <div class="fin-stats">
+          <p>🏆 Victorias: ${stats.victorias}</p>
+          <p>💔 Derrotas: ${stats.derrotas}</p>
+          <p>⚔️ Batallas totales: ${stats.batallas}</p>
+        </div>
         <div>
           <button class="fin-boton" id="fin-volver-menu">VOLVER AL MENÚ</button>
           <button class="fin-boton secondary" id="fin-ver-estadisticas">VER ESTADÍSTICAS</button>
@@ -1009,8 +992,8 @@ function mostrarPantallaFin(esVictoria, ganador) {
     `;
     
     document.getElementById("fin-volver-menu")?.addEventListener("click", () => {
-    window.location.href = `../HTML/Juego-Lobby.html?id=${partidaId}`;
-  });
+      window.location.href = `../HTML/Juego-Lobby.html?id=${partidaId}`;
+    });
     
     document.getElementById("fin-ver-estadisticas")?.addEventListener("click", () => {
       window.location.href = "Estadisticas.html";

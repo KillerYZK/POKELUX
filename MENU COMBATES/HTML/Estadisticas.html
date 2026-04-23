@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POKELUX - Estadísticas</title>
+    <link rel="stylesheet" href="../CSS/Estadisticas.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="stats-root">
+        <div class="stats-content">
+
+            <!-- NAVBAR -->
+            <nav class="navbar">
+                <div class="nav-logo">POKELUX</span></div>
+                <div class="nav-subtitle">FOR VZK, MUNNY Y GAEL</div>
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="window.location.href='../../MENU PRINCIPAL/Combate.html'">MENÚ DE COMBATE</button>
+                    <button class="nav-btn" onclick="window.location.href='../../MENU PRINCIPAL/Menu-Inicio.html'">VOLVER A INICIO</button>
+                </div>
+                <hr class="nav-divider">
+            </nav>
+
+            <!-- HERO -->
+            <div class="hero">
+                <h1 class="title">ESTADÍSTICAS</h1>
+                <p class="subtitle">Registro de tus batallas y logros</p>
+            </div>
+
+            <!-- TARJETA DE ESTADÍSTICAS PRINCIPALES -->
+            <div class="stats-card">
+                <div class="stats-grid-principal">
+                    <div class="stat-box">
+                        <div class="stat-icon">⚔️</div>
+                        <div class="stat-value" id="batallas-totales">0</div>
+                        <div class="stat-label">BATALLAS TOTALES</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-value" id="victorias">0</div>
+                        <div class="stat-label">VICTORIAS</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">💔</div>
+                        <div class="stat-value" id="derrotas">0</div>
+                        <div class="stat-label">DERROTAS</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-value" id="porcentaje">0%</div>
+                        <div class="stat-label">EFECTIVIDAD</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BARRAS DE PROGRESO -->
+            <div class="progress-card">
+                <h2 class="card-title">PROGRESO</h2>
+                <div class="progress-bars">
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="progress-label">VICTORIAS</span>
+                            <span class="progress-percent" id="victorias-porcentaje">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="victorias-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="progress-label">DERROTAS</span>
+                            <span class="progress-percent" id="derrotas-porcentaje">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill derrota" id="derrotas-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORIAL DE BATALLAS -->
+            <div class="historial-card">
+                <h2 class="card-title">HISTORIAL DE BATALLAS</h2>
+                <div class="historial-lista" id="historial-lista">
+                    <div class="historial-vacio">
+                        <p>📭 No hay batallas registradas</p>
+                        <p>Participa en combates para ver tu historial</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN -->
+            <div class="acciones">
+                <button class="btn-refrescar" id="btn-refrescar">⟳ REFRESCAR ESTADÍSTICAS</button>
+                <button class="btn-limpiar" id="btn-limpiar">🗑️ LIMPIAR HISTORIAL</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="../JS/Estadisticas.js"></script>
+</body>
+</html>

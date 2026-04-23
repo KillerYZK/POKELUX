@@ -1,0 +1,418 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800&display=swap");
+
+/* ============================================
+   VARIABLES
+   ============================================ */
+:root {
+  --magenta: #ff2d78;
+  --magenta-dark: #c4005a;
+  --azul-marino: #0d1b4b;
+  --azul-medio: #1a3080;
+  --azul-claro: #4fc3f7;
+  --blanco: #f0f4ff;
+  --sombra: rgba(255, 45, 120, 0.35);
+  --verde: #4caf50;
+  --rojo: #f44336;
+  --naranja: #ff9800;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Nunito", sans-serif;
+  background-color: var(--azul-marino);
+  color: var(--blanco);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* FONDO ANIMADO */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(255, 45, 120, 0.08) 100%),
+    repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(79, 195, 247, 0.04) 80px, rgba(79, 195, 247, 0.04) 81px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 45, 120, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: pulso 4s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* ============================================
+   ROOT
+   ============================================ */
+.stats-root {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+.stats-content {
+  padding: 1.5rem 3rem;
+  animation: deslizar 0.7s ease both;
+}
+
+@keyframes deslizar {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  padding: 0.5rem 0;
+}
+
+.nav-logo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.5rem;
+  letter-spacing: 0.06em;
+  color: var(--blanco);
+  text-shadow: 3px 3px 0 var(--magenta);
+}
+
+.nav-logo span {
+  color: var(--magenta);
+}
+
+.nav-subtitle {
+  font-family: "Nunito", sans-serif;
+  font-size: 0.7rem;
+  color: var(--azul-claro);
+  letter-spacing: 0.08em;
+  margin-top: -0.5rem;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 1rem;
+  margin: 0.5rem 0;
+}
+
+.nav-btn {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--blanco);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.3rem 0;
+}
+
+.nav-btn:hover {
+  color: var(--magenta);
+  text-shadow: 0 0 8px var(--sombra);
+  transform: translateY(-1px);
+}
+
+.nav-divider {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, var(--magenta), var(--azul-claro), transparent);
+  margin-top: 0.3rem;
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 3rem;
+  letter-spacing: 0.1em;
+  color: var(--magenta);
+  text-shadow: 2px 2px 0 var(--magenta-dark);
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: var(--azul-claro);
+  letter-spacing: 0.08em;
+}
+
+/* ============================================
+   TARJETAS
+   ============================================ */
+.stats-card,
+.progress-card,
+.historial-card {
+  background: rgba(26, 48, 128, 0.3);
+  border: 2px solid rgba(79, 195, 247, 0.12);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.3s ease;
+}
+
+.stats-card:hover,
+.progress-card:hover,
+.historial-card:hover {
+  border-color: rgba(79, 195, 247, 0.25);
+}
+
+/* ============================================
+   GRID DE ESTADÍSTICAS
+   ============================================ */
+.stats-grid-principal {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.stat-box {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(13, 27, 75, 0.5);
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-5px);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2rem;
+  color: var(--magenta);
+  margin-bottom: 0.3rem;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--azul-claro);
+  letter-spacing: 0.08em;
+}
+
+/* ============================================
+   BARRAS DE PROGRESO
+   ============================================ */
+.card-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  color: var(--magenta);
+  margin-bottom: 1rem;
+  border-left: 3px solid var(--magenta);
+  padding-left: 0.8rem;
+}
+
+.progress-item {
+  margin-bottom: 1rem;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.progress-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--azul-claro);
+}
+
+.progress-percent {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--blanco);
+}
+
+.progress-bar-bg {
+  height: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--verde);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.progress-bar-fill.derrota {
+  background: var(--rojo);
+}
+
+/* ============================================
+   HISTORIAL
+   ============================================ */
+.historial-lista {
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 195, 247, 0.2) transparent;
+}
+
+.historial-vacio {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(240, 244, 255, 0.5);
+}
+
+.historial-item {
+  background: rgba(13, 27, 75, 0.5);
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.historial-item:hover {
+  border-color: var(--magenta);
+  transform: translateX(3px);
+}
+
+.historial-fecha {
+  font-size: 0.7rem;
+  color: var(--azul-claro);
+}
+
+.historial-resultado {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+}
+
+.historial-resultado.victoria {
+  color: var(--verde);
+}
+
+.historial-resultado.derrota {
+  color: var(--rojo);
+}
+
+.historial-rival {
+  font-size: 0.75rem;
+  color: rgba(240, 244, 255, 0.7);
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+.acciones {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.btn-refrescar,
+.btn-limpiar {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-refrescar {
+  background: var(--magenta);
+  border: none;
+  color: var(--azul-marino);
+  box-shadow: 0 4px 0 var(--magenta-dark);
+}
+
+.btn-refrescar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--magenta-dark);
+  background: #ff4d8d;
+}
+
+.btn-limpiar {
+  background: transparent;
+  border: 2px solid rgba(79, 195, 247, 0.3);
+  color: var(--azul-claro);
+}
+
+.btn-limpiar:hover {
+  border-color: var(--rojo);
+  color: var(--rojo);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .stats-content {
+    padding: 1rem;
+  }
+
+  .stats-grid-principal {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .nav-buttons {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .nav-logo {
+    font-size: 1.8rem;
+  }
+
+  .acciones {
+    flex-direction: column;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .stat-icon {
+    font-size: 1.8rem;
+  }
+}

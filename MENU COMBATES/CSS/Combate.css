@@ -11,24 +11,23 @@
   --azul-claro: #4fc3f7;
   --blanco: #f0f4ff;
   --sombra: rgba(255, 45, 120, 0.35);
-  --verde-hp: #4caf50;
-  --naranja-hp: #ff9800;
-  --rojo-hp: #f44336;
+  --gris: rgba(240, 244, 255, 0.55);
+  --linea: rgba(79, 195, 247, 0.12);
+  --verde-hp: #39d353;
+  --naranja-hp: #f0a500;
+  --rojo-hp: #e01b24;
 }
 
 /* ============================================
    RESET & BASE
    ============================================ */
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html,
-body {
+html, body {
   height: 100%;
   overflow: hidden;
 }
@@ -41,7 +40,7 @@ body {
 }
 
 /* ============================================
-   FONDO ANIMADO BASE
+   FONDO ANIMADO — líneas de perspectiva
    ============================================ */
 body::before {
   content: "";
@@ -86,11 +85,11 @@ body::after {
 
 @keyframes pulso {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.1); }
+  50%       { opacity: 0.6; transform: scale(1.1); }
 }
 
 /* ============================================
-   ROOT DEL COMBATE
+   ROOT
    ============================================ */
 .combate-root {
   position: relative;
@@ -109,7 +108,7 @@ body::after {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px 40px;
+  padding: 20px 36px;
   position: relative;
   background-size: cover;
   background-position: center;
@@ -118,329 +117,210 @@ body::after {
   overflow: hidden;
 }
 
-/* Overlay para mejorar visibilidad de textos */
+/* Overlay sobre el fondo */
 .combate-campo::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(13, 27, 75, 0.3);
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(13, 27, 75, 0.65) 0%,
+    rgba(13, 27, 75, 0.35) 50%,
+    rgba(13, 27, 75, 0.7) 100%
+  );
   pointer-events: none;
   z-index: 0;
 }
 
-/* Contenido del campo por encima del overlay */
 .combate-lado {
   position: relative;
   z-index: 1;
 }
 
 /* ============================================
-   FONDOS POR TIPO DE POKÉMON
+   FONDOS POR TIPO
    ============================================ */
-.combate-campo.fuego {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/fire.png");
-}
-
-.combate-campo.agua {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/water.png");
-}
-
-.combate-campo.planta {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/grass.png");
-}
-
-.combate-campo.electrico {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/city.png");
-}
-
-.combate-campo.roca, 
-.combate-campo.tierra {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png");
-}
-
-.combate-campo.hielo {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/snow.png");
-}
-
-.combate-campo.psiquico, 
-.combate-campo.fantasma {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/space.png");
-}
-
-.combate-campo.dragon {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png");
-}
-
-.combate-campo.siniestro {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/cave.png");
-}
-
-.combate-campo.hada {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/forest.png");
-}
-
-.combate-campo.acero {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/city.png");
-}
-
-.combate-campo.volador {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/sky.png");
-}
-
-.combate-campo.veneno, 
-.combate-campo.bicho {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/forest.png");
-}
-
-.combate-campo.lucha {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png");
-}
-
-.combate-campo.estandar {
-  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/grass.png");
-}
+.combate-campo.fuego    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/fire.png"); }
+.combate-campo.agua     { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/water.png"); }
+.combate-campo.planta   { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/grass.png"); }
+.combate-campo.electrico{ background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/city.png"); }
+.combate-campo.roca,
+.combate-campo.tierra   { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png"); }
+.combate-campo.hielo    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/snow.png"); }
+.combate-campo.psiquico,
+.combate-campo.fantasma { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/space.png"); }
+.combate-campo.dragon   { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png"); }
+.combate-campo.siniestro{ background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/cave.png"); }
+.combate-campo.hada     { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/forest.png"); }
+.combate-campo.acero    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/city.png"); }
+.combate-campo.volador  { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/sky.png"); }
+.combate-campo.veneno,
+.combate-campo.bicho    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/forest.png"); }
+.combate-campo.lucha    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png"); }
+.combate-campo.estandar { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/grass.png"); }
 
 /* ============================================
-   CLIMAS - EFECTOS VISUALES
+   CLIMAS
    ============================================ */
-
-/* LLUVIA */
 .combate-campo.lluvia {
-  background: linear-gradient(135deg, #1a3a5c, #0d1b4b);
+  background: linear-gradient(135deg, #0d1b4b, #0a1530);
 }
-
 .combate-campo.lluvia::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: repeating-linear-gradient(
-    0deg,
-    rgba(79, 195, 247, 0.4),
-    rgba(79, 195, 247, 0.4) 2px,
-    transparent 2px,
-    transparent 15px
+    175deg,
+    rgba(79, 195, 247, 0.25),
+    rgba(79, 195, 247, 0.25) 1px,
+    transparent 1px,
+    transparent 14px
   );
-  animation: lluvia 0.4s linear infinite;
+  animation: lluvia 0.35s linear infinite;
   pointer-events: none;
   z-index: 2;
 }
-
-.combate-campo.lluvia .clima-indicador::before {
-  content: "🌧️ LLUVIA";
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 4px 12px;
-  border-radius: 20px;
-  color: #4fc3f7;
-  z-index: 3;
-  font-family: "Bebas Neue", sans-serif;
-  letter-spacing: 1px;
-}
-
 @keyframes lluvia {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 20px; }
+  from { background-position: 0 0; }
+  to   { background-position: 0 20px; }
 }
 
-/* SOL */
 .combate-campo.sol {
-  background: linear-gradient(135deg, #ffb74d, #ff9800);
+  background: linear-gradient(135deg, #1a2a10, #0d2a18);
 }
-
 .combate-campo.sol::before {
-  content: "☀️";
+  content: "☀";
   position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 3rem;
-  animation: girarSol 10s linear infinite;
+  top: 18px;
+  right: 24px;
+  font-size: 2.5rem;
+  color: #ffb300;
+  text-shadow: 0 0 20px #ff8c00;
+  animation: girarSol 12s linear infinite;
   pointer-events: none;
   z-index: 2;
 }
-
-.combate-campo.sol .clima-indicador::before {
-  content: "🌞 SOL INTENSO";
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 4px 12px;
-  border-radius: 20px;
-  color: #ffeb3b;
-  z-index: 3;
-  font-family: "Bebas Neue", sans-serif;
-  letter-spacing: 1px;
-}
-
 @keyframes girarSol {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 
-/* TORMENTA DE ARENA */
 .combate-campo.tormenta-arena {
-  background: linear-gradient(135deg, #c2b280, #8b7355);
+  background: linear-gradient(135deg, #1a1200, #2a1e08);
 }
-
-.combate-campo.tormenta-arena::before {
-  content: "🌪️";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  font-size: 5rem;
-  opacity: 0.4;
-  transform: translate(-50%, -50%);
-  animation: arena 2s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.combate-campo.tormenta-arena .clima-indicador::before {
-  content: "🌪️ TORMENTA ARENA";
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 4px 12px;
-  border-radius: 20px;
-  color: #d4a574;
-  z-index: 3;
-  font-family: "Bebas Neue", sans-serif;
-  letter-spacing: 1px;
-}
-
-@keyframes arena {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
-}
-
-/* GRANIZO */
 .combate-campo.granizo {
-  background: linear-gradient(135deg, #a8d8ea, #6ba3c7);
+  background: linear-gradient(135deg, #0d1b4b, #0d1f2d);
 }
-
 .combate-campo.granizo::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: repeating-linear-gradient(
     0deg,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 255, 255, 0.3) 3px,
-    transparent 3px,
-    transparent 20px
+    rgba(200, 235, 255, 0.2),
+    rgba(200, 235, 255, 0.2) 2px,
+    transparent 2px,
+    transparent 18px
   );
-  animation: granizo 0.8s linear infinite;
+  animation: granizo 0.7s linear infinite;
   pointer-events: none;
   z-index: 2;
 }
-
-.combate-campo.granizo .clima-indicador::before {
-  content: "❄️ GRANIZO";
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 4px 12px;
-  border-radius: 20px;
-  color: #e3f2fd;
-  z-index: 3;
-  font-family: "Bebas Neue", sans-serif;
-  letter-spacing: 1px;
-}
-
 @keyframes granizo {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 30px; }
-}
-
-/* Contenedor para el indicador de clima */
-.combate-campo {
-  position: relative;
+  from { background-position: 0 0; }
+  to   { background-position: 0 28px; }
 }
 
 .combate-campo .clima-indicador {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 12px;
+  left: 12px;
   z-index: 3;
 }
 
 /* ============================================
    LADOS DEL CAMPO
    ============================================ */
-/* LADOS DEL CAMPO - CORREGIDO */
 .combate-lado {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
 }
 
-/* Enemigo: ARRIBA (primero en el flujo) */
 .combate-lado.enemigo {
   justify-content: flex-end;
   order: 1;
 }
 
-/* Jugador: ABAJO (segundo en el flujo) */
 .combate-lado.jugador {
   justify-content: flex-start;
   order: 2;
 }
+
 /* ============================================
    SPRITES
    ============================================ */
 .combate-sprite-wrapper {
-  background: rgba(13, 27, 75, 0.5);
-  border-radius: 20px;
-  padding: 12px;
-  border: 2px solid rgba(79, 195, 247, 0.2);
-  backdrop-filter: blur(4px);
+  position: relative;
+  background: rgba(26, 48, 128, 0.5);
+  border-radius: 4px;
+  padding: 10px;
+  border: 1px solid var(--linea);
+  backdrop-filter: blur(6px);
+  box-shadow:
+    0 0 0 1px rgba(79, 195, 247, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.combate-sprite-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--magenta);
+  border-radius: 4px 4px 0 0;
 }
 
 .combate-sprite {
   width: 140px;
   height: 140px;
+  image-rendering: pixelated;
   image-rendering: crisp-edges;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.3));
-  transition: transform 0.2s ease;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.5));
+  transition: filter 0.2s ease;
 }
 
 .combate-sprite:hover {
-  transform: scale(1.02);
+  filter: drop-shadow(0 6px 20px rgba(255, 45, 120, 0.4));
 }
 
 /* ============================================
    INFOBAR (HP, nombre)
    ============================================ */
 .combate-infobar {
-  background: rgba(13, 27, 75, 0.85);
-  border: 2px solid rgba(79, 195, 247, 0.2);
-  border-radius: 12px;
-  padding: 12px 20px;
-  min-width: 250px;
-  backdrop-filter: blur(4px);
+  background: rgba(26, 48, 128, 0.6);
+  border: 2px solid var(--linea);
+  border-radius: 4px;
+  padding: 12px 18px 10px;
+  min-width: 240px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.combate-infobar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--magenta);
 }
 
 .combate-info-nombre-row {
@@ -452,65 +332,78 @@ body::after {
 
 .combate-nombre {
   font-family: "Bebas Neue", sans-serif;
-  font-size: 1.3rem;
-  letter-spacing: 0.06em;
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
   color: var(--blanco);
-  text-shadow: 2px 2px 0 var(--azul-marino);
 }
 
 .combate-nivel {
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
   color: var(--azul-claro);
+  letter-spacing: 0.05em;
 }
 
 .combate-hpbar-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
 .combate-hp-label {
-  font-size: 0.7rem;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.65rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--azul-claro);
+  letter-spacing: 0.08em;
+  color: var(--magenta);
 }
 
 .combate-hpbar-bg {
   flex: 1;
-  height: 10px;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 5px;
+  height: 8px;
+  background: rgba(13, 27, 75, 0.8);
+  border-radius: 4px;
   overflow: hidden;
+  border: 1px solid rgba(79, 195, 247, 0.1);
 }
 
 .combate-hpbar-fill {
   height: 100%;
   width: 100%;
-  background: var(--verde-hp);
-  border-radius: 5px;
-  transition: width 0.3s ease, background 0.2s ease;
+  background: linear-gradient(90deg, var(--verde-hp), #7bef7b);
+  border-radius: 4px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+  box-shadow: 0 0 6px rgba(57, 211, 83, 0.4);
 }
 
 .combate-hpbar-fill.hp-mid {
-  background: var(--naranja-hp);
+  background: linear-gradient(90deg, var(--naranja-hp), #ffc940);
+  box-shadow: 0 0 6px rgba(240, 165, 0, 0.4);
 }
 
 .combate-hpbar-fill.hp-low {
-  background: var(--rojo-hp);
+  background: linear-gradient(90deg, var(--rojo-hp), #ff4444);
+  box-shadow: 0 0 8px rgba(224, 27, 36, 0.6);
+  animation: hpPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes hpPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .combate-hp-numero {
-  font-size: 0.7rem;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.68rem;
   font-weight: 600;
   text-align: right;
-  color: rgba(240, 244, 255, 0.7);
+  color: var(--gris);
 }
 
 .combate-hp-numero span {
-  color: white;
+  color: var(--blanco);
   font-weight: 800;
 }
 
@@ -519,31 +412,49 @@ body::after {
    ============================================ */
 .combate-panel {
   flex: 1.2;
-  background: rgba(26, 48, 128, 0.6);
-  border-top: 3px solid var(--magenta);
+  background: rgba(13, 27, 75, 0.95);
+  border-top: 2px solid var(--magenta);
+  box-shadow: 0 -4px 30px rgba(255, 45, 120, 0.12);
   display: flex;
   flex-direction: column;
-  padding: 12px 30px;
+  padding: 12px 28px 14px;
   position: relative;
   z-index: 2;
 }
 
+.combate-panel::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--magenta) 30%, var(--magenta) 70%, transparent 100%);
+  box-shadow: 0 0 12px var(--sombra);
+}
+
 /* LOG */
 .combate-log {
-  background: rgba(13, 27, 75, 0.9);
-  margin-bottom: 12px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border-left: 4px solid var(--magenta);
-  font-size: 0.85rem;
+  background: rgba(26, 48, 128, 0.4);
+  border: 1px solid var(--linea);
+  border-left: 3px solid var(--magenta);
+  margin-bottom: 10px;
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--blanco);
+  letter-spacing: 0.02em;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
 }
 
 /* MENÚS */
 .combate-menu {
   display: flex;
-  gap: 20px;
+  gap: 14px;
   justify-content: center;
   align-items: center;
 }
@@ -553,155 +464,228 @@ body::after {
   display: none;
 }
 
+/* Botones principales */
 .combate-opcion {
   font-family: "Bebas Neue", sans-serif;
-  font-size: 1.2rem;
-  letter-spacing: 0.08em;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
   color: var(--azul-marino);
-  background: var(--blanco);
+  background: var(--magenta);
   border: none;
-  border-radius: 8px;
-  padding: 10px 30px;
+  border-radius: 3px;
+  padding: 9px 28px;
   cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
-  min-width: 130px;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  min-width: 120px;
+  box-shadow: 0 4px 0 var(--magenta-dark), 0 6px 20px var(--sombra);
 }
 
 .combate-opcion:hover {
+  background: #ff4d8d;
   transform: translateY(-2px);
-  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
-  background: var(--azul-claro);
-  color: var(--azul-marino);
+  box-shadow: 0 6px 0 var(--magenta-dark), 0 10px 30px var(--sombra);
 }
 
 .combate-opcion:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 0 var(--magenta-dark);
 }
 
-/* MOVIMIENTOS */
+/* GRID DE MOVIMIENTOS */
 .movimientos-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
+  gap: 10px;
   width: 100%;
-  max-width: 700px;
+  max-width: 680px;
   margin: 0 auto;
 }
 
 .combate-movimiento {
-  background: rgba(13, 27, 75, 0.95);
-  border: 2px solid rgba(79, 195, 247, 0.3);
-  border-radius: 10px;
-  padding: 12px;
+  background: rgba(26, 48, 128, 0.5);
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  padding: 10px 14px;
   cursor: pointer;
   transition: all 0.15s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 4px 8px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.combate-movimiento::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--magenta);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.15s ease;
 }
 
 .combate-movimiento:hover:not(:disabled) {
-  transform: translateY(-2px);
-  border-color: var(--magenta);
-  background: var(--azul-marino);
+  border-color: rgba(79, 195, 247, 0.3);
+  background: rgba(26, 48, 128, 0.8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.combate-movimiento:hover:not(:disabled)::before {
+  transform: scaleX(1);
 }
 
 .combate-movimiento:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
 .mov-nombre {
   font-family: "Bebas Neue", sans-serif;
-  font-size: 1rem;
-  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
   color: var(--blanco);
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .mov-tipo {
-  font-size: 0.65rem;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.58rem;
   font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 4px;
-  width: fit-content;
+  padding: 2px 7px;
+  border-radius: 3px;
+  grid-column: 2;
+  grid-row: 1;
+  text-align: center;
+  letter-spacing: 0.04em;
 }
 
-/* Tipos de movimientos */
-.tipo-normal { background: #a8a878; color: #000; }
-.tipo-fuego { background: #f08030; color: #000; }
-.tipo-agua { background: #6890f0; color: #fff; }
-.tipo-electrico { background: #f8d030; color: #000; }
-.tipo-planta { background: #78c850; color: #000; }
-.tipo-hielo { background: #98d8d8; color: #000; }
-.tipo-lucha { background: #c03028; color: #fff; }
-.tipo-veneno { background: #a040a0; color: #fff; }
-.tipo-tierra { background: #e0c068; color: #000; }
-.tipo-volador { background: #a890f0; color: #000; }
-.tipo-psiquico { background: #f85888; color: #fff; }
-.tipo-bicho { background: #a8b820; color: #000; }
-.tipo-roca { background: #b8a038; color: #000; }
-.tipo-fantasma { background: #705898; color: #fff; }
-.tipo-dragon { background: #7038f8; color: #fff; }
-.tipo-siniestro { background: #705848; color: #fff; }
-.tipo-acero { background: #b8b8d0; color: #000; }
-.tipo-hada { background: #ee99ac; color: #000; }
-
-.mov-pp,
-.mov-poder {
-  font-size: 0.65rem;
+.mov-pp, .mov-poder {
+  font-family: "Nunito", sans-serif;
+  font-size: 0.62rem;
   font-weight: 600;
-  color: var(--azul-claro);
+  color: var(--gris);
+  grid-row: 2;
 }
+
+.mov-poder { grid-column: 2; text-align: right; }
+.mov-pp    { grid-column: 1; }
+
+/* Tipos */
+.tipo-normal    { background: #6d6d4e; color: #fff; }
+.tipo-fire,
+.tipo-fuego     { background: #9c2f00; color: #ffd9a0; }
+.tipo-water,
+.tipo-agua      { background: #1a3a8f; color: #a8c8ff; }
+.tipo-electric,
+.tipo-electrico { background: #8f7000; color: #ffe066; }
+.tipo-grass,
+.tipo-planta    { background: #2d6b00; color: #a8f070; }
+.tipo-ice,
+.tipo-hielo     { background: #1a6b6b; color: #b8eef0; }
+.tipo-fighting,
+.tipo-lucha     { background: #7a1000; color: #ffb8a0; }
+.tipo-poison,
+.tipo-veneno    { background: #5a1a7a; color: #e8b0f8; }
+.tipo-ground,
+.tipo-tierra    { background: #7a5a00; color: #ffe0a0; }
+.tipo-flying,
+.tipo-volador   { background: #3d2a8f; color: #c0b0ff; }
+.tipo-psychic,
+.tipo-psiquico  { background: #8f004a; color: #ffb0d0; }
+.tipo-bug,
+.tipo-bicho     { background: #4a5a00; color: #d0e060; }
+.tipo-rock,
+.tipo-roca      { background: #5a4a10; color: #e0d090; }
+.tipo-ghost,
+.tipo-fantasma  { background: #2d1a5c; color: #c8b0f0; }
+.tipo-dragon    { background: #2d008f; color: #a090ff; }
+.tipo-dark,
+.tipo-siniestro { background: #1a1535; color: #c0a890; }
+.tipo-steel,
+.tipo-acero     { background: #3d3d5c; color: #c8c8e0; }
+.tipo-fairy,
+.tipo-hada      { background: #7a2d4a; color: #ffd0e0; }
 
 /* CAMBIO DE POKÉMON */
 .combate-cambio {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 12px;
   justify-content: center;
-  padding: 15px;
+  padding: 10px;
   max-height: 200px;
   overflow-y: auto;
 }
 
 .cambio-pokemon-btn {
-  background: rgba(13, 27, 75, 0.95);
-  border: 2px solid rgba(79, 195, 247, 0.3);
-  border-radius: 10px;
-  padding: 10px 15px;
+  background: rgba(26, 48, 128, 0.5);
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  padding: 10px 16px;
   cursor: pointer;
   transition: all 0.15s ease;
-  min-width: 160px;
+  min-width: 150px;
+  color: var(--blanco);
+  font-family: "Nunito", sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.cambio-pokemon-btn::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--magenta);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.15s ease;
 }
 
 .cambio-pokemon-btn:hover {
-  border-color: var(--magenta);
-  transform: translateY(-2px);
+  border-color: rgba(79, 195, 247, 0.3);
+  background: rgba(26, 48, 128, 0.85);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cambio-pokemon-btn:hover::before {
+  transform: scaleX(1);
 }
 
 .poke-nombre {
   font-family: "Bebas Neue", sans-serif;
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
   color: var(--blanco);
+  display: block;
 }
 
 .poke-hp {
-  font-size: 0.7rem;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.65rem;
   font-weight: 600;
   color: var(--verde-hp);
+  margin-top: 3px;
+  display: block;
 }
 
 /* ============================================
-   EQUIPOS MINI (pokeballs)
+   POKEBALLS MINI
    ============================================ */
 .combate-equipos-row {
   position: fixed;
-  left: 15px;
-  right: 15px;
-  bottom: 15px;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
   display: flex;
   justify-content: space-between;
   pointer-events: none;
@@ -710,187 +694,221 @@ body::after {
 
 .combate-equipo-mini {
   display: flex;
-  gap: 8px;
-  background: rgba(13, 27, 75, 0.7);
-  padding: 8px 12px;
+  gap: 7px;
+  background: rgba(13, 27, 75, 0.88);
+  padding: 7px 12px;
   border-radius: 30px;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
   pointer-events: auto;
-  border: 1px solid rgba(79, 195, 247, 0.2);
+  border: 1px solid var(--linea);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
 }
 
 .combate-pokeball {
-  width: 32px;
-  height: 32px;
-  background: radial-gradient(circle at 30% 30%, #ff4d4d, #cc0000);
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle at 35% 30%, var(--magenta), var(--magenta-dark));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
   transition: all 0.15s ease;
   cursor: pointer;
 }
 
+/* Línea horizontal */
 .combate-pokeball::before {
   content: "";
   position: absolute;
   top: 50%;
   left: 0;
   right: 0;
-  height: 3px;
-  background: #333;
+  height: 2px;
+  background: var(--azul-marino);
   transform: translateY(-50%);
 }
 
+/* Botón central */
 .combate-pokeball::after {
   content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 10px;
-  height: 10px;
-  background: #fff;
+  width: 9px;
+  height: 9px;
+  background: var(--blanco);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 2px #333;
+  box-shadow: 0 0 0 2px var(--azul-marino);
 }
 
 .combate-pokeball.debil {
-  opacity: 0.35;
-  filter: grayscale(0.6);
+  opacity: 0.25;
+  filter: grayscale(1);
 }
 
 .combate-pokeball.activo {
-  box-shadow: 0 0 16px var(--magenta);
-  border: 1px solid var(--magenta);
+  box-shadow: 0 0 14px var(--sombra), 0 0 0 1px var(--magenta);
+}
+
+.combate-pokeball.activo::after {
+  background: var(--azul-claro);
+  box-shadow: 0 0 0 2px var(--azul-marino), 0 0 6px rgba(79, 195, 247, 0.8);
 }
 
 .combate-pokeball.estado {
-  box-shadow: 0 0 10px #9c27b0;
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+}
+
+/* ============================================
+   PANTALLA DE FIN
+   ============================================ */
+.pantalla-fin {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 27, 75, 0.92);
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(12px);
+}
+
+.fin-contenido {
+  text-align: center;
+  background: rgba(26, 48, 128, 0.5);
+  padding: 44px 64px;
+  border-radius: 4px;
+  border: 2px solid var(--linea);
+  box-shadow:
+    0 0 60px rgba(255, 45, 120, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  animation: aparecer 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 480px;
+  width: 90%;
+  position: relative;
+  overflow: hidden;
+}
+
+.fin-contenido::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--magenta);
+}
+
+.fin-titulo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 3.5rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 16px;
+}
+
+.fin-titulo.victoria {
+  color: var(--verde-hp);
+  text-shadow: 0 0 30px rgba(57, 211, 83, 0.4);
+}
+
+.fin-titulo.derrota {
+  color: var(--magenta);
+  text-shadow: 0 0 30px var(--sombra);
+}
+
+.fin-mensaje {
+  font-family: "Nunito", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--gris);
+  letter-spacing: 0.02em;
+}
+
+.fin-stats {
+  background: rgba(13, 27, 75, 0.6);
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  padding: 14px 20px;
+  margin: 16px 0 24px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gris);
+  text-align: left;
+}
+
+.fin-stats p { margin-bottom: 4px; }
+.fin-stats p:last-child { margin-bottom: 0; }
+
+.fin-boton {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  color: var(--azul-marino);
+  background: var(--magenta);
+  border: none;
+  border-radius: 3px;
+  padding: 0.6rem 1.4rem;
+  margin: 0 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--magenta-dark), 0 6px 20px var(--sombra);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.fin-boton:hover {
+  background: #ff4d8d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--magenta-dark), 0 10px 30px var(--sombra);
+}
+
+.fin-boton:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--magenta-dark);
+}
+
+.fin-boton.secondary {
+  color: var(--blanco);
+  background: rgba(26, 48, 128, 0.6);
+  border: 2px solid rgba(79, 195, 247, 0.25);
+  box-shadow: none;
+}
+
+.fin-boton.secondary:hover {
+  background: rgba(26, 48, 128, 0.9);
+  border-color: rgba(79, 195, 247, 0.5);
+  transform: translateY(-1px);
+  box-shadow: none;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ============================================
+   ANIMACIÓN DE ENTRADA
+   ============================================ */
+@keyframes deslizar-arriba {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.combate-root {
+  animation: deslizar-arriba 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 900px) {
-  .combate-campo {
-    padding: 15px 20px;
-  }
-
-  .combate-sprite {
-    width: 100px;
-    height: 100px;
-  }
-
-  .combate-infobar {
-    min-width: 180px;
-    padding: 8px 15px;
-  }
-
-  .combate-nombre {
-    font-size: 1rem;
-  }
-
-  .movimientos-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .combate-opcion {
-    padding: 8px 20px;
-    font-size: 1rem;
-    min-width: 100px;
-  }
-
-  .combate-equipos-row {
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-  }
-
-  .combate-pokeball {
-    width: 26px;
-    height: 26px;
-  }
-
-  .combate-pokeball::after {
-    width: 8px;
-    height: 8px;
-  }
-}
-
-/* PANTALLA DE FIN DE COMBATE */
-.pantalla-fin {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(13, 27, 75, 0.95);
-  z-index: 10000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(8px);
-}
-
-.fin-contenido {
-  text-align: center;
-  background: linear-gradient(135deg, #1a3080, #0d1b4b);
-  padding: 40px 60px;
-  border-radius: 20px;
-  border: 3px solid var(--magenta);
-  box-shadow: 0 0 50px var(--sombra);
-  animation: aparecer 0.5s ease;
-}
-
-.fin-titulo {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 3rem;
-  letter-spacing: 0.1em;
-  margin-bottom: 20px;
-}
-
-.fin-titulo.victoria {
-  color: #4caf50;
-  text-shadow: 0 0 20px #4caf50;
-}
-
-.fin-titulo.derrota {
-  color: #f44336;
-  text-shadow: 0 0 20px #f44336;
-}
-
-.fin-mensaje {
-  font-size: 1.2rem;
-  margin-bottom: 30px;
-  color: var(--blanco);
-}
-
-.fin-boton {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 1.2rem;
-  letter-spacing: 0.08em;
-  color: var(--azul-marino);
-  background: var(--magenta);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 30px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.fin-boton:hover {
-  transform: scale(1.05);
-  background: #ff4d8d;
-}
-
-@keyframes aparecer {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  .combate-campo { padding: 14px 18px; }
+  .combate-sprite { width: 100px; height: 100px; }
+  .combate-infobar { min-width: 170px; padding: 10px 14px; }
+  .combate-nombre { font-size: 1rem; }
+  .movimientos-grid { grid-template-columns: 1fr; gap: 8px; }
+  .combate-opcion { padding: 8px 18px; font-size: 1rem; min-width: 100px; }
+  .combate-equipos-row { bottom: 10px; left: 10px; right: 10px; }
+  .combate-pokeball { width: 24px; height: 24px; }
+  .combate-pokeball::after { width: 7px; height: 7px; }
 }

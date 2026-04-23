@@ -1,18 +1,24 @@
 // ============================================
-// YA PORFAVOR
+// LOADING SCREEN 
 // ============================================
 
 const COLS           = 18;
 const ROWS           = 11;
-const DELAY_ENTRADA  = 100;  // Más lenta
-const DELAY_SALIDA   = 100;  // Más lenta
+const DELAY_ENTRADA  = 55;
+const DELAY_SALIDA   = 55;
 
 let overlay  = null;
 let blocks   = [];
-let animacionEnCurso = false;
+let animacionCompleta = false;
+let bloquesVisibles = false;
+let promesaMostrar = null;  // ← aquí, línea ~14
 
 function crearOverlay() {
-  if (overlay) return;
+  console.log("🔧 [LOADING] crearOverlay() - Iniciando");
+  if (overlay) {
+    console.log("🔧 [LOADING] overlay ya existe, omitiendo creación");
+    return;
+  }
 
   const style = document.createElement("style");
   style.textContent = `
@@ -29,7 +35,6 @@ function crearOverlay() {
       pointer-events: all;
     }
     #pk-loading-overlay.oculto {
-      pointer-events: none;
       display: none;
     }
     .pk-ls-block {
@@ -59,7 +64,7 @@ function crearOverlay() {
       opacity: 1;
     }
     #pk-loading-logo {
-      font-family: 'Bebas Neue', 'Arial Narrow', sans-serif;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(3rem, 8vw, 5rem);
       letter-spacing: 0.08em;
       color: #0d1b4b;
@@ -71,7 +76,7 @@ function crearOverlay() {
       color: #fff;
     }
     #pk-loading-sub {
-      font-family: 'Bebas Neue', 'Arial Narrow', sans-serif;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 0.85rem;
       letter-spacing: 0.22em;
       color: rgba(255, 255, 255, 0.8);
@@ -83,6 +88,7 @@ function crearOverlay() {
     }
   `;
   document.head.appendChild(style);
+  console.log("🔧 [LOADING] Estilos agregados");
 
   overlay = document.createElement("div");
   overlay.id = "pk-loading-overlay";
@@ -95,6 +101,7 @@ function crearOverlay() {
       blocks.push({ el: b, r, c });
     }
   }
+  console.log(`🔧 [LOADING] ${blocks.length} bloques creados`);
 
   const center = document.createElement("div");
   center.id = "pk-loading-center";
@@ -105,25 +112,52 @@ function crearOverlay() {
 
   document.body.appendChild(overlay);
   document.body.appendChild(center);
+  console.log("🔧 [LOADING] Overlay y centro agregados al DOM");
 }
 
 function getDiag(r, c) {
   return (COLS - 1 - c) + r;
 }
 
-export async function mostrarLoading() {
+// Crear overlay y poner todos los bloques VISIBLES (para salida inmediata)
+export async function asegurarOverlay() {
+  console.log("🟡 [LOADING] asegurarOverlay() - Creando overlay con bloques visibles");
   crearOverlay();
-  animacionEnCurso = true;
+  
+  if (overlay) {
+    overlay.classList.remove("oculto");
+    overlay.style.display = "grid";
+    
+    // Poner todos los bloques visibles inmediatamente
+    blocks.forEach(b => b.el.classList.add("visible"));
+    bloquesVisibles = true;
+    animacionCompleta = true;
+    
+    const center = document.getElementById("pk-loading-center");
+    if (center) center.classList.add("visible");
+    
+    console.log("🟡 [LOADING] Todos los bloques visibles, listo para animación de salida");
+  }
+  return Promise.resolve();
+}
+
+export async function mostrarLoading() {
+  console.log("🔴🔴🔴 [LOADING] mostrarLoading() LLAMADA 🔴🔴🔴");
+  crearOverlay();
 
   const center = document.getElementById("pk-loading-center");
   const maxDiag = (COLS - 1) + (ROWS - 1);
 
+  if (animacionCompleta) return;
+
+  bloquesVisibles = false;
   blocks.forEach(b => b.el.classList.remove("visible"));
   center.classList.remove("visible");
   overlay.classList.remove("oculto");
-  overlay.style.display = "grid";
 
-  return new Promise((resolve) => {
+  // ✅ Guardar la promise para que ocultarLoading pueda esperarla
+  promesaMostrar = new Promise((resolve) => {
+    console.log("🔴 [LOADING] Iniciando animación de entrada...");
     for (let d = 0; d <= maxDiag; d++) {
       const diagBlocks = blocks.filter(b => getDiag(b.r, b.c) === d);
       setTimeout(() => {
@@ -131,23 +165,32 @@ export async function mostrarLoading() {
         if (d === maxDiag) {
           setTimeout(() => {
             center.classList.add("visible");
+            animacionCompleta = true;
+            bloquesVisibles = true;
+            console.log("✅ [LOADING] Animación de entrada COMPLETADA");
             resolve();
           }, 300);
         }
       }, d * DELAY_ENTRADA);
     }
   });
+
+  return promesaMostrar;
 }
 
 export async function ocultarLoading() {
-  if (!overlay) return;
-  if (!animacionEnCurso) {
-    overlay.classList.add("oculto");
-    overlay.style.display = "none";
-    return;
-  }
+  console.log("🔵🔵🔵 [LOADING] ocultarLoading() LLAMADA 🔵🔵🔵");
+
+  // ✅ Esperar a que la animación de entrada termine primero
+  if (promesaMostrar) await promesaMostrar;
 
   const center = document.getElementById("pk-loading-center");
+
+  if (!animacionCompleta) {
+    if (overlay) overlay.classList.add("oculto");
+    return Promise.resolve();
+  }
+
   const maxDiag = (COLS - 1) + (ROWS - 1);
 
   return new Promise((resolve) => {
@@ -158,10 +201,11 @@ export async function ocultarLoading() {
         diagBlocks.forEach(b => b.el.classList.remove("visible"));
         if (d === 0) {
           setTimeout(() => {
-            center.classList.remove("visible");
-            overlay.classList.add("oculto");
-            overlay.style.display = "none";
-            animacionEnCurso = false;
+            if (center) center.classList.remove("visible");
+            if (overlay) overlay.classList.add("oculto");
+            animacionCompleta = false;
+            promesaMostrar = null;
+            console.log("✅ [LOADING] Animación de salida COMPLETADA");
             resolve();
           }, 300);
         }

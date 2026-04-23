@@ -243,20 +243,22 @@ function verificarJugadoresListo() {
     : "Esperando a que todos estén listos...";
 }
 
-// Iniciar partida - VERSIÓN CORREGIDA
 // Iniciar partida
 async function iniciarPartida() {
   if (redirigiendo) return;
   redirigiendo = true;
   
   try {
-    //  1. MOSTRAR ANIMACIÓN
+    // 1. Mostrar pantalla de carga
     await mostrarLoading();
     
-    //  2. CAMBIAR ESTADO
+    // 2. ESPERAR 1.5 SEGUNDOS PARA QUE SE VEA LA ANIMACIÓN
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // 3. Cambiar estado
     await set(ref(db, `partidas/${idPartida}/estado`), "en_progreso");
     
-    //  3. REDIRIGIR (la pantalla de carga sigue visible)
+    // 4. Redirigir
     window.location.href = `../HTML/Juego-Combate.html?id=${idPartida}`;
     
   } catch (error) {
@@ -279,7 +281,7 @@ async function salirDelaPartida() {
       await remove(partidaRef);
     }
 
-    window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
+    window.location.href = "../../MENU PRINCIPAL/Combate.html";
   } catch (error) {
     console.error("Error al salir:", error);
     alert("Error al salir de la partida.");
