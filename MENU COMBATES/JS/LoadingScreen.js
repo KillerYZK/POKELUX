@@ -1,25 +1,19 @@
 // ============================================
-// LoadingScreen.js
-// Uso:
-//   import { mostrarLoading, ocultarLoading } from "./LoadingScreen.js";
-//   mostrarLoading();
-//   await hacerAlgo();
-//   ocultarLoading();
+// YA PORFAVOR
 // ============================================
 
 const COLS           = 18;
 const ROWS           = 11;
-const DELAY_ENTRADA  = 55;  // ms por diagonal — entrada
-const DELAY_SALIDA   = 30;  // ms por diagonal — salida (más rápida)
+const DELAY_ENTRADA  = 100;  // Más lenta
+const DELAY_SALIDA   = 100;  // Más lenta
 
 let overlay  = null;
 let blocks   = [];
+let animacionEnCurso = false;
 
-// ── Crear el overlay la primera vez ─────────────────────────
 function crearOverlay() {
   if (overlay) return;
 
-  // Estilos globales del overlay
   const style = document.createElement("style");
   style.textContent = `
     #pk-loading-overlay {
@@ -36,6 +30,7 @@ function crearOverlay() {
     }
     #pk-loading-overlay.oculto {
       pointer-events: none;
+      display: none;
     }
     .pk-ls-block {
       background: rgba(255, 255, 255, 0.06);
@@ -46,6 +41,7 @@ function crearOverlay() {
     .pk-ls-block.visible {
       background: #ff2d78;
       border-color: #c4005a;
+      box-shadow: 0 0 5px rgba(255, 45, 120, 0.5);
     }
     #pk-loading-center {
       position: fixed;
@@ -57,7 +53,7 @@ function crearOverlay() {
       justify-content: center;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.6s ease;
     }
     #pk-loading-center.visible {
       opacity: 1;
@@ -69,6 +65,7 @@ function crearOverlay() {
       color: #0d1b4b;
       text-shadow: 3px 3px 0 #c4005a;
       line-height: 1;
+      animation: pulse 1.5s infinite;
     }
     #pk-loading-logo span {
       color: #fff;
@@ -77,13 +74,16 @@ function crearOverlay() {
       font-family: 'Bebas Neue', 'Arial Narrow', sans-serif;
       font-size: 0.85rem;
       letter-spacing: 0.22em;
-      color: rgba(13, 27, 75, 0.65);
+      color: rgba(255, 255, 255, 0.8);
       margin-top: 6px;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); text-shadow: 3px 3px 0 #ff2d78; }
     }
   `;
   document.head.appendChild(style);
 
-  // Overlay de bloques
   overlay = document.createElement("div");
   overlay.id = "pk-loading-overlay";
 
@@ -96,34 +96,32 @@ function crearOverlay() {
     }
   }
 
-  // Centro con logo
   const center = document.createElement("div");
   center.id = "pk-loading-center";
   center.innerHTML = `
     <div id="pk-loading-logo">POKE<span>LUX</span></div>
-    <div id="pk-loading-sub">CARGANDO...</div>
+    <div id="pk-loading-sub">CARGANDO COMBATE...</div>
   `;
 
   document.body.appendChild(overlay);
   document.body.appendChild(center);
 }
 
-// ── Diagonal desde esquina superior derecha ──────────────────
 function getDiag(r, c) {
   return (COLS - 1 - c) + r;
 }
 
-// ── Mostrar loading (animación de entrada) ───────────────────
-export function mostrarLoading() {
+export async function mostrarLoading() {
   crearOverlay();
+  animacionEnCurso = true;
 
-  const center  = document.getElementById("pk-loading-center");
+  const center = document.getElementById("pk-loading-center");
   const maxDiag = (COLS - 1) + (ROWS - 1);
 
-  // Reset
   blocks.forEach(b => b.el.classList.remove("visible"));
   center.classList.remove("visible");
   overlay.classList.remove("oculto");
+  overlay.style.display = "grid";
 
   return new Promise((resolve) => {
     for (let d = 0; d <= maxDiag; d++) {
@@ -141,17 +139,18 @@ export function mostrarLoading() {
   });
 }
 
-// ── Ocultar loading (animación de salida inversa) ────────────
-export function ocultarLoading() {
-  const center  = document.getElementById("pk-loading-center");
+export async function ocultarLoading() {
+  if (!overlay) return;
+  if (!animacionEnCurso) {
+    overlay.classList.add("oculto");
+    overlay.style.display = "none";
+    return;
+  }
+
+  const center = document.getElementById("pk-loading-center");
   const maxDiag = (COLS - 1) + (ROWS - 1);
 
-  if (!overlay) return Promise.resolve();
-
-  center.classList.remove("visible");
-
   return new Promise((resolve) => {
-    // Salida: bloques desaparecen desde esquina inferior izquierda → superior derecha
     for (let d = maxDiag; d >= 0; d--) {
       const diagBlocks = blocks.filter(b => getDiag(b.r, b.c) === d);
       const delay = (maxDiag - d) * DELAY_SALIDA;
@@ -159,9 +158,12 @@ export function ocultarLoading() {
         diagBlocks.forEach(b => b.el.classList.remove("visible"));
         if (d === 0) {
           setTimeout(() => {
+            center.classList.remove("visible");
             overlay.classList.add("oculto");
+            overlay.style.display = "none";
+            animacionEnCurso = false;
             resolve();
-          }, 200);
+          }, 300);
         }
       }, delay);
     }

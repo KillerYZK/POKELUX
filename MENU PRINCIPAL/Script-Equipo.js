@@ -132,3 +132,7 @@ document.getElementById("BorrarEquipo").addEventListener("click", () => {
   localStorage.removeItem("equipo");
   location.reload();
 });
+
+document.getElementById("Inicio").addEventListener("click", () => {
+  window.location.href = "Menu-Inicio.html";
+});

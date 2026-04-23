@@ -111,6 +111,8 @@ function reiniciarEstadosLocales() {
 }
 
 // ── INICIALIZAR ──────────────────────────────────────────────
+
+// ── INICIALIZAR ──────────────────────────────────────────────
 async function iniciarCombate() {
   if (!partidaId || !miNombre) {
     log("Error: no se encontró la partida.");
@@ -161,15 +163,12 @@ async function iniciarCombate() {
 
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     
-    // ✅ LISTENER - SOLO UNO, SIEMPRE ACTIVO
     if (!listenerActivo) {
       listenerActivo = true;
       onValue(combateRef, (snapshot) => {
         const nuevoEstado = snapshot.val();
         if (nuevoEstado) {
-          console.log("🔔 [LISTENER] Estado actualizado");
           estadoCombate = nuevoEstado;
-          // ✅ Reiniciar animación antes de renderizar
           reiniciarEstadosLocales();
           renderEstado(estadoCombate);
         }
@@ -181,6 +180,7 @@ async function iniciarCombate() {
     if (!combateSnap.exists()) {
       if (esHost) {
         await inicializarCombateEnFirebase();
+        await new Promise(resolve => setTimeout(resolve, 500));
       } else {
         let espera = true;
         for (let i = 0; i < 30 && espera; i++) {
@@ -196,13 +196,15 @@ async function iniciarCombate() {
       }
     }
 
-    const estadoInicial = await get(combateRef);
+      const estadoInicial = await get(combateRef);
     if (estadoInicial.exists()) {
       estadoCombate = estadoInicial.val();
       renderEstado(estadoCombate);
     }
 
-    log("¡Combate listo!");
+     log("¡Combate listo!");
+    
+    //  OCULTAR ANIMACIÓN - LOS BLOQUES SE VACÍAN
     await ocultarLoading();
 
   } catch (err) {
@@ -654,10 +656,10 @@ async function commitTurno(payload) {
 
 // ── ACCIONES DEL JUGADOR ─────────────────────────────────────
 async function elegirAtaque(mov, index) {
-  console.log("⚔️ [ATAQUE] Elegido:", mov.nombre);
+  console.log(" [ATAQUE] Elegido:", mov.nombre);
   
   if (!esMiTurno || animacionEnProceso || esperandoCambio) {
-    console.log("❌ [ATAQUE] No se puede atacar - no es tu turno o hay animación");
+    console.log(" [ATAQUE] No se puede atacar - no es tu turno o hay animación");
     return;
   }
 

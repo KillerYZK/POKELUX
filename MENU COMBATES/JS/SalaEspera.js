@@ -5,6 +5,7 @@ import {
   onValue,
   set,
   remove,
+  get,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { mostrarLoading, ocultarLoading } from "./LoadingScreen.js";
 
@@ -36,11 +37,23 @@ document.addEventListener("DOMContentLoaded", () => {
   nombreJugadorLocal = localStorage.getItem("nombreJugador");
   esHostLocal = localStorage.getItem("esHost") === "true";
 
+  console.log("=== DEBUG SALA ===");
+  console.log("idPartida:", idPartida);
+  console.log("nombreJugadorLocal:", nombreJugadorLocal);
+  console.log("esHostLocal:", esHostLocal);
+  console.log("==================");
+
   if (!idPartida || !nombreJugadorLocal) {
     alert("Información de la partida incompleta.");
-    window.location.href = "../MENU PRINCIPAL/MenuJuego-Interfaz.html";
+    window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
     return;
   }
+
+  // Mostrar loading en la interfaz mientras se cargan los datos
+  const nombreHostEl = document.getElementById("nombre-host");
+  if (nombreHostEl) nombreHostEl.textContent = "Cargando...";
+  const nombreGuestEl = document.getElementById("nombre-guest");
+  if (nombreGuestEl) nombreGuestEl.textContent = "Cargando...";
 
   cargarDatosPartida();
   escucharEstadoPartida();
@@ -50,6 +63,11 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("btn-cargar-equipo")
     .addEventListener("click", async () => {
       const equipoIDs = JSON.parse(localStorage.getItem("equipo"));
+      if (!equipoIDs || equipoIDs.length === 0) {
+        alert("No tienes Pokémon en tu equipo. Ve a la sección de equipo primero.");
+        return;
+      }
+      
       const equipoCompleto = [];
 
       for (const id of equipoIDs) {
@@ -94,15 +112,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Escuchar estado de la partida
 function escucharEstadoPartida() {
-  onValue(ref(db, `partidas/${idPartida}/estado`), async (snapshot) => {
-    if (snapshot.val() === "en_progreso" && !redirigiendo) {
+  const estadoRef = ref(db, `partidas/${idPartida}/estado`);
+  
+  onValue(estadoRef, async (snapshot) => {
+    const nuevoEstado = snapshot.val();
+    console.log("📢 [ESTADO] Cambio detectado:", nuevoEstado);
+    
+    if (nuevoEstado === "en_progreso" && !redirigiendo) {
+      console.log("🚀 [REDIRECCIÓN] Redirigiendo al combate...");
       redirigiendo = true;
       
       if (!esHostLocal) {
         await mostrarLoading();
       }
       
-      window.location.href = `Juego-Combate.html?id=${idPartida}`;
+      // Redirigir al combate
+      window.location.href = `../HTML/Juego-Combate.html?id=${idPartida}`;
     }
   });
 }
@@ -114,11 +139,22 @@ function cargarDatosPartida() {
   onValue(partidaRef, (snapshot) => {
     if (!snapshot.exists()) {
       alert("La partida fue eliminada.");
-      window.location.href = "../MENU PRINCIPAL/MenuJuego-Interfaz.html";
+      window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
       return;
     }
 
     datosPartidaActual = snapshot.val();
+    
+    console.log("✅ Datos de partida cargados:", datosPartidaActual);
+    
+    // Verificar que el jugador existe en la partida
+    if (!datosPartidaActual.jugadores || !datosPartidaActual.jugadores[nombreJugadorLocal]) {
+      console.error("Jugador no encontrado en la partida");
+      console.log("Jugadores disponibles:", Object.keys(datosPartidaActual.jugadores || {}));
+      alert("Error: No se encontró tu información en la partida.");
+      window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
+      return;
+    }
 
     document.getElementById("partida-nombre").textContent =
       datosPartidaActual.nombre;
@@ -207,22 +243,29 @@ function verificarJugadoresListo() {
     : "Esperando a que todos estén listos...";
 }
 
+// Iniciar partida - VERSIÓN CORREGIDA
 // Iniciar partida
 async function iniciarPartida() {
   if (redirigiendo) return;
   redirigiendo = true;
   
   try {
+    //  1. MOSTRAR ANIMACIÓN
     await mostrarLoading();
+    
+    //  2. CAMBIAR ESTADO
     await set(ref(db, `partidas/${idPartida}/estado`), "en_progreso");
+    
+    //  3. REDIRIGIR (la pantalla de carga sigue visible)
+    window.location.href = `../HTML/Juego-Combate.html?id=${idPartida}`;
+    
   } catch (error) {
     console.error("Error al iniciar partida:", error);
-    alert("Error al iniciar la partida.");
     redirigiendo = false;
   }
 }
 
-// FUNCIÓN SALIR DE LA PARTIDA - CORREGIDA
+// Salir de la partida
 async function salirDelaPartida() {
   try {
     const jugadorRef = ref(
@@ -236,15 +279,14 @@ async function salirDelaPartida() {
       await remove(partidaRef);
     }
 
-    //  Ruta corregida
-    window.location.href = "/MENU PRINCIPAL/Menu-Inicio.html";
+    window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
   } catch (error) {
     console.error("Error al salir:", error);
     alert("Error al salir de la partida.");
   }
 }
 
-// Función de chat
+// Chat
 function cargarChat() {
   const chatRef = ref(db, `partidas/${idPartida}/chat`);
 
@@ -298,7 +340,7 @@ function copiarID() {
     const feedback = document.getElementById("copiar-feedback");
     feedback.textContent = "¡Copiado!";
     setTimeout(() => {
-      feedback.textContent = "";
+      feedback.content = "";
     }, 2000);
   });
 }

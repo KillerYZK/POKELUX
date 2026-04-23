@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POKELUX - Pokédex | Detalle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --magenta: #ff2d78;
+            --magenta-dark: #c4005a;
+            --azul-marino: #0d1b4b;
+            --azul-medio: #1a3080;
+            --azul-claro: #4fc3f7;
+            --blanco: #f0f4ff;
+            --sombra: rgba(255, 45, 120, 0.35);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Nunito", sans-serif;
+            background-color: var(--azul-marino);
+            color: var(--blanco);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(255, 45, 120, 0.08) 100%),
+                        repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(79, 195, 247, 0.04) 80px, rgba(79, 195, 247, 0.04) 81px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 45, 120, 0.18) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulso 4s ease-in-out infinite;
+        }
+
+        @keyframes pulso {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(79, 195, 247, 0.2);
+        }
+
+        .logo {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 1.8rem;
+            color: var(--blanco);
+            text-shadow: 2px 2px 0 var(--magenta);
+        }
+
+        .logo span { color: var(--magenta); }
+
+        .volver-btn {
+            font-family: "Bebas Neue", sans-serif;
+            background: transparent;
+            border: 2px solid rgba(79, 195, 247, 0.3);
+            color: var(--azul-claro);
+            padding: 0.3rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .volver-btn:hover {
+            border-color: var(--magenta);
+            color: var(--magenta);
+        }
+
+        .detalle-card {
+            background: rgba(26, 48, 128, 0.3);
+            border: 2px solid rgba(79, 195, 247, 0.15);
+            border-radius: 20px;
+            padding: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detalle-header {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 700px) {
+            .detalle-header { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+        }
+
+        .sprite-area {
+            text-align: center;
+            background: rgba(13, 27, 75, 0.5);
+            border-radius: 16px;
+            padding: 1rem;
+        }
+
+        .sprite-area img {
+            width: 200px;
+            height: 200px;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 20px var(--sombra));
+        }
+
+        .pokemon-number {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 1rem;
+            color: var(--azul-claro);
+            margin-top: 0.5rem;
+        }
+
+        .info-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .pokemon-name {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 2rem;
+            color: var(--magenta);
+            text-transform: capitalize;
+        }
+
+        .types {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .type-badge {
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .type-fire { background: #f08030; color: #000; }
+        .type-water { background: #6890f0; color: #fff; }
+        .type-grass { background: #78c850; color: #000; }
+        .type-electric { background: #f8d030; color: #000; }
+        .type-psychic { background: #f85888; color: #fff; }
+        .type-fighting { background: #c03028; color: #fff; }
+        .type-normal { background: #a8a878; color: #000; }
+        .type-poison { background: #a040a0; color: #fff; }
+        .type-ground { background: #e0c068; color: #000; }
+        .type-flying { background: #a890f0; color: #000; }
+        .type-ice { background: #98d8d8; color: #000; }
+        .type-rock { background: #b8a038; color: #000; }
+        .type-bug { background: #a8b820; color: #000; }
+        .type-dragon { background: #7038f8; color: #fff; }
+        .type-ghost { background: #705898; color: #fff; }
+        .type-dark { background: #705848; color: #fff; }
+        .type-steel { background: #b8b8d0; color: #000; }
+        .type-fairy { background: #ee99ac; color: #000; }
+
+        .basic-data {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            background: rgba(13, 27, 75, 0.5);
+            border-radius: 12px;
+            padding: 0.8rem;
+        }
+
+        .data-item {
+            text-align: center;
+        }
+
+        .data-label {
+            font-size: 0.6rem;
+            color: var(--azul-claro);
+            text-transform: uppercase;
+        }
+
+        .data-value {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 1rem;
+        }
+
+        .section {
+            background: rgba(13, 27, 75, 0.5);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .section-title {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 0.9rem;
+            color: var(--magenta);
+            margin-bottom: 0.8rem;
+            border-left: 3px solid var(--magenta);
+            padding-left: 0.5rem;
+        }
+
+        .stats-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: 100px 40px 1fr;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-name {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--azul-claro);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .stat-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--magenta);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .abilities-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .ability-tag {
+            background: rgba(26, 48, 128, 0.6);
+            border: 1px solid rgba(79, 195, 247, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .ability-tag.hidden {
+            border-color: var(--magenta);
+            color: var(--magenta);
+        }
+
+        .flavor-text {
+            font-style: italic;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: rgba(240, 244, 255, 0.8);
+        }
+
+        .evolution-chain {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .evo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0.3rem;
+        }
+
+        .evo-item:hover {
+            transform: scale(1.05);
+        }
+
+        .evo-item img {
+            width: 50px;
+            height: 50px;
+            image-rendering: pixelated;
+        }
+
+        .evo-item span {
+            font-size: 0.6rem;
+            color: var(--azul-claro);
+            text-transform: capitalize;
+        }
+
+        .evo-arrow {
+            font-size: 1rem;
+            color: var(--magenta);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(79, 195, 247, 0.2);
+            border-top-color: var(--magenta);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="navbar">
+        <div class="logo">POKELUX</span></div>
+        <button class="volver-btn" onclick="window.location.href='Pokedex-Lista.html'">← VOLVER A LA LISTA</button>
+    </div>
+
+    <div id="contenido" class="detalle-card">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Cargando Pokémon...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const pokemonId = urlParams.get('id');
+
+    async function cargarDetalle() {
+        if (!pokemonId) {
+            document.getElementById('contenido').innerHTML = '<div class="loading"><p>❌ No se especificó ningún Pokémon</p></div>';
+            return;
+        }
+
+        try {
+            const [pokeRes, speciesRes] = await Promise.all([
+                fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`),
+                fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`)
+            ]);
+
+            if (!pokeRes.ok) throw new Error('Pokémon no encontrado');
+
+            const pokemon = await pokeRes.json();
+            const species = await speciesRes.json();
+
+            const tipos = pokemon.types.map(t => t.type.name);
+            const stats = {
+                hp: pokemon.stats.find(s => s.stat.name === "hp")?.base_stat || 0,
+                attack: pokemon.stats.find(s => s.stat.name === "attack")?.base_stat || 0,
+                defense: pokemon.stats.find(s => s.stat.name === "defense")?.base_stat || 0,
+                spAttack: pokemon.stats.find(s => s.stat.name === "special-attack")?.base_stat || 0,
+                spDefense: pokemon.stats.find(s => s.stat.name === "special-defense")?.base_stat || 0,
+                speed: pokemon.stats.find(s => s.stat.name === "speed")?.base_stat || 0
+            };
+
+            const maxStat = 255;
+            const statPercent = {
+                hp: (stats.hp / maxStat) * 100,
+                attack: (stats.attack / maxStat) * 100,
+                defense: (stats.defense / maxStat) * 100,
+                spAttack: (stats.spAttack / maxStat) * 100,
+                spDefense: (stats.spDefense / maxStat) * 100,
+                speed: (stats.speed / maxStat) * 100
+            };
+
+            const flavor = species.flavor_text_entries.find(e => e.language.name === "es") 
+                || species.flavor_text_entries.find(e => e.language.name === "en");
+
+            // Cadena evolutiva
+            let evolutionHtml = '';
+            if (species.evolution_chain) {
+                const evoRes = await fetch(species.evolution_chain.url);
+                const evoData = await evoRes.json();
+                const chain = [];
+                
+                function walkChain(node) {
+                    chain.push(node.species.name);
+                    if (node.evolves_to.length) walkChain(node.evolves_to[0]);
+                }
+                walkChain(evoData.chain);
+                
+                evolutionHtml = '<div class="evolution-chain">';
+                for (let i = 0; i < chain.length; i++) {
+                    if (i > 0) evolutionHtml += '<span class="evo-arrow">→</span>';
+                    const evoId = await getPokemonId(chain[i]);
+                    evolutionHtml += `
+                        <div class="evo-item" onclick="window.location.href='Pokedex-Detalle.html?id=${evoId}'">
+                            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId}.png" alt="${chain[i]}">
+                            <span>${chain[i]}</span>
+                        </div>
+                    `;
+                }
+                evolutionHtml += '</div>';
+            }
+
+            document.getElementById('contenido').innerHTML = `
+                <div class="detalle-header">
+                    <div class="sprite-area">
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png" alt="${pokemon.name}">
+                        <div class="pokemon-number">#${String(pokemon.id).padStart(3, '0')}</div>
+                    </div>
+                    <div class="info-area">
+                        <h1 class="pokemon-name">${pokemon.name}</h1>
+                        <div class="types">
+                            ${tipos.map(t => `<span class="type-badge type-${t}">${t.toUpperCase()}</span>`).join('')}
+                        </div>
+                        <div class="basic-data">
+                            <div class="data-item">
+                                <div class="data-label">Altura</div>
+                                <div class="data-value">${(pokemon.height / 10).toFixed(1)} m</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Peso</div>
+                                <div class="data-value">${(pokemon.weight / 10).toFixed(1)} kg</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Exp. Base</div>
+                                <div class="data-value">${pokemon.base_experience || '—'}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">ESTADÍSTICAS BASE</div>
+                    <div class="stats-grid">
+                        <div class="stat-row">
+                            <span class="stat-name">HP</span>
+                            <span class="stat-value">${stats.hp}</span>
+                            <div class="stat-bar"><div class="stat-fill" style="width: ${statPercent.hp}%"></div></div>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">ATAQUE</span>
+                            <span class="stat-value">${stats.attack}</span>
+                            <div class="stat-bar"><div class="stat-fill" style="width: ${statPercent.attack}%"></div></div>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">DEFENSA</span>
+                            <span class="stat-value">${stats.defense}</span>
+                            <div class="stat-bar"><div class="stat-fill" style="width: ${statPercent.defense}%"></div></div>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">ATAQUE ESP.</span>
+                            <span class="stat-value">${stats.spAttack}</span>
+                            <div class="stat-bar"><div class="stat-fill" style="width: ${statPercent.spAttack}%"></div></div>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">DEFENSA ESP.</span>
+                            <span class="stat-value">${stats.spDefense}</span>
+                            <div class="stat-bar"><div class="stat-fill" style="width: ${statPercent.spDefense}%"></div></div>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">VELOCIDAD</span>
+                            <span class="stat-value">${stats.speed}</span>
+                            <div class="stat-bar"><div class="stat-fill" style="width: ${statPercent.speed}%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">HABILIDADES</div>
+                    <div class="abilities-list">
+                        ${pokemon.abilities.map(a => `<span class="ability-tag ${a.is_hidden ? 'hidden' : ''}">${a.ability.name}${a.is_hidden ? ' (Oculta)' : ''}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">DESCRIPCIÓN</div>
+                    <div class="flavor-text">"${flavor?.flavor_text.replace(/\f|\n/g, ' ') || 'Sin descripción disponible'}"</div>
+                </div>
+
+                ${evolutionHtml ? `<div class="section"><div class="section-title">CADENA EVOLUTIVA</div>${evolutionHtml}</div>` : ''}
+            `;
+
+        } catch (error) {
+            document.getElementById('contenido').innerHTML = `<div class="loading"><p>Error: ${error.message}</p></div>`;
+        }
+    }
+
+    async function getPokemonId(name) {
+        try {
+            const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+            const data = await res.json();
+            return data.id;
+        } catch {
+            return 0;
+        }
+    }
+
+    cargarDetalle();
+</script>
+</body>
+</html>

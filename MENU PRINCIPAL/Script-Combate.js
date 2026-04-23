@@ -15,3 +15,9 @@ document
   .addEventListener("click", function () {
     window.location.href = "../MENU COMBATES/HTML/Juego-Unirse.html";
   });
+
+document
+  .getElementById("Inicio")
+  .addEventListener("click", function () {
+    window.location.href = "Menu-Inicio.html";
+  });

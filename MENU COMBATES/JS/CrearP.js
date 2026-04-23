@@ -43,19 +43,22 @@ async function generarIdUnico6Digitos() {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // --- Crear partida (CORREGIDO) ---
     const btnCrear = document.getElementById("btn-crear");
     if (btnCrear) {
         btnCrear.addEventListener("click", async () => {
-            const nombre      = document.getElementById("input-nombre").value.trim();
+            const nombre = document.getElementById("input-nombre").value.trim();
             const descripcion = document.getElementById("input-descripcion").value.trim();
-            const contrasena  = document.getElementById("input-contrasena").value.trim();
-            const hostName    = document.getElementById("input-host").value.trim();
+            const contrasena = document.getElementById("input-contrasena").value.trim();
+            const hostName = document.getElementById("input-host").value.trim();
 
             if (!nombre || !hostName) {
                 alert("El nombre de la partida y tu nombre son obligatorios.");
                 return;
             }
+
+            // Deshabilitar botón
+            btnCrear.disabled = true;
+            btnCrear.textContent = "CREANDO...";
 
             try {
                 console.log("Autenticando...");
@@ -67,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const partidaRef = ref(db, `partidas/${idPartida}`);
                 
-                // ✅ CREAR PARTIDA CORRECTAMENTE
+                // Crear partida con la estructura correcta
                 await set(partidaRef, {
                     id: idPartida,
                     nombre: nombre,
@@ -91,32 +94,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 console.log("Partida creada con ID:", idPartida);
 
+                // Esperar a que Firebase termine de guardar
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Verificar que la partida existe
+                const verifySnap = await get(partidaRef);
+                if (!verifySnap.exists()) {
+                    throw new Error("La partida no se guardó correctamente");
+                }
+
+                console.log("✅ Partida verificada en Firebase");
+                console.log("Datos guardados:", verifySnap.val());
+
+                // Guardar en localStorage
                 localStorage.setItem("nombreJugador", hostName);
                 localStorage.setItem("esHost", "true");
                 localStorage.setItem("idPartida", idPartida);
 
-                window.location.href = "Juego-Lobby.html?id=" + idPartida;
+                // Redirigir a la sala de espera
+                window.location.href = "../HTML/Juego-Lobby.html?id=" + idPartida;
 
             } catch (error) {
                 console.error("Error:", error);
                 alert(`Error: ${error.message}`);
+                btnCrear.disabled = false;
+                btnCrear.textContent = "CREAR PARTIDA";
             }
         });
     }
 
-    // --- Navegación ---
+    // Navegación
     const btnEquipo = document.getElementById("Equipo");
     if (btnEquipo) btnEquipo.addEventListener("click", () => {
-        window.location.href = "Equipo.html";
+        window.location.href = "../../MENU PRINCIPAL/Equipo.html";
     });
 
     const btnInicio = document.getElementById("Inicio");
     if (btnInicio) btnInicio.addEventListener("click", () => {
-        window.location.href = "Menu-Inicio.html";
+        window.location.href = "../../MENU PRINCIPAL/Menu-Inicio.html";
     });
 
     const btnAtras = document.getElementById("atras");
     if (btnAtras) btnAtras.addEventListener("click", () => {
-        window.location.href = "MenuJuego-Interfaz.html";
+        window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
     });
 });
