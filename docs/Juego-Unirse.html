@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POKELUX - Unirse a Partida</title>
+    <link rel="stylesheet" href="../CSS/UnirseP.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="logo">
+        <span class="titulo">POKELUX</span>
+        <span class="subtitulo">POR YZK, MUNNY Y GAEL</span>
+    </div>
+    <nav class="navbar">
+        <button class="boton-menu" onclick="window.location.href='../../MENU PRINCIPAL/Menu-Inicio.html'">Inicio</button>
+        <button class="boton-menu" onclick="window.location.href='Equipo.html'">Equipo</button>
+        <button class="boton-menu" onclick="window.location.href='../HTML/Pokedex-Lista.html'">Pokédex</button>
+        <button class="boton-menu">Instrucciones</button>
+    </nav>
+</header>
+
+<hr class="separador">
+
+<!-- CONTENEDOR PRINCIPAL (2 columnas) -->
+<div class="contenedor-principal dos-columnas">
+
+    <!-- COLUMNA IZQUIERDA: Formulario manual -->
+    <div class="columna-formulario">
+        <div>
+            <h1 class="titulo-seccion">Unirse a Partida</h1>
+            <p class="descripcion-seccion">Ingresa el ID de la partida manualmente</p>
+        </div>
+
+        <div class="form-card">
+            <form id="formUnirse">
+                <div class="form-group">
+                    <label for="input-id-partida">ID de la Partida *</label>
+                    <input type="text" id="input-id-partida" placeholder="Ej: 123456" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="input-nombre-jugador">Tu Nombre *</label>
+                    <input type="text" id="input-nombre-jugador" placeholder="Ej: Tu nombre de usuario" required>
+                </div>
+
+                <div id="contrasena-container" class="form-group oculto">
+                    <label for="input-contrasena-partida">Contraseña de la Partida</label>
+                    <input type="password" id="input-contrasena-partida" placeholder="Contraseña requerida">
+                </div>
+
+                <div class="form-botones">
+                    <button type="button" class="boton-secundario" onclick="window.location.href='MenuJuego-Interfaz.html'">Atrás</button>
+                    <button type="button" class="boton-combate" id="btn-unirse">Unirse</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: Lista de partidas activas -->
+    <div class="columna-partidas">
+        <div class="partidas-header">
+            <h2 class="partidas-titulo">PARTIDAS ACTIVAS</h2>
+            <button id="btn-refrescar" class="btn-refrescar">⟳ REFRESCAR</button>
+        </div>
+        <div class="partidas-lista" id="partidas-lista">
+            <div class="loading-partidas">
+                <div class="spinner-small"></div>
+                <p>Cargando partidas...</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL PARA CONTRASEÑA -->
+<div id="modal-contrasena" class="modal-oculto">
+    <div class="modal-contenido">
+        <div class="modal-header">
+            <h3>🔒 CONTRASEÑA REQUERIDA</h3>
+            <button class="modal-cerrar">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>La partida <strong id="modal-partida-id"></strong> tiene contraseña</p>
+            <input type="password" id="modal-input-contrasena" placeholder="Ingresa la contraseña">
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancelar">Cancelar</button>
+            <button class="btn-confirmar">Unirse</button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="../JS/UnirseP.js"></script>
+</body>
+</html>

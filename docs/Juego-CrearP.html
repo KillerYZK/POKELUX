@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POKELUX - Crear Partida</title>
+    <link rel="stylesheet" href="../CSS/CrearP.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <span class="titulo">POKELUX</span>
+      <span class="subtitulo">POR YZK, MUNNY Y GAEL</span>
+    </div>
+    <nav class="navbar">
+      <button class="boton-menu" onclick="window.location.href='../../MENU PRINCIPAL/Menu-Inicio.html'">Inicio</button>
+      <button class="boton-menu">Pokemones</button>
+      <button class="boton-menu">Instrucciones</button>
+    </nav>
+  </header>
+
+  <hr class="separador">
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="contenedor-principal">
+
+    <!-- TÍTULO -->
+    <div>
+      <h1 class="titulo-seccion">Crear Partida</h1>
+      <p class="descripcion-seccion">Configura tu partida y desafía a tus amigos</p>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="form-card">
+      <form id="formCrearPartida">
+
+        <div class="form-group">
+          <label for="input-nombre">Nombre de la Partida *</label>
+          <input type="text" id="input-nombre" placeholder="Ej: Batalla Épica" required>
+        </div>
+
+        <div class="form-group">
+          <label for="input-host">Tu Nombre (Host) *</label>
+          <input type="text" id="input-host" placeholder="Ej: Tu nombre de usuario" required>
+        </div>
+
+        <div class="form-group">
+          <label for="input-descripcion">Descripción</label>
+          <textarea id="input-descripcion" placeholder="Describe tu partida (opcional)"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="input-contrasena">Contraseña</label>
+          <input type="password" id="input-contrasena" placeholder="Contraseña (opcional)">
+        </div>
+
+        <div class="form-botones">
+          <button type="button" class="boton-secundario" onclick="window.location.href='../../MENU PRINCIPAL/Menu-Inicio.html'">Atrás</button>
+          <button type="button" class="boton-combate" id="btn-crear">Crear Partida</button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+
+  <script type="module" src="../JS/CrearP.js"></script>
+</body>
+</html>

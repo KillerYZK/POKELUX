@@ -1,0 +1,197 @@
+Hola me presento como siempre en cada uno de mis codigos, yo soy YZK y el día de hoy
+vengo programando un codigo en equipo por primera vez de esta escala.
+
+A lo largo de este texto ire expresando mis desacuerdos, aprendizajes, sugerencias pero
+sobre todo mi cordura. 
+
+================================================================================================
+14/04/2026
+================================================================================================
+
+El día de hoy programe lo que seria el inicio del formato de menu de peleas ademas de investigar
+un poco mas sobre como almacenar la informacion local del usuario al momento de jugar, de momento
+espero a terminar la idea del diseño del juego para poder despues programar la vista y después de 
+eso ya hacer los esceneraios de pelea.
+
+-- Cordura %90 = %100 
+
+La cordura de momento no va mal tengo algunos trabajos todavia pendientes pero hasta eso no significa
+un gran problema para mi.
+°-----------------------------------------------------------------------------------------------
+
+================================================================================================
+15/04/2026
+================================================================================================
+
+Hoy me encarge de emepzar a idear el funcionamiento del firebase para unirse y crear una partida
+Me hubiera gustado avanzar un poco mas en los botones y en contectar las pantallas para que cambie
+pero con lo que llevo esta bien. 
+
+--Cordura %85 = %100
+
+La verdad es que hoy me dio un poco de hambre entonces me tarde un poco mas en idear soluciones.
+°-----------------------------------------------------------------------------------------------
+
+================================================================================================
+19/04/2026
+================================================================================================
+
+Me doy cuenta que como nunca hemos decidido hacer un diagrama de flujos la idea de que debemos 
+hacer ademas del navbar esta muy mal organizado por lo que estuve dos horas pensando como organizar
+pero aun ya con la idea no entiendo POR QUE EL PINCHE CONEXIÓN LE VALIA MADRES TODO LO DE COMBATE
+
+--Cordura %65 = %100
+
+EN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROR
+EN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROR
+EN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROR DIOS NOS ABANDONO.
+EN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROR
+EN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROREN DONDE ESTA EL PUTO ERROR
+°-----------------------------------------------------------------------------------------------
+
+================================================================================================
+21&22/04/2026
+================================================================================================
+
+Este va a ser un comentario compartido por que va de la mano con todo lo que eh estado haciendo
+ok para resumir me estado encargando de realizar que el combate ya este dispuesto a funcionar,
+honestamente no eh jugado pokemon de una forma en la cual pueda considerarme como un jugador de 
+alto conocimineto por lo que el programar esto para mi es bastante complicado es ahí donde entra
+la IA en este caso, Honestamente es que el codigo de combate si esta en su mayor parte generado 
+por IA, me hace sentir un poco triste eso pero bueno....
+
+La verdad es que me dio muchisimo gusto el que la base de datos estuviera funcionando en los lobbys
+pero aun hay muchos errores los cuales se pueden debugear de ahora en adelante los proximos días se 
+centraran en corregir bugs, errores, poner estilos pero sobre todo debugear.
+
+Tengo fe de que este trabajo termine pronto al igual que mis compañeros pero no creo que sea dentro 
+de poco.
+
+
+10:42 pm
+Uncaught SyntaxError: Illegal return statement 529
+JAJAJA, ya, ya me reí el error me esta dando falla en un retunr donde dice que hay un ganador pero
+ES UN PUTO RETURN, va quiero pensar que el error va todavia mas atras en algo de la logica una no 
+esta cargando nada, pero ya inicia lo que falta es arreglar el codigo de combate, ya debugie peroa
+aun hay mucha mejora.
+
+
+-- Cordura 30% = 100%
+
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+SE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADOSE QUEDO CONGELADO SE QUEDO CONGELADO
+
+Solo quiero acabar esto...
+°-----------------------------------------------------------------------------------------------
+
+================================================================================================
+23/04/2026
+================================================================================================
+
+Ya me esta doliendo la cabeza no he solucionado casí nada, lo unico bueno el combate ya esta MEDIO
+FUNCIONANDO, lo que sucede es que firebase como que no me esta detectando los cambios a tiempo real
+honestamente ya solo voy a larpear.
+
+Tengo sueño me acabo acabar una monster solo quiero dormir el codigo no deja de salir de mi cabeza 
+a este punto ya no se que esta mal, eh estado cambiando y cambiando y cambiando y cambiando que mi
+misma existencia va a cambiar, no hay salvacion solo hay codigo y monster...
+a todo aquel que se atreva a leer esto solo quiero que sepa que esto ese MUUUUUUUUUUUUUUUUUUUUUY DIVERTIDOOOOOOOOOOOOOOOOOOOOOOOOOO :D
+JAJAJAJAJAJAAJAJAJAJAJAJAJAJAJAJAJJAJAJAJAJAAAJAJAJAJAJAJAJJAJAJAJAJAJAJAJAJAJAJAJAJA
+agh....
+mañana llegare a la escuela y solo seguire durmiendo por que ya estoy en mi limite mental
+quiero descansar bueno ya me queje y queme mucho tiempo con esto.
+
+YO ME VENDRE DONDE Y CUANDO NO SEEEEEEEEEEEEEEE, SOLO SE QUE PRONTO YO ME CORRE~REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE https://www.youtube.com/watch?v=yT0H9AYZ19
+
+--Cordura %NO HAY LALALALALA  = %HACHIMI HACHIMI HACHIMI~IIIII, HACHIMI WO NAMBERU~TOOOOOOOOO, ASHIGA ASHIGA ASHI-GA HAYAKU NARUUUUUU,
+
+Den' moyego svidaniya s Dzheyn
+Vsyo gotovo
+Utro my poydyom vmeste v tserkov'
+My budem pit' kofe i yest' omlety v kafe
+Posle togo kak mы prohodym v parke
+Eh
+My poydyom v akvarium i uvidim lyubimykh Dzheyn,
+Delfinov i pingvinov
+Posle obeda mы otdokhnёm
+Itak, chto mы sdelali utrom
+My budem govorit' ob etom poka ne vspomnim
+My ne vspomnim
+I noch'yu my budem spat' v tserkvi
+
+°-----------------------------------------------------------------------------------------------
+LOG ERRORES QUE SUPUESTAMENTE ME ESTAN CAUSANDO CORDURA BAJA
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+1	animacionEnProceso no se reinicia después de resolverAtaque si hay error	                680	El juego se queda trabado
+2	renderEstado tiene if (animacionEnProceso) return; al inicio	                            460	Bloquea actualizaciones si la animación queda true
+3	El clima se aplica dos veces en renderEstado	                                            495-496	Ineficiente, pero no crítico
+4	esperandoCambio no se reinicia al cambiar de turno	                                        540	El menú de cambio se queda abierto
+5	El listener onValue se crea ANTES de verificar si el combate existe	                        180	Puede haber carrera de datos
+6	esHost se usa para resolver ataques, pero el invitado también necesita ver el resultado	    530	El invitado no ve el daño hasta recargar
+
+Moly.... moly 
+================================================================================================
+
+Ok estoy un poco mas tranquilo son las 2:51 estoy muerto pero aun quiero añadir unas pocas cositas
+esto ya es ambición...
+
+
+Durante el transcurso del día logre trabajar con las pocas horas de sueño con lo mas que pude en
+el proyecto la pantalla de carga fue el mayor desafio por el que pase en este trabajo jajaja,
+honestamente si me desespere, llegue a querer dejar de trabajar por el simple hecho de estancarme
+en algo tan tonto y que en su momento me llegaron a enseñar como hacerlo...
+
+--Cordura %20 = %100
+
+Eres alguien increible YZK...
+
+===============================================================================================
+|                                   Punto de inflexion.                                       |
+===============================================================================================
+| PRIMEROS PENSAMIENTOS                                                                       |
+|°-------------------------------------------------------------------------------------------°|
+| Nuevamente me encuentro un trabajo el cual me causo un gran trabajo sin embargo esta vez es |
+| cierto que tuve la compañia de dos compañeros de los cuales me pude apoyar para poder       |
+|reducir la carga de trabajo que normalmente hago...                                          |
+|                                                                                             |
+| No se que pensar estoy escribiendo esto desde mi mas honesto desagrado, si fuera honesto se |
+| que este proyecto lo podriamos mejorar eh incluso escalar para que pueda ser utilizado por  |
+| mas personas, pero esos son solo sueños juveniles, al final lo unico que importa es que     |
+| pude crecer no tan solo como programador, creo que ha sido el proyecto donde mas he         |
+|disfrutado, el tener compañia fue una buena sensacion, incluso con la frustracion de no poder| 
+|seguir adelante siempre trate de motivarme, puede que al final haya querido hacer de mas     |
+|unicamente por ego,                                                                          |
+| --------------------------------------------------------------------------------------------|
+| Por que....
+|°--------------------------------------------------------------------------------------------|
+| Nuevamente...                                                                               |
+| Estoy aquí, pienso en lo que quiero decir.                                                  |
+| Si tuviera que describir este trabajo seria como si un niño estuviera en un caso donde este |
+| tiene dos opciones salvar a su mamá o a su papá de un ladron que tiene un cuchillo en ambos |
+| y tomar la desicion de disparase en el pie.                                                 |
+|                                                                                             |
+| Yo, y solo yo... tengo la culpa de estar como estoy, soy conciente de ello sin embargo me   |
+| apego a la idea de que los tiempos faciles hacen a los hombres debiles, ni mi papá, ni mi   |
+| mamá forjaron un hombre debil por ello siempre me trato de llevar al limite. Pero incluso yo|
+| puedo llegar al punto en el que no podre seguir el ritmo que me impongo, si tuviera una     |
+| maldición definitivamente seria mi determinacion por nunca conocer ese limite. Eso algun    |
+| día me llevara a mi inevitable final....                                                    |
+|---------------------------------------------------------------------------------------------|
+| Mi resolucion                                                                               |
+|---------------------------------------------------------------------------------------------| 
+|                                                                                             |
+| Esto es esto... y eso, es eso....                                                           |
+|                                                                                             |
+|---------------------------------------------------------------------------------------------|

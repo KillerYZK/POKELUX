@@ -1,0 +1,331 @@
+Documentacion parte 2
+Mas documentado que nunca
+
+  Seccion 1 — Estructura de los archivos
+ 
+  HTML/
+    Juego-CrearP.html    → Formulario para crear una nueva partida
+    Juego-Unirse.html    → Formulario para unirse a una partida existente
+    Juego-Lobby.html     → Sala de espera antes del combate
+ 
+  JS/
+    CrearP.js            → Lógica de creación de partida + Firebase
+    UnirseP.js           → Lógica para unirse a partida + Firebase
+    SalaEspera.js        → Sincronización en tiempo real del lobby + chat
+ 
+  CSS/
+    MenuJuego-Interfaz.css  → Estilos del módulo (archivo presente pero vacío)
+ 
+  menu_combates/JS/
+    CrearP.js            → Copia vacía (no se usa, ignorar)
+ 
+  Seccion 2 — Firebase (Configuración compartida)
+ 
+  Los tres archivos JS comparten la misma configuración de Firebase.
+  Se inicializa al comienzo de cada archivo:
+ 
+  Proyecto Firebase: "pokelux"
+  Base de datos: Firebase Realtime Database
+  Autenticación: Firebase Auth (inicio de sesión anónimo, solo CrearP.js)
+ 
+  Módulos importados via CDN (Firebase v10.12.0):
+    - firebase-app.js        → initializeApp()
+    - firebase-database.js   → getDatabase(), ref(), set(), get(),
+                               onValue(), remove()
+    - firebase-auth.js       → getAuth(), signInAnonymously()
+                               (solo en CrearP.js)
+ 
+  Estructura de datos del Firebase:
+    partidas/
+      {idPartida}/
+        id                  → String (6 dígitos)
+        nombre              → String
+        descripcion         → String
+        contrasena          → String o null
+        estado              → "esperando" o "en_progreso"
+        host                → String (nombre del host)
+        creadorId           → String (UID de Firebase Auth)
+        fechaCreacion       → Number (timestamp)
+        jugadores/
+          {nombreJugador}/
+            equipo          → Array
+            listo           → Boolean
+            esHost          → Boolean
+            uid             → String (solo para el host)
+        chat/
+          {timestamp}/
+            jugador         → String
+            texto           → String
+            timestamp       → Number
+ 
+  SECCIÓN 3 — Juego-CrearP.html
+ 
+  ¿Para que sirve?:
+    Formulario donde el jugador configura y crea una nueva partida.
+    Una vez creada, redirige al Lobby con el ID generado.
+ 
+  Estructura HTML:
+    - <nav class="pk-navbar">: Barra de navegación con logo y botones:
+        "Inicio" → Menu-Inicio.html (via onclick inline)
+        "Pokemones" → sin funcionalidad asignada aún
+        "Instrucciones" → sin funcionalidad asignada aún
+ 
+    - <div class="pk-hero">: Encabezado visual con título "Crear Partida"
+ 
+    - <form id="formCrearPartida">: Formulario controlado por JS (no usa submit):
+        #input-nombre      → Nombre de la partida (obligatorio)
+        #input-host        → Nombre del host/jugador (obligatorio)
+        #input-descripcion → Descripción opcional (textarea)
+        #input-contrasena  → Contraseña opcional (type="password")
+        #btn-crear         → Botón que dispara la creación en Firebase
+ 
+  Scripts:
+    - ../JS/CrearP.js (importado como módulo ES: type="module")
+ 
+  Nota importante para la trama: El botón "Atrás" usa onclick inline hacia Menu-Inicio.html.
+ 
+
+  Seccion 4 — Juego-Unirse.html
+
+  ¿Para que sirve?:
+    Permite a un segundo jugador unirse a una partida existente ingresando
+    el ID de 6 dígitos. Valida contraseña si la partida la tiene.
+ 
+  Estructura de HTML:
+    - <nav class="navbar">: Navbar con botones de navegación
+ 
+    - <div class="hero">: Encabezado con título "Unirse a Partida"
+ 
+    - Texto informativo sobre el ID y contraseña
+ 
+    - <form id="formUnirse">:
+        #input-id-partida         → ID de 6 dígitos (obligatorio)
+        #input-nombre-jugador     → Nombre del jugador (obligatorio)
+        #input-contrasena-partida → Contraseña de la partida (opcional)
+        #btn-unirse               → Dispara la lógica de unirse
+ 
+    - Botón "Atrás" → Combate.html (onclick inline)
+ 
+  Scripts:
+    - ../JS/UnirseP.js (importado como módulo ES: type="module")
+ 
+
+  Seccion 5 — Juego-Lobby.html
+
+  ¿Para que sirve?:
+    Sala de espera visual donde ambos jugadores ven su estado antes de
+    comenzar el combate. Muestra equipos, estado de los jugadores,
+    ID de la partida y un chat en tiempo real.
+ 
+  ESTRUCTURA HTML RELEVANTE:
+ 
+  Columna izquierda — Jugadores:
+    - Bloque Host:
+        #nombre-host     → Nombre del host (actualizado por JS)
+        #estado-host     → Estado "Listo" o "Preparando equipo"
+        #equipo-host     → 6 slots con imagen y nombre del Pokemon
+    - Separador visual "VS"
+    - Bloque Guest:
+        #nombre-guest    → Nombre del guest o "Esperando..."
+        #estado-guest    → Estado del guest
+        #equipo-guest    → 6 slots (con clase "vacio" si no hay guest)
+ 
+  Columna derecha — Info de partida:
+    - Tarjeta de info:
+        #partida-nombre       → Nombre de la partida
+        #partida-descripcion  → Descripción
+        #partida-contrasena   → "Sí" o "No"
+        #partida-estado       → "Esperando jugadores..." o "En progreso"
+    - Tarjeta de ID:
+        #partida-id     → El ID de 6 dígitos
+        #btn-copiar     → Copia el ID al portapapeles
+        #copiar-feedback → Feedback temporal "Copiado!"
+    - Acciones:
+        #btn-iniciar    → Iniciar la partida (solo visible para el host)
+        #btn-salir      → Salir de la sala
+ 
+  Seccion extra: Chat(Eres un imbecil Zack esto ya era demas):
+    - #chat-mensajes   → Contenedor donde se renderizan los mensajes
+    - #chat-input      → Campo de texto para escribir
+    - #btn-enviar-chat → Botón para enviar (también funciona con Enter)
+ 
+  Scripts:
+    - ../JS/SalaEspera.js (como módulo ES: type="module")
+ 
+  Seccion 6 — CrearP.js
+ 
+  ¿Para que sirve?:
+    Maneja la lógica completa de creación de una partida nueva en Firebase.
+ 
+  Funciones auxiliar:
+ 
+  generarId6Digitos()
+    - Genera un número aleatorio de 6 dígitos como String
+    - Fórmula: Math.floor(100000 + Math.random() * 900000).toString()
+ 
+  verificarIdUnico(id)   [ASYNC]
+    - Consulta Firebase en ref "partidas/{id}"
+    - Retorna true si el ID no existe todavía
+ 
+  generarIdUnico6Digitos()   [ASYNC]
+    - Repite generarId6Digitos() + verificarIdUnico() hasta encontrar uno libre
+    - Máximo 10 intentos; si no lo logra lanza un Error
+ 
+  Flujo principal (click en #btn-crear):
+    1. Valida que nombre y hostName no estén vacíos
+    2. signInAnonymously(auth) para obtener uid del usuario
+    3. generarIdUnico6Digitos() para obtener un ID libre
+    4. set() en Firebase creando el nodo completo de la partida,
+       incluyendo al host como primer jugador
+    5. Guarda en localStorage:
+         "nombreJugador" → hostName
+         "esHost"        → "true"
+         "idPartida"     → idPartida
+    6. Redirige a Juego-Lobby.html?id={idPartida}
+ 
+  Nota importante para la trama:
+    Los botones de navegación secundarios (Equipo, Inicio) tienen
+    protección con if-checks porque sus IDs no existen en esta página.
+ 
+================================================================================
+  Seccion 7 — UnirseP.js
+================================================================================
+ 
+  ¿Para que sirve?:
+    Valida y ejecuta el proceso de unirse a una partida existente en Firebase.
+ 
+  Funcion auxiliar:
+  validarId6Digitos(id)
+    - Verifica con regex /^\d{6}$/ que el ID sea exactamente 6 dígitos
+ 
+  Flujo principal (click en #btn-unirse):
+    1. Leer idPartida, nombreJugador y contraseña del formulario
+    2. Validar campos obligatorios
+    3. validarId6Digitos() → error si el formato no es correcto
+    4. get() en Firebase para buscar la partida por ID
+    5. Verificaciones en cascada:
+       a. ¿Existe la partida?
+       b. ¿Estado es "esperando"?
+       c. ¿Hay menos de 2 jugadores?
+       d. ¿Contraseña coincide (si la tiene)?
+       e. ¿El jugador ya está dentro?
+       f. ¿El nombre ya está en uso?
+    6. set() en Firebase para agregar al jugador como guest
+    7. Guarda en localStorage:
+         "nombreJugador" → nombreJugador
+         "esHost"        → "false"
+         "idPartida"     → idPartida
+    8. Redirige a Juego-Lobby.html?id={idPartida}
+ 
+  Nota Importante para la trama:
+    Los botones de navegación (Equipo, inicio) al final del script buscan IDs
+    que no existen en Juego-Unirse.html, por lo que no tienen efecto.
+ 
+  Seccion 8 — SalaEspera.js
+ 
+  ¿Para que sirve?:
+    Mantiene la sala de espera sincronizada en tiempo real con Firebase.
+    Actualiza la UI conforme cambian los datos, maneja el chat y los
+    botones de iniciar y salir.
+ 
+  Variables Globales:
+    idPartida            → ID leído de la URL (?id=XXXXXX)
+    nombreJugadorLocal   → De localStorage["nombreJugador"]
+    esHostLocal          → Boolean de localStorage["esHost"]
+    datosPartidaActual   → Último snapshot de Firebase
+ 
+  Inicializacion (DOMContentLoaded):
+    - Lee el ID de la URL con URLSearchParams
+    - Si faltan datos redirige a Menu-Inicio.html
+    - Llama a cargarDatosPartida()
+    - Asigna listeners a los botones de acción y chat
+    - Permite enviar mensaje con la tecla Enter
+    - Oculta #btn-iniciar si el jugador no es host
+ 
+  Funcion cargarDatosPartida():
+    - onValue() → suscripción en tiempo real al nodo partidas/{id}
+    - Cada actualización:
+        Actualiza los textos de info de la partida en el DOM
+        Llama a actualizarJugadores()
+        Llama a cargarChat()
+        Si es host → llama a verificarJugadoresListo()
+    - Si la partida ya no existe → alerta y redirige
+ 
+  Funcion actualizarJugadores():
+    - Separa jugadores en host y guest según jugador.esHost
+    - Actualiza nombres, estados y clases CSS de los slots
+    - Maneja el caso de que el guest aún no haya llegado
+ 
+  Funcion verificarJugadoresListo():
+    - Solo la corre el host
+    - Si hay 2 jugadores y ambos tienen listo === true → habilita #btn-iniciar
+    - Si no → lo deja deshabilitado con mensaje de espera
+ 
+  Funcion iniciarPartida()   [ASYNC]:
+    - set() en Firebase: cambia estado a "en_progreso"
+    - Redirige a Juego-Combate.html?id={idPartida}
+    - NOTA: Juego-Combate.html aún no existe en el proyecto
+ 
+  Funcion salirDelaPartida()   [ASYNC]:
+    - remove() del jugador en Firebase
+    - Si es host → remove() de toda la partida
+    - Redirige a Combate.html
+ 
+  Funcion cargarChat():
+    - onValue() en el nodo chat
+    - Limpia y re-renderiza todos los mensajes en cada actualización
+    - Auto-scroll al último mensaje
+ 
+  Funcion agregarMensajeAlChat(jugador, texto):
+    - Crea y agrega un div con formato "NombreJugador: mensaje" al chat
+ 
+  Funcion enviarMensaje()   [ASYNC]:
+    - Valida que el texto no esté vacío
+    - set() en Firebase bajo chat/{Date.now()} con jugador, texto y timestamp
+    - Limpia el input
+ 
+  Funcion copiarID():
+    - Copia el ID de partida al portapapeles con navigator.clipboard
+    - Muestra "Copiado!" 2 segundos
+    - Expuesta globalmente como window.copiarID para el onclick inline del HTML
+ 
+  Seccion 9 — Flujo completo del modulo combates:
+ 
+  [Jugador 1 — Crear Partida]
+  1. Llega desde Combate.html al presionar "Crear Partida"
+  2. Juego-CrearP.html: llena nombre, su nombre, descripción, contraseña
+  3. CrearP.js: autenticación anónima → ID único → crea nodo en Firebase
+  4. Guarda en localStorage y redirige a Juego-Lobby.html?id=XXXXXX
+  5. En el Lobby: ve su nombre como HOST, ID de partida visible para compartir
+ 
+  [Jugador 2 — Unirse a Partida]
+  1. Llega desde Combate.html al presionar "Unirse a Partida"
+  2. Juego-Unirse.html: ingresa el ID de 6 dígitos y su nombre
+  3. UnirseP.js: valida → busca partida → pasa todas las verificaciones
+  4. Agrega su nodo en Firebase y redirige a Juego-Lobby.html?id=XXXXXX
+ 
+  [Sala de Espera — Ambos jugadores]
+  5. SalaEspera.js se inicializa de forma independiente para cada jugador
+  6. onValue() mantiene la UI sincronizada en tiempo real para ambos
+  7. Los jugadores pueden chatear en tiempo real
+  8. Cuando ambos estén "listos" → el host puede iniciar la partida
+  9. iniciarPartida() cambia estado en Firebase y redirige a Juego-Combate.html
+ 
+  [Salir]
+  - Cualquier jugador puede usar "Salir"
+  - Si el host sale → se elimina toda la partida de Firebase
+ 
+  Seccion 10 — Estado de implementacion:
+ 
+  ¿Como funciona?                   Estado
+  -------------------------------  -----------------------------------------
+  Crear partida en Firebase        Implementado y funcional
+  Unirse a partida con validación  Implementado con validaciones completas
+  Sala de espera en tiempo real    Implementado (suscripción onValue)
+  Chat en tiempo real              Implementado
+  Copiar ID de partida             Implementado
+  Mostrar equipo en slots          Parcial (slots existen sin sprites reales)
+  Sistema de marcarse como listo   Parcial (UI lista, falta botón de acción)
+  Pantalla de combate real         No implementado (Juego-Combate.html faltante)
+  Estilos CSS del módulo           No implementado (CSS vacío)
+ 

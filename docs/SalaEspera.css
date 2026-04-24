@@ -1,0 +1,614 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800&display=swap");
+ 
+/* ============================================
+   VARIABLES
+   ============================================ */
+:root {
+  --magenta: #ff2d78;
+  --magenta-dark: #c4005a;
+  --azul-marino: #0d1b4b;
+  --azul-medio: #1a3080;
+  --azul-claro: #4fc3f7;
+  --blanco: #f0f4ff;
+  --sombra: rgba(255, 45, 120, 0.35);
+}
+ 
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+ 
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+ 
+body {
+  font-family: "Nunito", sans-serif;
+  background-color: var(--azul-marino);
+  color: var(--blanco);
+  cursor: default;
+}
+ 
+/* ============================================
+   FONDO ANIMADO — líneas de perspectiva
+   ============================================ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 60%, rgba(255, 45, 120, 0.08) 100%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 80px,
+      rgba(79, 195, 247, 0.04) 80px,
+      rgba(79, 195, 247, 0.04) 81px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 80px,
+      rgba(79, 195, 247, 0.04) 80px,
+      rgba(79, 195, 247, 0.04) 81px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+ 
+body::after {
+  content: "";
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 45, 120, 0.18) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: pulso 4s ease-in-out infinite;
+}
+ 
+@keyframes pulso {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.1); }
+}
+ 
+/* ============================================
+   LAYOUT PRINCIPAL
+   ============================================ */
+.root {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+ 
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.5rem 3rem;
+  gap: 1rem;
+  animation: deslizar-arriba 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+ 
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+ 
+.nav-logo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: 0.06em;
+  color: var(--blanco);
+  text-shadow:
+    3px 3px 0px var(--magenta),
+    6px 6px 0px var(--azul-medio);
+  position: relative;
+  width: fit-content;
+}
+ 
+.nav-logo span {
+  color: var(--magenta);
+}
+ 
+.nav-logo::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--magenta), transparent);
+}
+ 
+.nav-divider {
+  border: none;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--magenta) 0%,
+    var(--azul-claro) 40%,
+    transparent 100%
+  );
+}
+ 
+/* ============================================
+   SALA CONTAINER
+   ============================================ */
+.sala-container {
+  display: flex;
+  gap: 1.5rem;
+  flex: 1;
+  min-height: 0;
+}
+ 
+/* ============================================
+   COLUMNA IZQUIERDA — equipos
+   ============================================ */
+.sala-equipos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(26, 48, 128, 0.3);
+  border: 2px solid rgba(79, 195, 247, 0.12);
+  border-radius: 4px;
+  padding: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+ 
+.sala-equipos::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--magenta);
+}
+ 
+.sala-jugador {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+}
+ 
+.sala-jugador-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+ 
+.sala-jugador-nombre {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  color: var(--blanco);
+}
+ 
+.sala-jugador-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+ 
+.sala-jugador-badge.host {
+  background: var(--magenta);
+  color: var(--azul-marino);
+}
+ 
+.sala-jugador-estado {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin-left: auto;
+}
+ 
+.sala-jugador-estado.listo    { color: #4fc3f7; }
+.sala-jugador-estado.esperando { color: rgba(240, 244, 255, 0.4); }
+ 
+.sala-equipo-slots {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.4rem;
+  flex: 1;
+}
+ 
+.sala-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(13, 27, 75, 0.6);
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  border-radius: 4px;
+  padding: 6px 4px;
+  transition: border-color 0.2s ease;
+}
+ 
+.sala-slot:not(.vacio) {
+  border-color: rgba(79, 195, 247, 0.25);
+}
+ 
+.sala-slot-sprite {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+ 
+.sala-slot.vacio .sala-slot-sprite {
+  opacity: 0.15;
+}
+ 
+.sala-slot-nombre {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--azul-claro);
+  opacity: 0.7;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+ 
+.sala-vs {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: 0.1em;
+  color: var(--magenta);
+  text-align: center;
+  text-shadow: 2px 2px 0 var(--magenta-dark);
+  flex-shrink: 0;
+}
+ 
+/* ============================================
+   COLUMNA DERECHA — info
+   ============================================ */
+.sala-info {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+ 
+.sala-info-card,
+.sala-id-card {
+  background: rgba(26, 48, 128, 0.3);
+  border: 2px solid rgba(79, 195, 247, 0.12);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+ 
+.sala-info-card::before,
+.sala-id-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--magenta);
+}
+ 
+.sala-info-titulo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  color: var(--blanco);
+  margin-bottom: 0.3rem;
+}
+ 
+.sala-info-descripcion {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--azul-claro);
+  opacity: 0.7;
+  margin-bottom: 0.6rem;
+  line-height: 1.4;
+}
+ 
+.sala-info-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-top: 1px solid rgba(79, 195, 247, 0.07);
+}
+ 
+.sala-info-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--azul-claro);
+  opacity: 0.5;
+}
+ 
+.sala-info-valor {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--blanco);
+}
+ 
+.sala-info-valor.esperando { color: rgba(240, 244, 255, 0.4); }
+ 
+.sala-id-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--azul-claro);
+  opacity: 0.5;
+  margin-bottom: 0.4rem;
+}
+ 
+.sala-id-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+ 
+.sala-id-codigo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  color: var(--magenta);
+  flex: 1;
+  word-break: break-all;
+}
+ 
+.sala-id-hint {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--azul-claro);
+  margin-top: 4px;
+  min-height: 14px;
+}
+ 
+/* ============================================
+   BOTONES
+   ============================================ */
+.sala-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+ 
+.sala-btn-iniciar,
+.sala-btn-cargar,
+.sala-btn-salir,
+.sala-id-copiar {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  border: none;
+  border-radius: 3px;
+  padding: 0.6rem 1.2rem;
+  width: 100%;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+ 
+.sala-btn-iniciar {
+  color: var(--azul-marino);
+  background: var(--magenta);
+  box-shadow: 0 4px 0 var(--magenta-dark), 0 6px 20px var(--sombra);
+}
+ 
+.sala-btn-iniciar:hover:not(:disabled) {
+  background: #ff4d8d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--magenta-dark), 0 10px 30px var(--sombra);
+}
+ 
+.sala-btn-iniciar:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--magenta-dark);
+}
+ 
+.sala-btn-iniciar:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+ 
+.sala-btn-cargar {
+  color: var(--blanco);
+  background: rgba(26, 48, 128, 0.6);
+  border: 2px solid rgba(79, 195, 247, 0.25);
+}
+ 
+.sala-btn-cargar:hover {
+  background: rgba(26, 48, 128, 0.9);
+  border-color: rgba(79, 195, 247, 0.5);
+  transform: translateY(-1px);
+}
+ 
+.sala-btn-salir {
+  color: rgba(240, 244, 255, 0.5);
+  background: transparent;
+  border: 2px solid rgba(240, 244, 255, 0.1);
+}
+ 
+.sala-btn-salir:hover {
+  color: var(--blanco);
+  border-color: rgba(240, 244, 255, 0.3);
+}
+ 
+.sala-id-copiar {
+  font-size: 0.85rem;
+  width: auto;
+  padding: 0.3rem 0.8rem;
+  color: var(--azul-marino);
+  background: var(--azul-claro);
+  box-shadow: 0 2px 0 #2a8fb5;
+}
+ 
+.sala-id-copiar:hover {
+  background: #74d4f9;
+  transform: translateY(-1px);
+}
+ 
+/* ============================================
+   CHAT
+   ============================================ */
+.sala-chat-container {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(26, 48, 128, 0.3);
+  border: 2px solid rgba(79, 195, 247, 0.12);
+  border-radius: 4px;
+  padding: 0.8rem 1rem;
+  height: 160px;
+  position: relative;
+  overflow: hidden;
+}
+ 
+.sala-chat-container::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--azul-claro), transparent);
+}
+ 
+.sala-chat-mensajes {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 195, 247, 0.2) transparent;
+}
+ 
+.sala-chat-mensaje {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(240, 244, 255, 0.8);
+  line-height: 1.4;
+}
+ 
+.sala-chat-mensaje strong {
+  color: var(--azul-claro);
+  margin-right: 4px;
+}
+ 
+.sala-chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+ 
+.sala-chat-input {
+  flex: 1;
+  background: rgba(13, 27, 75, 0.7);
+  border: 1px solid rgba(79, 195, 247, 0.15);
+  border-radius: 3px;
+  padding: 0.45rem 0.8rem;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--blanco);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+ 
+.sala-chat-input::placeholder {
+  color: rgba(240, 244, 255, 0.25);
+}
+ 
+.sala-chat-input:focus {
+  border-color: rgba(79, 195, 247, 0.4);
+}
+ 
+.sala-chat-enviar {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--azul-marino);
+  background: var(--magenta);
+  border: none;
+  border-radius: 3px;
+  padding: 0 1rem;
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--magenta-dark);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+ 
+.sala-chat-enviar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 var(--magenta-dark);
+}
+ 
+.sala-chat-enviar:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--magenta-dark);
+}
+ 
+/* ============================================
+   ANIMACIONES DE ENTRADA
+   ============================================ */
+@keyframes deslizar-arriba {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+ 
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .content {
+    padding: 1rem 1.2rem;
+  }
+ 
+  .sala-container {
+    flex-direction: column;
+  }
+ 
+  .sala-info {
+    width: 100%;
+  }
+ 
+  .sala-equipo-slots {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+ 

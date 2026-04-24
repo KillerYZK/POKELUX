@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POKELUX - Combate</title>
+    <link rel="stylesheet" href="../CSS/Combate.css">
+</head>
+<body>
+  <div class="combate-root">
+
+    <!-- CAMPO DE BATALLA -->
+<div class="combate-campo">
+
+  <!-- Pokémon JUGADOR (abajo izquierda) - PRIMERO -->
+  <div class="combate-lado jugador">
+    <div class="combate-sprite-wrapper jugador">
+      <img class="combate-sprite" id="jugador-sprite" src="" alt="Pokémon jugador">
+    </div>
+    <div class="combate-infobar jugador">
+      <div class="combate-info-nombre-row">
+        <span class="combate-nombre" id="jugador-nombre">Pikachu</span>
+        <span class="combate-nivel" id="jugador-nivel">Nv. 50</span>
+      </div>
+      <div class="combate-hpbar-row">
+        <span class="combate-hp-label">HP</span>
+        <div class="combate-hpbar-bg">
+          <div class="combate-hpbar-fill" id="jugador-hp-fill"></div>
+        </div>
+      </div>
+      <div class="combate-hp-numero">
+        <span id="jugador-hp-actual">100</span>/<span id="jugador-hp-max">100</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pokémon ENEMIGO (arriba derecha) - SEGUNDO -->
+  <div class="combate-lado enemigo">
+    <div class="combate-sprite-wrapper enemigo">
+      <img class="combate-sprite" id="enemigo-sprite" src="" alt="Pokémon enemigo">
+    </div>
+    <div class="combate-infobar enemigo">
+      <div class="combate-info-nombre-row">
+        <span class="combate-nombre" id="enemigo-nombre">Gengar</span>
+        <span class="combate-nivel" id="enemigo-nivel">Nv. 50</span>
+      </div>
+      <div class="combate-hpbar-row">
+        <span class="combate-hp-label">HP</span>
+        <div class="combate-hpbar-bg">
+          <div class="combate-hpbar-fill" id="enemigo-hp-fill"></div>
+        </div>
+      </div>
+      <div class="combate-hp-numero">
+        <span id="enemigo-hp-actual">50</span>/<span id="enemigo-hp-max">50</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+    <!-- PANEL INFERIOR -->
+    <div class="combate-panel">
+
+      <!-- LOG de mensajes -->
+      <div class="combate-log" id="combate-log">
+        <p id="log-texto">¿Qué hará Pikachu?</p>
+      </div>
+
+      <!-- MENÚ PRINCIPAL -->
+      <div class="combate-menu" id="menu-principal">
+        <button class="combate-opcion" id="btn-luchar">LUCHAR</button>
+        <button class="combate-opcion" id="btn-pokemon">POKÉMON</button>
+        <button class="combate-opcion" id="btn-bolsa">BOLSA</button>
+      </div>
+
+      <!-- MENÚ MOVIMIENTOS (oculto por defecto) -->
+      <div class="combate-menu combate-movimientos oculto" id="menu-movimientos">
+        <div class="movimientos-grid"></div>
+      </div>
+
+      <!-- MENÚ CAMBIO DE POKÉMON (oculto por defecto) -->
+      <div class="combate-cambio oculto" id="menu-cambio"></div>
+
+    </div>
+
+    <!-- EQUIPOS (miniaturas laterales) -->
+    <div class="combate-equipos-row">
+
+      <!-- Equipo enemigo -->
+      <div class="combate-equipo-mini" id="equipo-enemigo">
+        <div class="combate-pokeball" id="en-0"></div>
+        <div class="combate-pokeball" id="en-1"></div>
+        <div class="combate-pokeball" id="en-2"></div>
+        <div class="combate-pokeball" id="en-3"></div>
+        <div class="combate-pokeball" id="en-4"></div>
+        <div class="combate-pokeball" id="en-5"></div>
+      </div>
+
+      <!-- Equipo jugador -->
+      <div class="combate-equipo-mini" id="equipo-jugador">
+        <div class="combate-pokeball" id="jg-0"></div>
+        <div class="combate-pokeball" id="jg-1"></div>
+        <div class="combate-pokeball" id="jg-2"></div>
+        <div class="combate-pokeball" id="jg-3"></div>
+        <div class="combate-pokeball" id="jg-4"></div>
+        <div class="combate-pokeball" id="jg-5"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script type="module" src="../JS/Combate.js"></script>
+</body>
+</html>

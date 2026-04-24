@@ -1,0 +1,505 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800&display=swap");
+
+/* ============================================
+   VARIABLES
+   ============================================ */
+:root {
+  --magenta: #ff2d78;
+  --magenta-dark: #c4005a;
+  --azul-marino: #0d1b4b;
+  --azul-medio: #1a3080;
+  --azul-claro: #4fc3f7;
+  --blanco: #f0f4ff;
+  --sombra: rgba(255, 45, 120, 0.35);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Nunito", sans-serif;
+  background-color: var(--azul-marino);
+  color: var(--blanco);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 80px,
+      rgba(79, 195, 247, 0.03) 80px,
+      rgba(79, 195, 247, 0.03) 81px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 80px,
+      rgba(79, 195, 247, 0.03) 80px,
+      rgba(79, 195, 247, 0.03) 81px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================
+   HEADER / NAVBAR
+   ============================================ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13, 27, 75, 0.93);
+  backdrop-filter: blur(10px);
+  padding: 1rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  animation: deslizar-arriba 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  flex-shrink: 0;
+}
+
+.titulo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.06em;
+  color: var(--blanco);
+  text-shadow: 3px 3px 0px var(--magenta);
+}
+
+.subtitulo {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--azul-claro);
+  opacity: 0.7;
+}
+
+.navbar {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.separador {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border: none;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--magenta) 0%,
+    var(--azul-claro) 40%,
+    transparent 100%
+  );
+}
+
+.boton-menu {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  color: var(--blanco);
+  background: transparent;
+  border: 2px solid rgba(79, 195, 247, 0.25);
+  border-radius: 3px;
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.boton-menu:hover {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: var(--azul-marino);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--sombra);
+}
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+.contenedor-principal {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: deslizar-arriba 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================
+   BARRA DE BÚSQUEDA
+   ============================================ */
+.barra-busqueda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.busqueda-pokemon {
+  font-family: "Nunito", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--blanco);
+  background: rgba(26, 48, 128, 0.5);
+  border: 2px solid rgba(79, 195, 247, 0.2);
+  border-radius: 3px;
+  padding: 0.75rem 1.2rem;
+  width: 100%;
+  max-width: 520px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.busqueda-pokemon::placeholder {
+  color: rgba(240, 244, 255, 0.35);
+}
+
+.busqueda-pokemon:focus {
+  border-color: var(--magenta);
+  box-shadow: 0 0 0 3px rgba(255, 45, 120, 0.15);
+}
+
+/* ============================================
+   FILTROS (details/summary)
+   ============================================ */
+.filtros-menu {
+  max-width: 520px;
+  background: rgba(26, 48, 128, 0.45);
+  border: 2px solid rgba(79, 195, 247, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.filtros-menu[open] {
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+.filtros-menu summary {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  color: var(--azul-claro);
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.filtros-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Flecha animada */
+.filtros-menu summary::after {
+  content: "▸";
+  font-size: 0.9rem;
+  transition: transform 0.25s ease;
+  margin-left: auto;
+}
+
+.filtros-menu[open] summary::after {
+  transform: rotate(90deg);
+}
+
+.filtros-menu summary:hover {
+  color: var(--blanco);
+}
+
+.filtros-checkbox {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem 1.2rem 1.2rem;
+  border-top: 1px solid rgba(79, 195, 247, 0.1);
+}
+
+.filtros-tipo,
+.filtros-generacion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.filtros-tipo h3,
+.filtros-generacion h3 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  color: var(--magenta);
+  margin-bottom: 0.3rem;
+}
+
+/* Checkboxes personalizados */
+.filtros-checkbox input[type="checkbox"] {
+  accent-color: var(--magenta);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  vertical-align: middle;
+  margin-right: 0.3rem;
+}
+
+.filtros-checkbox label,
+.filtros-checkbox input[type="checkbox"] + * {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(240, 244, 255, 0.75);
+  cursor: pointer;
+  transition: color 0.15s ease;
+  vertical-align: middle;
+}
+
+.filtros-tipo input,
+.filtros-generacion input {
+  display: inline;
+}
+
+/* ============================================
+   GRID DE CARTAS POKEMON
+   ============================================ */
+#cartas-pokemon {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.carta-pokemon {
+  background: rgba(26, 48, 128, 0.5);
+  border: 2px solid rgba(79, 195, 247, 0.1);
+  border-radius: 4px;
+  padding: 1rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+  animation: aparecer 0.4s ease both;
+}
+
+.carta-pokemon::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--magenta);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.carta-pokemon:hover {
+  transform: translateY(-5px);
+  border-color: rgba(79, 195, 247, 0.35);
+}
+
+.carta-pokemon:hover::before {
+  transform: scaleX(1);
+}
+
+.imagen-pokemon {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 6px rgba(255, 45, 120, 0.25));
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease;
+}
+
+.carta-pokemon:hover .imagen-pokemon {
+  transform: scale(1.1) translateY(-2px);
+  filter: drop-shadow(0 4px 12px rgba(255, 45, 120, 0.5));
+}
+
+.nombre-pokemon {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: capitalize;
+  color: var(--blanco);
+  text-align: center;
+}
+
+.id-pokemon {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--azul-claro);
+  opacity: 0.6;
+}
+
+/* ============================================
+   BOTÓN AÑADIR AL EQUIPO
+   ============================================ */
+.boton-anadir {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--azul-marino);
+  background: var(--magenta);
+  border: none;
+  border-radius: 2px;
+  padding: 0.3rem 0.8rem;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 0 var(--magenta-dark);
+  margin-top: 0.2rem;
+}
+
+.boton-anadir:hover {
+  background: #ff4d8d;
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 0 var(--magenta-dark),
+    0 6px 16px var(--sombra);
+}
+
+.boton-anadir:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--magenta-dark);
+}
+
+/* ============================================
+   PAGINACIÓN
+   ============================================ */
+.botones-paginacion {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  padding: 1rem 0 2rem;
+}
+
+.boton-paginacion {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  color: var(--blanco);
+  background: rgba(26, 48, 128, 0.6);
+  border: 2px solid rgba(79, 195, 247, 0.2);
+  border-radius: 3px;
+  padding: 0.5rem 1.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.boton-paginacion:hover {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: var(--azul-marino);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--sombra);
+}
+
+.boton-paginacion:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes deslizar-arriba {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  #cartas-pokemon {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 1.5rem;
+  }
+
+  .contenedor-principal {
+    padding: 1.5rem;
+  }
+
+  #cartas-pokemon {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .filtros-checkbox {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #cartas-pokemon {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+#cartas-pokemon {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
