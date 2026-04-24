@@ -19,5 +19,5 @@ document
 document
   .getElementById("Inicio")
   .addEventListener("click", function () {
-    window.location.href = "Menu-Inicio.html";
+    window.location.href = "Index.html";
   });

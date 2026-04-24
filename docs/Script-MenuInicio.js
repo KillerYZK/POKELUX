@@ -11,6 +11,6 @@ document.getElementById("Pokedex").addEventListener("click", () => {
 });
 
 document.getElementById("Inicio").addEventListener("click", () => {
-  window.location.href = "Menu-Inicio.html";
+  window.location.href = "Index.html";
 });
 
