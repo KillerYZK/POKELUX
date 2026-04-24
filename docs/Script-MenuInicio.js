@@ -7,7 +7,7 @@ document.getElementById("Equipo").addEventListener("click", () => {
 });
 
 document.getElementById("Pokedex").addEventListener("click", () => {
-  window.location.href = "Pokedex-Lista.html";
+  window.location.href = "POKEDEX-Lista.html";
 });
 
 document.getElementById("Inicio").addEventListener("click", () => {
