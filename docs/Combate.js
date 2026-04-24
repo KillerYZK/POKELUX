@@ -992,7 +992,7 @@ function mostrarPantallaFin(esVictoria, ganador) {
     `;
     
     document.getElementById("fin-volver-menu")?.addEventListener("click", () => {
-      window.location.href = `HTML/Juego-Lobby.html?id=${partidaId}`;
+      window.location.href = `Juego-Lobby.html?id=${partidaId}`;
     });
     
     document.getElementById("fin-ver-estadisticas")?.addEventListener("click", () => {
