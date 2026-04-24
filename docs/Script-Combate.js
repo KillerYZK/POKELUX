@@ -7,13 +7,13 @@ document
 document
     .getElementById("Comenzar")
     .addEventListener("click", function () {
-      window.location.href = "../MENU COMBATES/HTML/Juego-CrearP.html";
+      window.location.href = "Juego-CrearP.html";
     });
 
 document
   .getElementById("Unirse")
   .addEventListener("click", function () {
-    window.location.href = "../MENU COMBATES/HTML/Juego-Unirse.html";
+    window.location.href = "Juego-Unirse.html";
   });
 
 document
