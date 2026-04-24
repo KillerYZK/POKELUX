@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!idPartida || !nombreJugadorLocal) {
     alert("Información de la partida incompleta.");
-    window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
+    window.location.href = "Combate.html";
     return;
   }
 
@@ -127,7 +127,7 @@ function escucharEstadoPartida() {
       }
       
       // Redirigir al combate
-      window.location.href = `../HTML/Juego-Combate.html?id=${idPartida}`;
+      window.location.href = `Juego-Combate.html?id=${idPartida}`;
     }
   });
 }
@@ -139,7 +139,7 @@ function cargarDatosPartida() {
   onValue(partidaRef, (snapshot) => {
     if (!snapshot.exists()) {
       alert("La partida fue eliminada.");
-      window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
+      window.location.href = "Combate.html";
       return;
     }
 
@@ -152,7 +152,7 @@ function cargarDatosPartida() {
       console.error("Jugador no encontrado en la partida");
       console.log("Jugadores disponibles:", Object.keys(datosPartidaActual.jugadores || {}));
       alert("Error: No se encontró tu información en la partida.");
-      window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
+      window.location.href = "Index.html";
       return;
     }
 
@@ -259,7 +259,7 @@ async function iniciarPartida() {
     await set(ref(db, `partidas/${idPartida}/estado`), "en_progreso");
     
     // 4. Redirigir
-    window.location.href = `../HTML/Juego-Combate.html?id=${idPartida}`;
+    window.location.href = `Juego-Combate.html?id=${idPartida}`;
     
   } catch (error) {
     console.error("Error al iniciar partida:", error);
@@ -281,7 +281,7 @@ async function salirDelaPartida() {
       await remove(partidaRef);
     }
 
-    window.location.href = "../../MENU PRINCIPAL/Combate.html";
+    window.location.href = "Combate.html";
   } catch (error) {
     console.error("Error al salir:", error);
     alert("Error al salir de la partida.");

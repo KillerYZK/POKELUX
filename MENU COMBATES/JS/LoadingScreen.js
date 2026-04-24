@@ -106,7 +106,7 @@ function crearOverlay() {
   const center = document.createElement("div");
   center.id = "pk-loading-center";
   center.innerHTML = `
-    <div id="pk-loading-logo">POKE<span>LUX</span></div>
+    <div id="pk-loading-logo">POKELUX</span></div>
     <div id="pk-loading-sub">CARGANDO COMBATE...</div>
   `;
 

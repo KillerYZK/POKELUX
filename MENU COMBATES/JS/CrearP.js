@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem("idPartida", idPartida);
 
                 // Redirigir a la sala de espera
-                window.location.href = "../HTML/Juego-Lobby.html?id=" + idPartida;
+                window.location.href = "Juego-Lobby.html?id=" + idPartida;
 
             } catch (error) {
                 console.error("Error:", error);
@@ -126,16 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // Navegación
     const btnEquipo = document.getElementById("Equipo");
     if (btnEquipo) btnEquipo.addEventListener("click", () => {
-        window.location.href = "../../MENU PRINCIPAL/Equipo.html";
+        window.location.href = "Equipo.html";
     });
 
     const btnInicio = document.getElementById("Inicio");
     if (btnInicio) btnInicio.addEventListener("click", () => {
-        window.location.href = "../../MENU PRINCIPAL/Menu-Inicio.html";
+    window.location.href = "Index.html";
     });
 
     const btnAtras = document.getElementById("atras");
     if (btnAtras) btnAtras.addEventListener("click", () => {
-        window.location.href = "../../MENU PRINCIPAL/MenuJuego-Interfaz.html";
+        window.location.href = "Combate.html";
     });
 });

@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const exito = await unirsePartida(idPartida, nombreJugador, contrasena);
             if (exito) {
-                window.location.href = "../../MENU COMBATES/HTML/Juego-Lobby.html?id=" + idPartida;
+                window.location.href = "Juego-Lobby.html?id=" + idPartida;
             }
         });
     }
