@@ -1,6 +1,3 @@
-let peleaActiva = true;
-let datosMeowscarada, datosStarmie, hpMeowscarada, hpStarmie, turno;
-
 document.getElementById("AgregarPokemon").addEventListener("click", () => {
   window.location.href = "Lista.html";
 });
@@ -134,4 +131,8 @@ document.getElementById("BorrarEquipo").addEventListener("click", () => {
   });
   localStorage.removeItem("equipo");
   location.reload();
+});
+
+document.getElementById("Inicio").addEventListener("click", () => {
+  window.location.href = "Menu-Inicio.html";
 });

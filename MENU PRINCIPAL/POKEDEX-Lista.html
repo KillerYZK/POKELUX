@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POKELUX - Pokédex | Lista</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --magenta: #ff2d78;
+            --magenta-dark: #c4005a;
+            --azul-marino: #0d1b4b;
+            --azul-medio: #1a3080;
+            --azul-claro: #4fc3f7;
+            --blanco: #f0f4ff;
+            --sombra: rgba(255, 45, 120, 0.35);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Nunito", sans-serif;
+            background-color: var(--azul-marino);
+            color: var(--blanco);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(255, 45, 120, 0.08) 100%),
+                        repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(79, 195, 247, 0.04) 80px, rgba(79, 195, 247, 0.04) 81px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 45, 120, 0.18) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulso 4s ease-in-out infinite;
+        }
+
+        @keyframes pulso {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid rgba(79, 195, 247, 0.2);
+        }
+
+        .logo {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 1.8rem;
+            color: var(--blanco);
+            text-shadow: 2px 2px 0 var(--magenta);
+        }
+
+        .logo span { color: var(--magenta); }
+
+        .volver-btn {
+            font-family: "Bebas Neue", sans-serif;
+            background: transparent;
+            border: 2px solid rgba(79, 195, 247, 0.3);
+            color: var(--azul-claro);
+            padding: 0.3rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .volver-btn:hover {
+            border-color: var(--magenta);
+            color: var(--magenta);
+        }
+
+        /* TÍTULO */
+        .title {
+            text-align: center;
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 2.5rem;
+            color: var(--magenta);
+            margin-bottom: 1.5rem;
+        }
+
+        /* BÚSQUEDA */
+        .search-section {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box {
+            display: flex;
+            background: rgba(26, 48, 128, 0.6);
+            border: 2px solid rgba(79, 195, 247, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            padding: 0.6rem 1rem;
+            font-family: "Nunito", sans-serif;
+            font-size: 0.9rem;
+            color: var(--blanco);
+            width: 250px;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(240, 244, 255, 0.4);
+        }
+
+        .search-box button {
+            font-family: "Bebas Neue", sans-serif;
+            background: var(--magenta);
+            border: none;
+            color: var(--azul-marino);
+            padding: 0 1.2rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .search-box button:hover {
+            background: var(--magenta-dark);
+        }
+
+        .random-btn {
+            font-family: "Bebas Neue", sans-serif;
+            background: transparent;
+            border: 2px solid rgba(79, 195, 247, 0.3);
+            color: var(--azul-claro);
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .random-btn:hover {
+            border-color: var(--magenta);
+            color: var(--magenta);
+        }
+
+        /* FILTROS */
+        .filters {
+            background: rgba(26, 48, 128, 0.3);
+            border: 1px solid rgba(79, 195, 247, 0.1);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            margin-bottom: 0.8rem;
+        }
+
+        .filter-title {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 0.7rem;
+            color: var(--azul-claro);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+
+        .filter-btn {
+            font-family: "Bebas Neue", sans-serif;
+            background: rgba(13, 27, 75, 0.7);
+            border: 1px solid rgba(79, 195, 247, 0.2);
+            color: var(--blanco);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--magenta);
+            border-color: var(--magenta);
+            color: var(--azul-marino);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--magenta);
+        }
+
+        /* GRID DE POKÉMON */
+        .pokemon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pokemon-card {
+            background: rgba(26, 48, 128, 0.4);
+            border: 2px solid rgba(79, 195, 247, 0.15);
+            border-radius: 12px;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pokemon-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--magenta);
+            box-shadow: 0 10px 20px var(--sombra);
+        }
+
+        .pokemon-card img {
+            width: 80px;
+            height: 80px;
+            image-rendering: pixelated;
+        }
+
+        .pokemon-card .nombre {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 1rem;
+            margin: 0.3rem 0;
+            text-transform: capitalize;
+        }
+
+        .pokemon-card .id {
+            font-size: 0.65rem;
+            color: var(--azul-claro);
+        }
+
+        .pokemon-card .tipos {
+            display: flex;
+            justify-content: center;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
+        .type-badge {
+            font-size: 0.55rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .type-fire { background: #f08030; color: #000; }
+        .type-water { background: #6890f0; color: #fff; }
+        .type-grass { background: #78c850; color: #000; }
+        .type-electric { background: #f8d030; color: #000; }
+        .type-psychic { background: #f85888; color: #fff; }
+        .type-fighting { background: #c03028; color: #fff; }
+        .type-normal { background: #a8a878; color: #000; }
+        .type-poison { background: #a040a0; color: #fff; }
+        .type-ground { background: #e0c068; color: #000; }
+        .type-flying { background: #a890f0; color: #000; }
+        .type-ice { background: #98d8d8; color: #000; }
+        .type-rock { background: #b8a038; color: #000; }
+        .type-bug { background: #a8b820; color: #000; }
+        .type-dragon { background: #7038f8; color: #fff; }
+        .type-ghost { background: #705898; color: #fff; }
+        .type-dark { background: #705848; color: #fff; }
+        .type-steel { background: #b8b8d0; color: #000; }
+        .type-fairy { background: #ee99ac; color: #000; }
+
+        /* INFINITE SCROLL LOADER */
+        .loader {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem;
+            color: var(--azul-claro);
+        }
+
+        .loader .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(79, 195, 247, 0.2);
+            border-top-color: var(--magenta);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            font-family: "Bebas Neue", sans-serif;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="navbar">
+        <div class="logo">POKELUX</span></div>
+        <button class="volver-btn" onclick="window.location.href='Menu-Inicio.html'">VOLVER</button>
+    </div>
+
+    <h1 class="title">POKÉDEX</h1>
+
+    <div class="search-section">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Nombre o número...">
+            <button id="searchBtn">BUSCAR</button>
+        </div>
+        <button id="randomBtn" class="random-btn"> ALEATORIO</button>
+    </div>
+
+    <div class="filters">
+        <div class="filter-group">
+            <span class="filter-title">FILTRAR POR TIPO</span>
+            <div class="filter-buttons" id="tipoFilters"></div>
+        </div>
+        <div class="filter-group">
+            <span class="filter-title">FILTRAR POR GENERACIÓN</span>
+            <div class="filter-buttons" id="genFilters"></div>
+        </div>
+    </div>
+
+    <div class="pokemon-grid" id="pokemonGrid"></div>
+</div>
+
+<script>
+    let pagina = 1;
+    let cargando = false;
+    let busquedaActiva = false;
+    let filtroActivo = null;
+    let pokemonsCargados = new Set();
+
+    const grid = document.getElementById('pokemonGrid');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const randomBtn = document.getElementById('randomBtn');
+
+    // Tipos disponibles
+    const tipos = ['normal', 'fire', 'water', 'grass', 'electric', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
+    const generaciones = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    // Crear filtros
+    function crearFiltros() {
+        const tipoContainer = document.getElementById('tipoFilters');
+        const genContainer = document.getElementById('genFilters');
+        
+        tipos.forEach(tipo => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn';
+            btn.textContent = tipo.toUpperCase();
+            btn.dataset.tipo = tipo;
+            btn.onclick = () => filtrarPorTipo(tipo);
+            tipoContainer.appendChild(btn);
+        });
+        
+        generaciones.forEach(gen => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn';
+            btn.textContent = `GEN ${gen}`;
+            btn.dataset.gen = gen;
+            btn.onclick = () => filtrarPorGeneracion(gen);
+            genContainer.appendChild(btn);
+        });
+    }
+
+    // Limpiar filtros activos
+    function limpiarFiltros() {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        filtroActivo = null;
+    }
+
+    // Filtrar por tipo
+    async function filtrarPorTipo(tipo) {
+        limpiarFiltros();
+        document.querySelector(`.filter-btn[data-tipo="${tipo}"]`).classList.add('active');
+        busquedaActiva = true;
+        filtroActivo = { tipo: 'tipo', valor: tipo };
+        grid.innerHTML = '';
+        pokemonsCargados.clear();
+        pagina = 1;
+        await cargarPokemonsPorTipo(tipo);
+    }
+
+    async function cargarPokemonsPorTipo(tipo) {
+        if (cargando) return;
+        cargando = true;
+        mostrarLoader();
+        
+        try {
+            const res = await fetch(`https://pokeapi.co/api/v2/type/${tipo}`);
+            const data = await res.json();
+            const pokemons = data.pokemon.slice(0, 50);
+            
+            for (const p of pokemons) {
+                if (!pokemonsCargados.has(p.pokemon.name)) {
+                    pokemonsCargados.add(p.pokemon.name);
+                    const carta = await crearCarta(p.pokemon);
+                    grid.appendChild(carta);
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+        
+        ocultarLoader();
+        cargando = false;
+    }
+
+    // Filtrar por generación
+    async function filtrarPorGeneracion(gen) {
+        limpiarFiltros();
+        document.querySelector(`.filter-btn[data-gen="${gen}"]`).classList.add('active');
+        busquedaActiva = true;
+        filtroActivo = { tipo: 'gen', valor: gen };
+        grid.innerHTML = '';
+        pokemonsCargados.clear();
+        pagina = 1;
+        await cargarPokemonsPorGeneracion(gen);
+    }
+
+  async function cargarPokemonsPorGeneracion(gen) {
+    if (cargando) return;
+    cargando = true;
+    mostrarLoader();
+    
+    try {
+        const res = await fetch(`https://pokeapi.co/api/v2/generation/${gen}`);
+        const data = await res.json();
+        
+        // Filtrar y limpiar nombres
+        const pokemonsValidos = data.pokemon_species
+            .filter(p => {
+                // Filtrar formas alternativas y nombres con guiones
+                const nombre = p.name;
+                return !nombre.includes('-') && 
+                       !nombre.includes('_') &&
+                       !nombre.includes('totem') &&
+                       !nombre.includes('mega') &&
+                       !nombre.includes('gmax') &&
+                       nombre.length < 20;
+            })
+            .slice(0, 50);
+        
+        for (const p of pokemonsValidos) {
+            if (!pokemonsCargados.has(p.name)) {
+                pokemonsCargados.add(p.name);
+                const carta = await crearCarta({ 
+                    name: p.name, 
+                    url: `https://pokeapi.co/api/v2/pokemon/${p.name}/` 
+                });
+                grid.appendChild(carta);
+            }
+        }
+        
+        if (pokemonsValidos.length === 0) {
+            grid.innerHTML = '<div class="no-results">❌ No se encontraron Pokémon para esta generación</div>';
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        grid.innerHTML = '<div class="no-results">❌ Error al cargar la generación</div>';
+    }
+    
+    ocultarLoader();
+    cargando = false;
+}
+
+    // Cargar Pokémon (scroll infinito)
+    async function cargarPokemon() {
+        if (busquedaActiva || cargando) return;
+        cargando = true;
+        mostrarLoader();
+        
+        try {
+            const offset = (pagina - 1) * 20;
+            const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=20&offset=${offset}`);
+            const data = await res.json();
+            
+            for (const pokemon of data.results) {
+                if (!pokemonsCargados.has(pokemon.name)) {
+                    pokemonsCargados.add(pokemon.name);
+                    const carta = await crearCarta(pokemon);
+                    grid.appendChild(carta);
+                }
+            }
+            pagina++;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+        
+        ocultarLoader();
+        cargando = false;
+    }
+
+    // Crear carta individual
+    async function crearCarta(pokemon) {
+    const id = pokemon.url ? parseInt(pokemon.url.split('/')[6]) : pokemon.id;
+    
+    if (!id || isNaN(id)) {
+        // Si no se puede obtener el ID, intentar buscar el Pokémon por nombre
+        try {
+            const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
+            if (!res.ok) return null;
+            const data = await res.json();
+            const idReal = data.id;
+            return await crearCartaReal(idReal, pokemon.name);
+        } catch {
+            return null;
+        }
+    }
+    
+    return await crearCartaReal(id, pokemon.name);
+}
+
+async function crearCartaReal(id, nombre) {
+    let tipos = [];
+    try {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const data = await res.json();
+        tipos = data.types.map(t => t.type.name);
+    } catch (e) {}
+    
+    const carta = document.createElement('div');
+    carta.className = 'pokemon-card';
+    carta.innerHTML = `
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png" alt="${nombre}">
+        <div class="nombre">${nombre}</div>
+        <div class="id">#${String(id).padStart(3, '0')}</div>
+        <div class="tipos">
+            ${tipos.map(t => `<span class="type-badge type-${t}">${t.toUpperCase()}</span>`).join('')}
+        </div>
+    `;
+    
+    carta.onclick = () => {
+        window.location.href = `Pokedex-Detalle.html?id=${id}`;
+    };
+    
+    return carta;
+}
+    // Búsqueda
+    async function buscarPokemon() {
+        const query = searchInput.value.trim().toLowerCase();
+        if (!query) {
+            resetearLista();
+            return;
+        }
+        
+        busquedaActiva = true;
+        limpiarFiltros();
+        grid.innerHTML = '';
+        pokemonsCargados.clear();
+        mostrarLoader();
+        
+        try {
+            const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${query}`);
+            if (res.ok) {
+                const pokemon = await res.json();
+                const carta = await crearCarta({ name: pokemon.name, url: `https://pokeapi.co/api/v2/pokemon/${pokemon.id}/` });
+                grid.appendChild(carta);
+            } else {
+                grid.innerHTML = '<div class="no-results"> Pokémon no encontrado</div>';
+            }
+        } catch (error) {
+            grid.innerHTML = '<div class="no-results"> Error en la búsqueda</div>';
+        }
+        
+        ocultarLoader();
+    }
+
+    // Resetear lista
+    function resetearLista() {
+        busquedaActiva = false;
+        filtroActivo = null;
+        pagina = 1;
+        pokemonsCargados.clear();
+        grid.innerHTML = '';
+        cargarPokemon();
+    }
+
+    // Pokémon aleatorio
+    async function randomPokemon() {
+        const id = Math.floor(Math.random() * 1025) + 1;
+        window.location.href = `Pokedex-Detalle.html?id=${id}`;
+    }
+
+    // Mostrar/ocultar loader
+    function mostrarLoader() {
+        const loader = document.createElement('div');
+        loader.id = 'loader';
+        loader.className = 'loader';
+        loader.innerHTML = '<div class="spinner"></div><p>Cargando Pokémon...</p>';
+        grid.appendChild(loader);
+    }
+    
+    function ocultarLoader() {
+        const loader = document.getElementById('loader');
+        if (loader) loader.remove();
+    }
+
+    // Scroll infinito
+    window.addEventListener('scroll', () => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+            if (!busquedaActiva && !cargando && !filtroActivo) {
+                cargarPokemon();
+            }
+        }
+    });
+
+    // Eventos
+    searchBtn.addEventListener('click', buscarPokemon);
+    searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscarPokemon(); });
+    randomBtn.addEventListener('click', randomPokemon);
+    
+    // Inicializar
+    crearFiltros();
+    cargarPokemon();
+</script>
+</body>
+</html>

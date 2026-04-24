@@ -186,14 +186,14 @@ header {
   padding: 3rem;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2rem;
   animation: deslizar-arriba 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* ============================================
-   TÍTULO DE COMBATE
+   TÍTULO
    ============================================ */
-.titulo-combate {
+.titulo-seccion {
   font-family: "Bebas Neue", sans-serif;
   font-size: clamp(2rem, 5vw, 3.5rem);
   letter-spacing: 0.08em;
@@ -203,7 +203,7 @@ header {
   text-shadow: 4px 4px 0px var(--magenta);
 }
 
-.titulo-combate::after {
+.titulo-seccion::after {
   content: "";
   position: absolute;
   left: 0;
@@ -213,30 +213,30 @@ header {
   background: linear-gradient(90deg, var(--magenta), transparent);
 }
 
-/* ============================================
-   OPCIONES DE COMBATE
-   ============================================ */
-.opciones-combate {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
+.descripcion-seccion {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--azul-claro);
+  opacity: 0.7;
+  line-height: 1.6;
+  margin-top: 0.4rem;
 }
 
-.opcion-combate {
+/* ============================================
+   FORMULARIO
+   ============================================ */
+.form-card {
   background: rgba(26, 48, 128, 0.45);
   border: 2px solid rgba(79, 195, 247, 0.12);
   border-radius: 4px;
   padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  max-width: 560px;
   position: relative;
   overflow: hidden;
   transition: border-color 0.3s ease;
 }
 
-.opcion-combate::before {
+.form-card::before {
   content: "";
   position: absolute;
   top: 0;
@@ -249,17 +249,69 @@ header {
   transition: transform 0.35s ease;
 }
 
-.opcion-combate:hover {
-  border-color: rgba(79, 195, 247, 0.28);
-}
-
-.opcion-combate:hover::before {
+.form-card:focus-within::before {
   transform: scaleX(1);
 }
 
+.form-card:focus-within {
+  border-color: rgba(79, 195, 247, 0.28);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  color: var(--magenta);
+}
+
+.form-group input,
+.form-group textarea {
+  font-family: "Nunito", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--blanco);
+  background: rgba(13, 27, 75, 0.6);
+  border: 1.5px solid rgba(79, 195, 247, 0.15);
+  border-radius: 3px;
+  padding: 0.65rem 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  width: 100%;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(240, 244, 255, 0.25);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: rgba(79, 195, 247, 0.5);
+  background: rgba(13, 27, 75, 0.8);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.5;
+}
+
 /* ============================================
-   BOTONES DE COMBATE
+   BOTONES
    ============================================ */
+.form-botones {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.8rem;
+}
+
 .boton-combate {
   font-family: "Bebas Neue", sans-serif;
   font-size: 1.2rem;
@@ -274,7 +326,6 @@ header {
   box-shadow:
     0 4px 0 var(--magenta-dark),
     0 6px 20px var(--sombra);
-  width: 100%;
 }
 
 .boton-combate:hover {
@@ -290,78 +341,26 @@ header {
   box-shadow: 0 2px 0 var(--magenta-dark);
 }
 
-/* Botón secundario — Consultar Equipo */
-#consultar-combate {
-  background: transparent;
+.boton-secundario {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
   color: var(--azul-claro);
+  background: transparent;
   border: 2px solid rgba(79, 195, 247, 0.3);
+  border-radius: 3px;
+  padding: 0.7rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
   box-shadow: none;
 }
 
-#consultar-combate:hover {
+.boton-secundario:hover {
   background: rgba(79, 195, 247, 0.1);
   border-color: var(--azul-claro);
   color: var(--blanco);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(79, 195, 247, 0.2);
-}
-
-/* ============================================
-   DESCRIPCIÓN
-   ============================================ */
-.descripcion-opcion {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--azul-claro);
-  opacity: 0.7;
-  line-height: 1.6;
-}
-
-/* ============================================
-   TABLA DE EQUIPOS
-   ============================================ */
-.equipos-guardados {
-  margin-top: 0.5rem;
-  overflow: hidden;
-  border-radius: 3px;
-  border: 1px solid rgba(79, 195, 247, 0.12);
-}
-
-.equipos-guardados table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.82rem;
-}
-
-.equipos-guardados thead {
-  background: rgba(255, 45, 120, 0.15);
-}
-
-.equipos-guardados th {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 0.9rem;
-  letter-spacing: 0.1em;
-  color: var(--magenta);
-  padding: 0.6rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid rgba(255, 45, 120, 0.2);
-}
-
-.equipos-guardados td {
-  padding: 0.55rem 1rem;
-  font-weight: 600;
-  color: rgba(240, 244, 255, 0.8);
-  border-bottom: 1px solid rgba(79, 195, 247, 0.06);
-  transition: background 0.15s ease;
-}
-
-.equipos-guardados tbody tr:hover td {
-  background: rgba(79, 195, 247, 0.05);
-  color: var(--blanco);
-}
-
-.equipos-guardados tbody tr:last-child td {
-  border-bottom: none;
 }
 
 /* ============================================
@@ -392,11 +391,16 @@ header {
     padding: 1.5rem;
   }
 
-  .opciones-combate {
-    grid-template-columns: 1fr;
-  }
-
   .separador {
     margin: 0 1.5rem;
+  }
+
+  .form-botones {
+    flex-direction: column;
+  }
+
+  .form-botones button {
+    width: 100%;
+    text-align: center;
   }
 }
