@@ -427,7 +427,7 @@
                     if (i > 0) evolutionHtml += '<span class="evo-arrow">→</span>';
                     const evoId = await getPokemonId(chain[i]);
                     evolutionHtml += `
-                        <div class="evo-item" onclick="window.location.href='POKEDEX-Detalle.html?id=${evoId}'">
+                        <div class="evo-item" onclick="window.location.href='Pokedex-Detalle.html?id=${evoId}'">
                             <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId}.png" alt="${chain[i]}">
                             <span>${chain[i]}</span>
                         </div>
