@@ -402,11 +402,11 @@ function renderEstado(estado) {
   if (!estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) return;
 
   esMiTurno       = estado.turno === miNombre;
+  console.log("turno:", estado.turno, "| yo:", miNombre, "| esMiTurno:", esMiTurno, "| fase:", estado.fase);
   miIndexActivo   = estado.indexActivo[miNombre];
   rivalIndexActivo= estado.indexActivo[rivalNombreGlobal];
 
-  console.log("turno:", estado.turno, "| yo:", miNombre, "| esMiTurno:", esMiTurno, "| fase:", estado.fase);
-  
+
   if (!miEquipo[miIndexActivo] || !equipoRival[rivalIndexActivo]) return;
 
   const miPoke       = miEquipo[miIndexActivo];
