@@ -762,7 +762,7 @@ body::after {
 /* ============================================
    PANTALLA DE FIN
    ============================================ */
-.pantalla-fin {
+#fin-overlay {
   position: fixed;
   inset: 0;
   background: rgba(13, 27, 75, 0.92);
@@ -774,14 +774,13 @@ body::after {
 }
 
 .fin-contenido {
+  /* mantén el contenido igual que ya lo tienes */
   text-align: center;
   background: rgba(26, 48, 128, 0.5);
   padding: 44px 64px;
   border-radius: 4px;
   border: 2px solid var(--linea);
-  box-shadow:
-    0 0 60px rgba(255, 45, 120, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 60px rgba(255, 45, 120, 0.15), inset 0 1px 0 rgba(255,255,255,0.04);
   animation: aparecer 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   max-width: 480px;
   width: 90%;
