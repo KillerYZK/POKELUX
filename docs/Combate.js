@@ -62,7 +62,7 @@ let rivalIndexActivo = 0;
 let esMiTurno = false;
 let esperandoCambio = false;
 let cambioForzado = false;
-let animacionEnProceso = false;   // Solo usado en resolverAtaque para evitar concurrencia
+let animacionEnProceso = false;
 let ultimoLog = "";
 let combateListener = null;
 
@@ -416,10 +416,13 @@ function calcularQuienEmpieza() {
 function renderEstado(estado) {
   if (!estado) { debug("renderEstado: estado null"); log("Esperando inicio del combate..."); return; }
   if (!estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) return;
+
+  // Reseteo de flag si es necesario
   if (estado.fase === "cambio" && estado.turno === miNombre && esperandoCambio && !cambioForzado) {
-  debug("Reseteando flag esperandoCambio porque estamos en cambio y es mi turno");
-  esperandoCambio = false;
+    debug("Reseteando flag esperandoCambio porque estamos en cambio y es mi turno");
+    esperandoCambio = false;
   }
+
   esMiTurno = estado.turno === miNombre;
   debug(`renderEstado: turno=${estado.turno}, miNombre=${miNombre}, esMiTurno=${esMiTurno}, fase=${estado.fase}, esperandoCambio=${esperandoCambio}, animacionEnProceso=${animacionEnProceso}`);
 
@@ -455,14 +458,9 @@ function renderEstado(estado) {
 
   if (estado.fase === "fin") { finalizarCombate(estado.ganador); return; }
 
-  // --- CORRECCIÓN PRINCIPAL ---
+  // CORRECCIÓN FUNDAMENTAL: llamamos siempre a resolverAtaque si es host y fase resolviendo
   if (estado.fase === "resolver" && esHost) {
-    debug("Llamando a resolverAtaque desde renderEstado. animacionEnProceso=" + animacionEnProceso);
-    // Si el flag está activo por error, lo forzamos a false para que pueda ejecutarse
-    if (animacionEnProceso) {
-      debug("⚠️ animacionEnProceso estaba true, forzando reset");
-      animacionEnProceso = false;
-    }
+    debug("Llamando a resolverAtaque desde renderEstado");
     resolverAtaque(estado);
     return;
   }
@@ -529,11 +527,20 @@ function actualizarInfobar(lado, pokemon, hpActual, estado) {
   if (hpMax) hpMax.textContent = pokemon.hpMax;
 }
 
+// CORRECCIÓN: usa los IDs reales del HTML (jg-0, en-0, etc.)
 function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray, indexActivo) {
   for (let i = 0; i < equipo.length; i++) {
-    const ball = document.getElementById(`${prefijo}-ball-${i}`);
+    let ballId = "";
+    if (prefijo === "jugador") {
+      ballId = `jg-${i}`;
+    } else if (prefijo === "enemigo") {
+      ballId = `en-${i}`;
+    } else {
+      ballId = `${prefijo}-ball-${i}`; // fallback
+    }
+    const ball = document.getElementById(ballId);
     if (!ball) continue;
-    ball.classList.toggle("debil",  hpArray[i] <= 0);
+    ball.classList.toggle("debil", hpArray[i] <= 0);
     ball.classList.toggle("activo", i === indexActivo);
     ball.classList.toggle("estado", !!estadosArray?.[i]?.nombre);
     ball.title = estadosArray?.[i]?.nombre || "";
@@ -622,11 +629,9 @@ async function resolverAtaque(estado) {
       let nuevosEstados= structuredClone(estadoActual.estados);
       let nuevosStats  = structuredClone(estadoActual.estadisticas);
 
-      // Descontar PP
       nuevosPP[atacante][indexAtacante][accion.movIndex] =
         Math.max(0, nuevosPP[atacante][indexAtacante][accion.movIndex] - 1);
 
-      // Verificar estado pre-acción
       const { puedeActuar, nuevosEstadosPost } = verificarEstadoPreAccion(nuevosEstados, atacante, indexAtacante);
       nuevosEstados = nuevosEstadosPost;
       if (!puedeActuar) {
@@ -635,7 +640,6 @@ async function resolverAtaque(estado) {
           log: `¡${pokeAtacante.nombre} no puede moverse!`, accion: null };
       }
 
-      // Precisión
       const precisionMod = obtenerModificadorPrecision(nuevosStats, atacante, indexAtacante);
       if (movimiento.precision !== null && Math.random() * 100 >= movimiento.precision * precisionMod) {
         return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
@@ -669,7 +673,6 @@ async function resolverAtaque(estado) {
         }
       }
 
-      // Daño post-acción
       const postResult = aplicarDanoPostAccion(nuevosHP, nuevosEstados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor);
       nuevosHP = postResult.nuevosHPPost;
       nuevosEstados = postResult.nuevosEstadosPost2;
@@ -888,12 +891,11 @@ async function elegirAtaque(mov, index) {
     return;
   }
 
-  ocultarMenus(); // Oculta el menú mientras se procesa
+  ocultarMenus();
 
   try {
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     const result = await runTransaction(combateRef, (estadoActual) => {
-      // Validaciones: siempre devolver estadoActual si no se debe modificar
       if (!estadoActual) return estadoActual;
       if (estadoActual.turno !== miNombre) return estadoActual;
       if (estadoActual.fase !== "elegir") return estadoActual;
@@ -908,17 +910,15 @@ async function elegirAtaque(mov, index) {
     });
 
     if (!result.committed) {
-      debug("elegirAtaque: transacción NO cometida (posiblemente condiciones no cumplidas)");
-      // No se escribió la acción; el menú se vuelve a mostrar
+      debug("elegirAtaque: transacción NO cometida");
       mostrarMenuPrincipal();
     } else {
       debug("elegirAtaque: transacción cometida exitosamente");
-      // La fase ahora es "resolver" y el host se encargará de resolver el ataque
     }
   } catch (err) {
     console.error("[ATAQUE ERROR]", err);
     log("Error al enviar el ataque: " + err.message);
-    mostrarMenuPrincipal(); // Recupera el menú en caso de error
+    mostrarMenuPrincipal();
   }
 }
 
@@ -965,6 +965,7 @@ function cancelarCambio() {
   menuCambio?.classList.add("oculto");
 }
 
+// CORRECCIÓN: transacción robusta y reintento
 async function confirmarCambio(nuevoIndex) {
   debug(`confirmarCambio llamado para índice ${nuevoIndex}`);
   esperandoCambio = false;
@@ -994,15 +995,13 @@ async function confirmarCambio(nuevoIndex) {
 
   if (result.committed) {
     debug("Cambio confirmado correctamente");
+    menuCambio?.classList.add("oculto");
+    mostrarMenuPrincipal();
   } else {
     debug("La transacción de cambio no se confirmó");
-    // Si falla, reintentamos mostrando el menú nuevamente
+    log("Error al cambiar de Pokémon. Intenta de nuevo.");
     mostrarSelectorPokemon();
-    return;
   }
-
-  menuCambio?.classList.add("oculto");
-  mostrarMenuPrincipal();
 }
 
 // ---------- BOLSA ----------
@@ -1161,6 +1160,7 @@ function ocultarMenus() {
 async function finalizarCombate(ganador) {
   if (window.combateFinalizado) return;
   window.combateFinalizado = true;
+  debug("finalizarCombate llamado, ganador:", ganador);
   ocultarMenus();
 
   if (combateListener) { off(combateListener); combateListener = null; }
@@ -1190,7 +1190,6 @@ function mostrarPantallaFin(esVictoria, ganador) {
   if (!overlay) {
     overlay = document.createElement("div");
     overlay.id = "fin-overlay";
-    // Estilos inline de respaldo (por si el CSS falla)
     overlay.style.position = "fixed";
     overlay.style.inset = "0";
     overlay.style.backgroundColor = "rgba(13, 27, 75, 0.96)";
@@ -1227,7 +1226,6 @@ function mostrarPantallaFin(esVictoria, ganador) {
     window.location.href = "Estadisticas.html";
   });
 
-  // Cargar estadísticas reales
   const statsRef = ref(db, `estadisticas/${miNombre}`);
   get(statsRef).then((snap) => {
     const stats = snap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
