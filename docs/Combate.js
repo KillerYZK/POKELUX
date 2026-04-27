@@ -25,7 +25,7 @@ const miNombreRaw = localStorage.getItem("nombreJugador");
 const miNombre = miNombreRaw ? miNombreRaw.trim() : "";
 const esHost = localStorage.getItem("esHost") === "true";
 
-// ---------- TABLA DE EFECTIVIDAD (Gen 6+) ----------
+// ---------- TABLA DE EFECTIVIDAD ----------
 const TIPO_CHART = {
   normal:   { rock: 0.5, steel: 0.5, ghost: 0 },
   fire:     { fire: 0.5, water: 0.5, rock: 0.5, dragon: 0.5, grass: 2, ice: 2, bug: 2, steel: 2 },
@@ -62,14 +62,13 @@ let rivalIndexActivo = 0;
 let esMiTurno = false;
 let esperandoCambio = false;
 let cambioForzado = false;
-let animacionEnProceso = false;
+let animacionEnProceso = false;   // Solo usado en resolverAtaque para evitar concurrencia
 let ultimoLog = "";
 let combateListener = null;
 
 const pokemonCache = new Map();
 const CACHE_MAX = 100;
 
-// DOM refs – se asignan al inicio
 let logTxt = null;
 let menuPrincipal = null;
 let menuMovimientos = null;
@@ -269,7 +268,6 @@ function crearPokemonPorDefecto(nombre) {
 
 // ---------- INICIALIZAR COMBATE ----------
 async function iniciarCombate() {
-  // Asignar referencias DOM
   logTxt         = document.getElementById("log-texto");
   menuPrincipal  = document.getElementById("menu-principal");
   menuMovimientos= document.getElementById("menu-movimientos");
@@ -287,7 +285,6 @@ async function iniciarCombate() {
     return;
   }
 
-  // Registrar eventos solo una vez
   if (btnLuchar) btnLuchar.onclick = () => {
     if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
     menuPrincipal.classList.add("oculto");
@@ -340,7 +337,6 @@ async function iniciarCombate() {
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     const combateSnap = await get(combateRef);
 
-    // SÓLO si el nodo no existe, el host lo crea.
     if (!combateSnap.exists() && esHost) {
       debug("Host: inicializando combate...");
       await inicializarCombateEnFirebase();
@@ -357,7 +353,6 @@ async function iniciarCombate() {
       debug("El nodo combate ya existe, no se modifica.");
     }
 
-    // Registrar listener
     if (combateListener) off(combateListener);
     combateListener = onValue(combateRef, (snapshot) => {
       const nuevoEstado = snapshot.val();
@@ -457,7 +452,9 @@ function renderEstado(estado) {
 
   if (estado.fase === "fin") { finalizarCombate(estado.ganador); return; }
 
-  if (estado.fase === "resolver" && esHost && !animacionEnProceso) {
+  // CORRECCIÓN: El host siempre debe resolver cuando la fase es "resolver"
+  if (estado.fase === "resolver" && esHost) {
+    debug("Llamando a resolverAtaque desde renderEstado");
     resolverAtaque(estado);
     return;
   }
@@ -538,7 +535,10 @@ function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray
 // ---------- RESOLVER ATAQUE ----------
 async function resolverAtaque(estado) {
   debug("resolverAtaque llamado, accion:", JSON.stringify(estado.accion));
-  if (animacionEnProceso) return;
+  if (animacionEnProceso) {
+    debug("resolverAtaque: ya hay una resolución en curso");
+    return;
+  }
   animacionEnProceso = true;
 
   const accion = estado.accion;
@@ -684,6 +684,7 @@ async function resolverAtaque(estado) {
     log("Error al resolver el ataque");
   } finally {
     animacionEnProceso = false;
+    debug("resolverAtaque finalizado, animacionEnProceso=false");
   }
 }
 
@@ -838,13 +839,11 @@ async function elegirAtaque(mov, index) {
   const ppActual = estadoCombate?.pp[miNombre]?.[miIndexActivo]?.[index];
   if (ppActual <= 0) { log("¡No quedan PP para " + mov.nombre + "!"); return; }
 
-  animacionEnProceso = true;
   ocultarMenus();
 
   try {
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     await runTransaction(combateRef, (estadoActual) => {
-      // CORRECCIÓN: siempre devolver estadoActual si no se debe modificar
       if (!estadoActual) return estadoActual;
       if (estadoActual.turno !== miNombre) return estadoActual;
       if (estadoActual.fase !== "elegir") return estadoActual;
@@ -859,9 +858,8 @@ async function elegirAtaque(mov, index) {
   } catch (err) {
     console.error("[ATAQUE ERROR]", err);
     log("Error al enviar el ataque");
-  } finally {
-    animacionEnProceso = false;
   }
+  // NOTA: animacionEnProceso NO se toca aquí; solo se usa dentro de resolverAtaque
 }
 
 function mostrarSelectorPokemon() {
