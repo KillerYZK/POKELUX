@@ -1817,16 +1817,18 @@ function mostrarPantallaFin(esVictoria, ganador) {
         <p>Cargando estadísticas...</p>
       </div>
       <div class="fin-botones">
-        <button class="fin-boton" id="fin-volver-menu">VOLVER AL MENÚ</button>
+        <button class="fin-boton" id="fin-nuevo-combate">NUEVO COMBATE</button>
         <button class="fin-boton secondary" id="fin-ver-estadisticas">VER ESTADÍSTICAS</button>
       </div>
     </div>`;
 
   overlay.style.display = "flex";
 
-  document.getElementById("fin-volver-menu")?.addEventListener("click", () => {
-    window.location.href = "Juego-Lobby.html?id=" + partidaId;
-  });
+  document
+    .getElementById("fin-nuevo-combate")
+    ?.addEventListener("click", () => {
+      window.location.href = "Juego-Lobby.html?id=" + partidaId;
+    });
   document
     .getElementById("fin-ver-estadisticas")
     ?.addEventListener("click", () => {

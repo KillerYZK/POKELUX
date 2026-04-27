@@ -21,13 +21,16 @@
 /* ============================================
    RESET & BASE
    ============================================ */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   overflow: hidden;
 }
@@ -84,8 +87,15 @@ body::after {
 }
 
 @keyframes pulso {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.6; transform: scale(1.1); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
 }
 
 /* ============================================
@@ -140,24 +150,54 @@ body::after {
 /* ============================================
    FONDOS POR TIPO
    ============================================ */
-.combate-campo.fuego    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/fire.png"); }
-.combate-campo.agua     { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/water.png"); }
-.combate-campo.planta   { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/grass.png"); }
-.combate-campo.electrico{ background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/city.png"); }
+.combate-campo.fuego {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/fire.png");
+}
+.combate-campo.agua {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/water.png");
+}
+.combate-campo.planta {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/grass.png");
+}
+.combate-campo.electrico {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/city.png");
+}
 .combate-campo.roca,
-.combate-campo.tierra   { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png"); }
-.combate-campo.hielo    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/snow.png"); }
+.combate-campo.tierra {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png");
+}
+.combate-campo.hielo {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/snow.png");
+}
 .combate-campo.psiquico,
-.combate-campo.fantasma { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/space.png"); }
-.combate-campo.dragon   { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png"); }
-.combate-campo.siniestro{ background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/cave.png"); }
-.combate-campo.hada     { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/forest.png"); }
-.combate-campo.acero    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/city.png"); }
-.combate-campo.volador  { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/sky.png"); }
+.combate-campo.fantasma {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/space.png");
+}
+.combate-campo.dragon {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png");
+}
+.combate-campo.siniestro {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/cave.png");
+}
+.combate-campo.hada {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/forest.png");
+}
+.combate-campo.acero {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/city.png");
+}
+.combate-campo.volador {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/sky.png");
+}
 .combate-campo.veneno,
-.combate-campo.bicho    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/forest.png"); }
-.combate-campo.lucha    { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png"); }
-.combate-campo.estandar { background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/grass.png"); }
+.combate-campo.bicho {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/forest.png");
+}
+.combate-campo.lucha {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/mountain.png");
+}
+.combate-campo.estandar {
+  background-image: url("https://play.pokemonshowdown.com/sprites/battle-bg/grass.png");
+}
 
 /* ============================================
    CLIMAS
@@ -181,8 +221,12 @@ body::after {
   z-index: 2;
 }
 @keyframes lluvia {
-  from { background-position: 0 0; }
-  to   { background-position: 0 20px; }
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 20px;
+  }
 }
 
 .combate-campo.sol {
@@ -201,8 +245,12 @@ body::after {
   z-index: 2;
 }
 @keyframes girarSol {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .combate-campo.tormenta-arena {
@@ -227,8 +275,12 @@ body::after {
   z-index: 2;
 }
 @keyframes granizo {
-  from { background-position: 0 0; }
-  to   { background-position: 0 28px; }
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 28px;
+  }
 }
 
 .combate-campo .clima-indicador {
@@ -374,7 +426,9 @@ body::after {
   width: 100%;
   background: linear-gradient(90deg, var(--verde-hp), #7bef7b);
   border-radius: 4px;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+  transition:
+    width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s ease;
   box-shadow: 0 0 6px rgba(57, 211, 83, 0.4);
 }
 
@@ -390,8 +444,13 @@ body::after {
 }
 
 @keyframes hpPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .combate-hp-numero {
@@ -429,7 +488,13 @@ body::after {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--magenta) 30%, var(--magenta) 70%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--magenta) 30%,
+    var(--magenta) 70%,
+    transparent 100%
+  );
   box-shadow: 0 0 12px var(--sombra);
 }
 
@@ -475,15 +540,22 @@ body::after {
   border-radius: 3px;
   padding: 9px 28px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
   min-width: 120px;
-  box-shadow: 0 4px 0 var(--magenta-dark), 0 6px 20px var(--sombra);
+  box-shadow:
+    0 4px 0 var(--magenta-dark),
+    0 6px 20px var(--sombra);
 }
 
 .combate-opcion:hover {
   background: #ff4d8d;
   transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--magenta-dark), 0 10px 30px var(--sombra);
+  box-shadow:
+    0 6px 0 var(--magenta-dark),
+    0 10px 30px var(--sombra);
 }
 
 .combate-opcion:active {
@@ -567,7 +639,8 @@ body::after {
   letter-spacing: 0.04em;
 }
 
-.mov-pp, .mov-poder {
+.mov-pp,
+.mov-poder {
   font-family: "Nunito", sans-serif;
   font-size: 0.62rem;
   font-weight: 600;
@@ -575,44 +648,103 @@ body::after {
   grid-row: 2;
 }
 
-.mov-poder { grid-column: 2; text-align: right; }
-.mov-pp    { grid-column: 1; }
+.mov-poder {
+  grid-column: 2;
+  text-align: right;
+}
+.mov-pp {
+  grid-column: 1;
+}
 
 /* Tipos */
-.tipo-normal    { background: #6d6d4e; color: #fff; }
+.tipo-normal {
+  background: #6d6d4e;
+  color: #fff;
+}
 .tipo-fire,
-.tipo-fuego     { background: #9c2f00; color: #ffd9a0; }
+.tipo-fuego {
+  background: #9c2f00;
+  color: #ffd9a0;
+}
 .tipo-water,
-.tipo-agua      { background: #1a3a8f; color: #a8c8ff; }
+.tipo-agua {
+  background: #1a3a8f;
+  color: #a8c8ff;
+}
 .tipo-electric,
-.tipo-electrico { background: #8f7000; color: #ffe066; }
+.tipo-electrico {
+  background: #8f7000;
+  color: #ffe066;
+}
 .tipo-grass,
-.tipo-planta    { background: #2d6b00; color: #a8f070; }
+.tipo-planta {
+  background: #2d6b00;
+  color: #a8f070;
+}
 .tipo-ice,
-.tipo-hielo     { background: #1a6b6b; color: #b8eef0; }
+.tipo-hielo {
+  background: #1a6b6b;
+  color: #b8eef0;
+}
 .tipo-fighting,
-.tipo-lucha     { background: #7a1000; color: #ffb8a0; }
+.tipo-lucha {
+  background: #7a1000;
+  color: #ffb8a0;
+}
 .tipo-poison,
-.tipo-veneno    { background: #5a1a7a; color: #e8b0f8; }
+.tipo-veneno {
+  background: #5a1a7a;
+  color: #e8b0f8;
+}
 .tipo-ground,
-.tipo-tierra    { background: #7a5a00; color: #ffe0a0; }
+.tipo-tierra {
+  background: #7a5a00;
+  color: #ffe0a0;
+}
 .tipo-flying,
-.tipo-volador   { background: #3d2a8f; color: #c0b0ff; }
+.tipo-volador {
+  background: #3d2a8f;
+  color: #c0b0ff;
+}
 .tipo-psychic,
-.tipo-psiquico  { background: #8f004a; color: #ffb0d0; }
+.tipo-psiquico {
+  background: #8f004a;
+  color: #ffb0d0;
+}
 .tipo-bug,
-.tipo-bicho     { background: #4a5a00; color: #d0e060; }
+.tipo-bicho {
+  background: #4a5a00;
+  color: #d0e060;
+}
 .tipo-rock,
-.tipo-roca      { background: #5a4a10; color: #e0d090; }
+.tipo-roca {
+  background: #5a4a10;
+  color: #e0d090;
+}
 .tipo-ghost,
-.tipo-fantasma  { background: #2d1a5c; color: #c8b0f0; }
-.tipo-dragon    { background: #2d008f; color: #a090ff; }
+.tipo-fantasma {
+  background: #2d1a5c;
+  color: #c8b0f0;
+}
+.tipo-dragon {
+  background: #2d008f;
+  color: #a090ff;
+}
 .tipo-dark,
-.tipo-siniestro { background: #1a1535; color: #c0a890; }
+.tipo-siniestro {
+  background: #1a1535;
+  color: #c0a890;
+}
 .tipo-steel,
-.tipo-acero     { background: #3d3d5c; color: #c8c8e0; }
+.tipo-acero {
+  background: #3d3d5c;
+  color: #c8c8e0;
+}
 .tipo-fairy,
-.tipo-hada      { background: #7a2d4a; color: #ffd0e0; }
+.tipo-hada {
+  background: #7a2d4a;
+  color: #ffd0e0;
+}
 
 /* CAMBIO DE POKÉMON */
 .combate-cambio {
@@ -642,7 +774,9 @@ body::after {
 .cambio-pokemon-btn::before {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 3px;
   background: var(--magenta);
   transform: scaleX(0);
@@ -709,7 +843,11 @@ body::after {
   height: 28px;
   border-radius: 50%;
   position: relative;
-  background: radial-gradient(circle at 35% 30%, var(--magenta), var(--magenta-dark));
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--magenta),
+    var(--magenta-dark)
+  );
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
   transition: all 0.15s ease;
   cursor: pointer;
@@ -747,12 +885,16 @@ body::after {
 }
 
 .combate-pokeball.activo {
-  box-shadow: 0 0 14px var(--sombra), 0 0 0 1px var(--magenta);
+  box-shadow:
+    0 0 14px var(--sombra),
+    0 0 0 1px var(--magenta);
 }
 
 .combate-pokeball.activo::after {
   background: var(--azul-claro);
-  box-shadow: 0 0 0 2px var(--azul-marino), 0 0 6px rgba(79, 195, 247, 0.8);
+  box-shadow:
+    0 0 0 2px var(--azul-marino),
+    0 0 6px rgba(79, 195, 247, 0.8);
 }
 
 .combate-pokeball.estado {
@@ -765,7 +907,11 @@ body::after {
 #fin-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(13, 27, 75, 0.92);
+  background: linear-gradient(
+    135deg,
+    rgba(13, 27, 75, 0.95),
+    rgba(26, 48, 128, 0.9)
+  );
   z-index: 10000;
   display: flex;
   justify-content: center;
@@ -776,12 +922,19 @@ body::after {
 .fin-contenido {
   /* mantén el contenido igual que ya lo tienes */
   text-align: center;
-  background: rgba(26, 48, 128, 0.5);
+  background: linear-gradient(
+    145deg,
+    rgba(26, 48, 128, 0.8),
+    rgba(13, 27, 75, 0.6)
+  );
   padding: 44px 64px;
-  border-radius: 4px;
+  border-radius: 12px;
   border: 2px solid var(--linea);
-  box-shadow: 0 0 60px rgba(255, 45, 120, 0.15), inset 0 1px 0 rgba(255,255,255,0.04);
-  animation: aparecer 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow:
+    0 0 60px rgba(255, 45, 120, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: aparecer 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   max-width: 480px;
   width: 90%;
   position: relative;
@@ -803,16 +956,21 @@ body::after {
   font-size: 3.5rem;
   letter-spacing: 0.12em;
   margin-bottom: 16px;
+  animation: tituloAparecer 0.8s ease-out;
 }
 
 .fin-titulo.victoria {
   color: var(--verde-hp);
-  text-shadow: 0 0 30px rgba(57, 211, 83, 0.4);
+  text-shadow:
+    0 0 30px rgba(57, 211, 83, 0.6),
+    0 0 60px rgba(57, 211, 83, 0.3);
 }
 
 .fin-titulo.derrota {
   color: var(--magenta);
-  text-shadow: 0 0 30px var(--sombra);
+  text-shadow:
+    0 0 30px rgba(255, 45, 120, 0.6),
+    0 0 60px rgba(255, 45, 120, 0.3);
 }
 
 .fin-mensaje {
@@ -825,72 +983,142 @@ body::after {
 }
 
 .fin-stats {
-  background: rgba(13, 27, 75, 0.6);
+  background: linear-gradient(
+    145deg,
+    rgba(13, 27, 75, 0.8),
+    rgba(26, 48, 128, 0.5)
+  );
   border: 1px solid var(--linea);
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 14px 20px;
   margin: 16px 0 24px;
   font-family: "Nunito", sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--gris);
-  text-align: left;
+  text-align: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.fin-stats p { margin-bottom: 4px; }
-.fin-stats p:last-child { margin-bottom: 0; }
+.fin-stats p {
+  margin-bottom: 4px;
+}
+.fin-stats p:last-child {
+  margin-bottom: 0;
+}
 
 .fin-boton {
   font-family: "Bebas Neue", sans-serif;
   font-size: 1.1rem;
   letter-spacing: 0.1em;
   color: var(--azul-marino);
-  background: var(--magenta);
+  background: linear-gradient(145deg, var(--magenta), #ff4d8d);
   border: none;
-  border-radius: 3px;
-  padding: 0.6rem 1.4rem;
-  margin: 0 6px;
+  border-radius: 6px;
+  padding: 0.7rem 1.6rem;
+  margin: 0 8px;
   cursor: pointer;
-  box-shadow: 0 4px 0 var(--magenta-dark), 0 6px 20px var(--sombra);
-  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow:
+    0 4px 0 var(--magenta-dark),
+    0 6px 20px rgba(255, 45, 120, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.fin-boton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.fin-boton:hover::before {
+  left: 100%;
 }
 
 .fin-boton:hover {
-  background: #ff4d8d;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--magenta-dark), 0 10px 30px var(--sombra);
+  background: linear-gradient(145deg, #ff4d8d, var(--magenta));
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 0 var(--magenta-dark),
+    0 12px 30px rgba(255, 45, 120, 0.6);
 }
 
 .fin-boton:active {
-  transform: translateY(2px);
+  transform: translateY(1px);
   box-shadow: 0 2px 0 var(--magenta-dark);
 }
 
 .fin-boton.secondary {
   color: var(--blanco);
-  background: rgba(26, 48, 128, 0.6);
-  border: 2px solid rgba(79, 195, 247, 0.25);
-  box-shadow: none;
+  background: linear-gradient(
+    145deg,
+    rgba(26, 48, 128, 0.8),
+    rgba(13, 27, 75, 0.6)
+  );
+  border: 2px solid rgba(79, 195, 247, 0.4);
+  box-shadow:
+    0 4px 0 rgba(13, 27, 75, 0.8),
+    0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .fin-boton.secondary:hover {
-  background: rgba(26, 48, 128, 0.9);
-  border-color: rgba(79, 195, 247, 0.5);
-  transform: translateY(-1px);
-  box-shadow: none;
+  background: linear-gradient(
+    145deg,
+    rgba(26, 48, 128, 1),
+    rgba(13, 27, 75, 0.8)
+  );
+  border-color: rgba(79, 195, 247, 0.7);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 0 rgba(13, 27, 75, 0.8),
+    0 12px 30px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes aparecer {
-  from { opacity: 0; transform: scale(0.92) translateY(12px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes tituloAparecer {
+  from {
+    opacity: 0;
+    transform: scale(0.8) rotate(-5deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 }
 
 /* ============================================
    ANIMACIÓN DE ENTRADA
    ============================================ */
 @keyframes deslizar-arriba {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .combate-root {
@@ -903,9 +1131,16 @@ body::after {
 
 /* Sacudir Pokemon */
 @keyframes shakePokemon {
-  0%, 100% { transform: translateX(0px); }
-  25% { transform: translateX(-8px) rotate(-1deg); }
-  75% { transform: translateX(8px) rotate(1deg); }
+  0%,
+  100% {
+    transform: translateX(0px);
+  }
+  25% {
+    transform: translateX(-8px) rotate(-1deg);
+  }
+  75% {
+    transform: translateX(8px) rotate(1deg);
+  }
 }
 
 .shaking {
@@ -914,8 +1149,15 @@ body::after {
 
 /* Flash por daño */
 @keyframes flashDamage {
-  0%, 100% { filter: brightness(1); opacity: 1; }
-  50% { filter: brightness(1.8); background: rgba(255, 255, 255, 0.6); }
+  0%,
+  100% {
+    filter: brightness(1);
+    opacity: 1;
+  }
+  50% {
+    filter: brightness(1.8);
+    background: rgba(255, 255, 255, 0.6);
+  }
 }
 
 .flash-damage {
@@ -924,9 +1166,18 @@ body::after {
 
 /* Texto flotante */
 @keyframes flotarTexto {
-  0% { opacity: 0; transform: translate(-50%, -20px); }
-  20% { opacity: 1; transform: translate(-50%, -50px); }
-  100% { opacity: 0; transform: translate(-50%, -120px); }
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -120px);
+  }
 }
 
 /* Overlay de animacion */
@@ -955,9 +1206,18 @@ body::after {
 }
 
 @keyframes animacionAtaque {
-  0% { transform: translateX(0) scale(0.5); opacity: 1; }
-  50% { transform: translateX(var(--tx, 100px)) scale(1.2); opacity: 1; }
-  100% { transform: translateX(var(--tx, 100px)) scale(0); opacity: 0; }
+  0% {
+    transform: translateX(0) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(var(--tx, 100px)) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--tx, 100px)) scale(0);
+    opacity: 0;
+  }
 }
 
 /* Tipos de efectos visuales */
@@ -999,8 +1259,15 @@ body::after {
 }
 
 @keyframes pulsacionPsiquica {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.3); opacity: 1; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
 }
 
 .efecto-visual.dragon {
@@ -1048,7 +1315,9 @@ body::after {
 .damage-number.critico {
   font-size: 2.5rem;
   color: #ff8888;
-  text-shadow: 0 0 15px red, 2px 2px 0 #660000;
+  text-shadow:
+    0 0 15px red,
+    2px 2px 0 #660000;
 }
 
 /* Clase oculto (si no existe ya) */
@@ -1060,14 +1329,40 @@ body::after {
    RESPONSIVE
    ============================================ */
 @media (max-width: 900px) {
-  .combate-campo { padding: 14px 18px; }
-  .combate-sprite { width: 100px; height: 100px; }
-  .combate-infobar { min-width: 170px; padding: 10px 14px; }
-  .combate-nombre { font-size: 1rem; }
-  .movimientos-grid { grid-template-columns: 1fr; gap: 8px; }
-  .combate-opcion { padding: 8px 18px; font-size: 1rem; min-width: 100px; }
-  .combate-equipos-row { bottom: 10px; left: 10px; right: 10px; }
-  .combate-pokeball { width: 24px; height: 24px; }
-  .combate-pokeball::after { width: 7px; height: 7px; }
+  .combate-campo {
+    padding: 14px 18px;
+  }
+  .combate-sprite {
+    width: 100px;
+    height: 100px;
+  }
+  .combate-infobar {
+    min-width: 170px;
+    padding: 10px 14px;
+  }
+  .combate-nombre {
+    font-size: 1rem;
+  }
+  .movimientos-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .combate-opcion {
+    padding: 8px 18px;
+    font-size: 1rem;
+    min-width: 100px;
+  }
+  .combate-equipos-row {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+  }
+  .combate-pokeball {
+    width: 24px;
+    height: 24px;
+  }
+  .combate-pokeball::after {
+    width: 7px;
+    height: 7px;
+  }
 }
-
