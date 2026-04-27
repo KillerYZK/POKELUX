@@ -534,45 +534,79 @@ function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray
 
 // ---------- RESOLVER ATAQUE ----------
 async function resolverAtaque(estado) {
-  debug("resolverAtaque llamado, accion:", JSON.stringify(estado.accion));
+  debug("resolverAtaque llamado, accion:", JSON.stringify(estado?.accion));
   if (animacionEnProceso) {
     debug("resolverAtaque: ya hay una resolución en curso");
     return;
   }
   animacionEnProceso = true;
 
-  const accion = estado.accion;
-  if (!accion) { animacionEnProceso = false; return; }
-
-  const atacante      = accion.jugador;
-  const defensor      = atacante === miNombre ? rivalNombreGlobal : miNombre;
-  const equipoAtac    = atacante === miNombre ? miEquipo : equipoRival;
-  const equipoDef     = atacante === miNombre ? equipoRival : miEquipo;
-  const indexAtacante = estado.indexActivo[atacante];
-  const indexDefensor = estado.indexActivo[defensor];
-  const pokeAtacante  = equipoAtac[indexAtacante];
-  const pokeDefensor  = equipoDef[indexDefensor];
-
-  if (!pokeAtacante || !pokeDefensor) { animacionEnProceso = false; return; }
-
-  const movimiento    = pokeAtacante.movimientos[accion.movIndex];
-
-  const spriteAtacanteEl = atacante === miNombre
-    ? document.getElementById("jugador-sprite")?.parentElement
-    : document.getElementById("enemigo-sprite")?.parentElement;
-  const spriteDefensorEl = atacante === miNombre
-    ? document.getElementById("enemigo-sprite")?.parentElement
-    : document.getElementById("jugador-sprite")?.parentElement;
+  // Timeout de seguridad (5 segundos)
+  const timeoutId = setTimeout(() => {
+    debug("resolverAtaque: TIMEOUT - forzando reset a elegir");
+    const combateRef = ref(db, `partidas/${partidaId}/combate`);
+    runTransaction(combateRef, (estadoActual) => {
+      if (!estadoActual) return estadoActual;
+      if (estadoActual.fase === "resolver") {
+        return { ...estadoActual, fase: "elegir", accion: null, log: "Timeout: reiniciando turno" };
+      }
+      return estadoActual;
+    }).finally(() => {
+      animacionEnProceso = false;
+    });
+  }, 5000);
 
   try {
+    const accion = estado?.accion;
+    if (!accion) {
+      debug("resolverAtaque: accion vacía, reseteando fase a elegir");
+      const combateRef = ref(db, `partidas/${partidaId}/combate`);
+      await runTransaction(combateRef, (estadoActual) => {
+        if (!estadoActual) return estadoActual;
+        if (estadoActual.fase === "resolver") {
+          return { ...estadoActual, fase: "elegir", accion: null, log: "Acción perdida, reintenta" };
+        }
+        return estadoActual;
+      });
+      animacionEnProceso = false;
+      clearTimeout(timeoutId);
+      return;
+    }
+
+    const atacante      = accion.jugador;
+    const defensor      = atacante === miNombre ? rivalNombreGlobal : miNombre;
+    const equipoAtac    = atacante === miNombre ? miEquipo : equipoRival;
+    const equipoDef     = atacante === miNombre ? equipoRival : miEquipo;
+    const indexAtacante = estado.indexActivo[atacante];
+    const indexDefensor = estado.indexActivo[defensor];
+    const pokeAtacante  = equipoAtac[indexAtacante];
+    const pokeDefensor  = equipoDef[indexDefensor];
+
+    if (!pokeAtacante || !pokeDefensor) {
+      debug("resolverAtaque: Pokémon no encontrado");
+      animacionEnProceso = false;
+      clearTimeout(timeoutId);
+      return;
+    }
+
+    const movimiento = pokeAtacante.movimientos[accion.movIndex];
+
+    const spriteAtacanteEl = atacante === miNombre
+      ? document.getElementById("jugador-sprite")?.parentElement
+      : document.getElementById("enemigo-sprite")?.parentElement;
+    const spriteDefensorEl = atacante === miNombre
+      ? document.getElementById("enemigo-sprite")?.parentElement
+      : document.getElementById("jugador-sprite")?.parentElement;
+
+    // Animaciones
     await animaciones.reproducirAtaque(movimiento, movimiento.clase === "special");
     await animaciones.sacudirPokemon(spriteAtacanteEl);
 
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
-    const resultado  = await runTransaction(combateRef, (estadoActual) => {
-      if (!estadoActual)                            return estadoActual;
-      if (estadoActual.fase !== "resolver")         return estadoActual;
-      if (!estadoActual.accion)                     return estadoActual;
+    const resultado = await runTransaction(combateRef, (estadoActual) => {
+      if (!estadoActual) return estadoActual;
+      if (estadoActual.fase !== "resolver") return estadoActual;
+      if (!estadoActual.accion) return estadoActual;
       if (estadoActual.accion.jugador !== atacante) return estadoActual;
 
       let nuevosHP     = structuredClone(estadoActual.hp);
@@ -580,18 +614,20 @@ async function resolverAtaque(estado) {
       let nuevosEstados= structuredClone(estadoActual.estados);
       let nuevosStats  = structuredClone(estadoActual.estadisticas);
 
+      // Descontar PP
       nuevosPP[atacante][indexAtacante][accion.movIndex] =
         Math.max(0, nuevosPP[atacante][indexAtacante][accion.movIndex] - 1);
 
+      // Verificar estado pre-acción
       const { puedeActuar, nuevosEstadosPost } = verificarEstadoPreAccion(nuevosEstados, atacante, indexAtacante);
       nuevosEstados = nuevosEstadosPost;
-
       if (!puedeActuar) {
         return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
           estadisticas: nuevosStats, turno: defensor, fase: "elegir",
           log: `¡${pokeAtacante.nombre} no puede moverse!`, accion: null };
       }
 
+      // Precisión
       const precisionMod = obtenerModificadorPrecision(nuevosStats, atacante, indexAtacante);
       if (movimiento.precision !== null && Math.random() * 100 >= movimiento.precision * precisionMod) {
         return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
@@ -599,41 +635,39 @@ async function resolverAtaque(estado) {
           log: `¡${pokeAtacante.nombre} falló!`, accion: null };
       }
 
-      let logMsg       = "";
-      let danoRealizado= 0;
-
+      let logMsg = "", danoRealizado = 0;
       if (movimiento.clase === "status") {
         const result = aplicarMovimientoStatus(movimiento, pokeAtacante, pokeDefensor, nuevosEstados, defensor, indexDefensor);
-        logMsg        = result.mensaje;
+        logMsg = result.mensaje;
         nuevosEstados = result.nuevosEstados;
       } else {
         const esCritico = Math.random() < 0.0625;
         const result = calcularDano(
-          movimiento, pokeAtacante, pokeDefensor,
-          nuevosStats, nuevosEstados,
+          movimiento, pokeAtacante, pokeDefensor, nuevosStats, nuevosEstados,
           atacante, defensor, indexAtacante, indexDefensor,
           estadoActual.clima, nuevosHP, esCritico
         );
-        logMsg       = result.logMsg;
-        nuevosHP     = result.nuevosHP;
-        nuevosStats  = result.nuevosStatsResult;
-        danoRealizado= result.dano;
+        logMsg = result.logMsg;
+        nuevosHP = result.nuevosHP;
+        nuevosStats = result.nuevosStatsResult;
+        danoRealizado = result.dano;
 
         if (movimiento.efectoEstado && danoRealizado > 0 && Math.random() < 0.3) {
-          const secResult = aplicarEstadoPorMovimiento(
-            movimiento.efectoEstado, pokeDefensor, nuevosEstados, defensor, indexDefensor
-          );
-          if (secResult.mensaje) { logMsg += " " + secResult.mensaje; nuevosEstados = secResult.nuevosEstados; }
+          const secResult = aplicarEstadoPorMovimiento(movimiento.efectoEstado, pokeDefensor, nuevosEstados, defensor, indexDefensor);
+          if (secResult.mensaje) {
+            logMsg += " " + secResult.mensaje;
+            nuevosEstados = secResult.nuevosEstados;
+          }
         }
       }
 
+      // Daño post-acción
       const postResult = aplicarDanoPostAccion(nuevosHP, nuevosEstados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor);
-      nuevosHP      = postResult.nuevosHPPost;
+      nuevosHP = postResult.nuevosHPPost;
       nuevosEstados = postResult.nuevosEstadosPost2;
       if (postResult.mensaje) logMsg += " " + postResult.mensaje;
 
-      let nuevaFase  = "elegir";
-      let nuevoTurno = defensor;
+      let nuevaFase = "elegir", nuevoTurno = defensor;
 
       if (nuevosHP[defensor][indexDefensor] <= 0) {
         nuevosHP[defensor][indexDefensor] = 0;
@@ -643,9 +677,9 @@ async function resolverAtaque(estado) {
             estadisticas: nuevosStats, turno: atacante, fase: "fin", ganador: atacante,
             log: `¡${atacante} ha ganado el combate!`, accion: null };
         }
-        nuevaFase  = "cambio";
+        nuevaFase = "cambio";
         nuevoTurno = defensor;
-        logMsg    += " Elige tu siguiente Pokémon.";
+        logMsg += " Elige tu siguiente Pokémon.";
       }
 
       if (nuevosHP[atacante][indexAtacante] <= 0) {
@@ -657,7 +691,7 @@ async function resolverAtaque(estado) {
             log: `¡${defensor} ha ganado el combate!`, accion: null };
         }
         if (nuevaFase !== "cambio") {
-          nuevaFase  = "cambio";
+          nuevaFase = "cambio";
           nuevoTurno = atacante;
         }
         logMsg += " Elige tu siguiente Pokémon.";
@@ -667,6 +701,8 @@ async function resolverAtaque(estado) {
         estadisticas: nuevosStats, turno: nuevoTurno, fase: nuevaFase, log: logMsg, accion: null };
     });
 
+    clearTimeout(timeoutId);
+
     if (resultado.committed) {
       const estadoFinal = resultado.snapshot.val();
       const danoFinal = calcularUltimoDanoDesdeEstado(estadoFinal, defensor, indexDefensor, estado);
@@ -674,14 +710,16 @@ async function resolverAtaque(estado) {
         await animaciones.sacudirPokemon(spriteDefensorEl);
         await animaciones.flashDamage(spriteDefensorEl);
         const rect = spriteDefensorEl?.getBoundingClientRect();
-        const posX = rect ? rect.left + rect.width  / 2 : window.innerWidth  / 2;
-        const posY = rect ? rect.top  + rect.height / 2 : window.innerHeight / 2;
+        const posX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+        const posY = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
         await animaciones.mostrarDano(danoFinal, false, posX, posY);
       }
+    } else {
+      debug("resolverAtaque: transacción no cometida");
     }
   } catch (err) {
     console.error("[RESOLVER ERROR]", err);
-    log("Error al resolver el ataque");
+    log("Error al resolver el ataque: " + err.message);
   } finally {
     animacionEnProceso = false;
     debug("resolverAtaque finalizado, animacionEnProceso=false");
@@ -833,33 +871,47 @@ function encontrarSiguientePokemon(hpArray) {
 async function elegirAtaque(mov, index) {
   debug(`elegirAtaque llamado: mov=${mov.nombre}, index=${index}`);
   if (!esMiTurno) { debug("No es mi turno"); return; }
-  if (animacionEnProceso) { debug("Animación en proceso"); return; }
-  if (esperandoCambio) { debug("Esperando cambio"); return; }
+  if (animacionEnProceso) { debug("Ya hay una animación en curso"); return; }
+  if (esperandoCambio) { debug("Esperando cambio de Pokémon"); return; }
 
   const ppActual = estadoCombate?.pp[miNombre]?.[miIndexActivo]?.[index];
-  if (ppActual <= 0) { log("¡No quedan PP para " + mov.nombre + "!"); return; }
+  if (ppActual <= 0) {
+    log("¡No quedan PP para " + mov.nombre + "!");
+    return;
+  }
 
-  ocultarMenus();
+  ocultarMenus(); // Oculta el menú mientras se procesa
 
   try {
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
-    await runTransaction(combateRef, (estadoActual) => {
+    const result = await runTransaction(combateRef, (estadoActual) => {
+      // Validaciones: siempre devolver estadoActual si no se debe modificar
       if (!estadoActual) return estadoActual;
       if (estadoActual.turno !== miNombre) return estadoActual;
       if (estadoActual.fase !== "elegir") return estadoActual;
       if (estadoActual.pp[miNombre][miIndexActivo][index] <= 0) return estadoActual;
-      debug("Transacción: escribiendo accion");
+
+      debug("Transacción: escribiendo acción de ataque");
       return {
         ...estadoActual,
         accion: { jugador: miNombre, movIndex: index, movNombre: mov.nombre },
         fase: "resolver"
       };
     });
+
+    if (!result.committed) {
+      debug("elegirAtaque: transacción NO cometida (posiblemente condiciones no cumplidas)");
+      // No se escribió la acción; el menú se vuelve a mostrar
+      mostrarMenuPrincipal();
+    } else {
+      debug("elegirAtaque: transacción cometida exitosamente");
+      // La fase ahora es "resolver" y el host se encargará de resolver el ataque
+    }
   } catch (err) {
     console.error("[ATAQUE ERROR]", err);
-    log("Error al enviar el ataque");
+    log("Error al enviar el ataque: " + err.message);
+    mostrarMenuPrincipal(); // Recupera el menú en caso de error
   }
-  // NOTA: animacionEnProceso NO se toca aquí; solo se usa dentro de resolverAtaque
 }
 
 function mostrarSelectorPokemon() {
@@ -889,6 +941,7 @@ function mostrarSelectorPokemon() {
     btnCancelar.onclick = cancelarCambio;
     menuCambio.appendChild(btnCancelar);
   }
+
 }
 
 function cancelarCambio() {
