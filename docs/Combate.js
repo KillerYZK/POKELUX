@@ -19,13 +19,11 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 const params = new URLSearchParams(window.location.search);
-const partidaIdRaw = params.get("id");
-const partidaId = partidaIdRaw ? partidaIdRaw.trim() : null;
-const miNombreRaw = localStorage.getItem("nombreJugador");
-const miNombre = miNombreRaw ? miNombreRaw.trim() : "";
+const partidaId = params.get("id");
+const miNombre = localStorage.getItem("nombreJugador");
 const esHost = localStorage.getItem("esHost") === "true";
 
-// ---------- TABLA DE EFECTIVIDAD ----------
+// ---------- TABLA DE EFECTIVIDAD (Gen 6+) ----------
 const TIPO_CHART = {
   normal:   { rock: 0.5, steel: 0.5, ghost: 0 },
   fire:     { fire: 0.5, water: 0.5, rock: 0.5, dragon: 0.5, grass: 2, ice: 2, bug: 2, steel: 2 },
@@ -69,6 +67,7 @@ let combateListener = null;
 const pokemonCache = new Map();
 const CACHE_MAX = 100;
 
+// DOM refs — se asignan en iniciarCombate() tras DOMContentLoaded
 let logTxt = null;
 let menuPrincipal = null;
 let menuMovimientos = null;
@@ -84,10 +83,6 @@ let contenedorMovimientos = null;
 function log(msg) {
   if (logTxt) logTxt.textContent = msg;
   console.log("[COMBATE]", msg);
-}
-
-function debug(msg) {
-  console.log("[DEBUG]", msg);
 }
 
 function cachePokemon(key, value) {
@@ -268,6 +263,7 @@ function crearPokemonPorDefecto(nombre) {
 
 // ---------- INICIALIZAR COMBATE ----------
 async function iniciarCombate() {
+  // FIX: Asignar referencias DOM aquí, después de DOMContentLoaded
   logTxt         = document.getElementById("log-texto");
   menuPrincipal  = document.getElementById("menu-principal");
   menuMovimientos= document.getElementById("menu-movimientos");
@@ -275,40 +271,38 @@ async function iniciarCombate() {
   menuBolsa      = document.getElementById("menu-bolsa");
   btnLuchar      = document.getElementById("btn-luchar");
   btnPokemon     = document.getElementById("btn-pokemon");
-  btnBolsa       = document.getElementById("btn-bolsa");
+  btnBolsa       = document.getElementById("btn-bolsa");        // FIX: antes se leía a nivel módulo (null)
   btnCerrarBolsa = document.getElementById("btn-cerrar-bolsa");
-
-  debug("Elementos DOM: menuPrincipal=" + !!menuPrincipal + ", btnLuchar=" + !!btnLuchar);
 
   if (!menuPrincipal || !menuMovimientos) {
     console.error("Faltan elementos del DOM necesarios");
     return;
   }
 
-  if (btnLuchar) btnLuchar.onclick = () => {
+  // FIX: Registrar event listeners aquí, donde los botones ya existen
+  btnLuchar?.addEventListener("click", () => {
     if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
-    menuPrincipal.classList.add("oculto");
-    menuMovimientos.classList.remove("oculto");
-  };
-if (btnPokemon) btnPokemon.onclick = () => {
-  if (!esMiTurno || animacionEnProceso) return;
-  if (esperandoCambio) return;
-  cambioForzado = false; // IMPORTANTE: esto indica que es un cambio voluntario
-  mostrarSelectorPokemon();
-};
-  if (btnBolsa) btnBolsa.onclick = () => {
+    menuPrincipal?.classList.add("oculto");
+    menuMovimientos?.classList.remove("oculto");
+  });
+  btnPokemon?.addEventListener("click", () => {
+    if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
+    cambioForzado = false;
+    mostrarSelectorPokemon();
+  });
+  btnBolsa?.addEventListener("click", () => {
     if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
     mostrarBolsa();
-  };
-  if (btnCerrarBolsa) btnCerrarBolsa.onclick = () => {
-    menuBolsa.classList.add("oculto");
+  });
+  btnCerrarBolsa?.addEventListener("click", () => {
+    menuBolsa?.classList.add("oculto");
     mostrarMenuPrincipal();
-  };
+  });
 
   await mostrarLoading();
 
   if (!partidaId || !miNombre) {
-    log("Error: no se encontró la partida o nombre de jugador.");
+    log("Error: no se encontró la partida.");
     await ocultarLoading();
     return;
   }
@@ -321,8 +315,6 @@ if (btnPokemon) btnPokemon.onclick = () => {
     const jugadores = Object.keys(data.jugadores);
     rivalNombreGlobal = jugadores.find(n => n !== miNombre);
     if (!rivalNombreGlobal) throw new Error("Rival no encontrado");
-
-    debug(`Jugador: ${miNombre}, Rival: ${rivalNombreGlobal}, esHost: ${esHost}`);
 
     const equipoMiData    = data.jugadores[miNombre]?.equipo;
     const equipoRivalData = data.jugadores[rivalNombreGlobal]?.equipo;
@@ -339,9 +331,9 @@ if (btnPokemon) btnPokemon.onclick = () => {
     const combateSnap = await get(combateRef);
 
     if (!combateSnap.exists() && esHost) {
-      debug("Host: inicializando combate...");
       await inicializarCombateEnFirebase();
-    } else if (!combateSnap.exists() && !esHost) {
+    }
+    if (!combateSnap.exists() && !esHost) {
       log("Esperando al host...");
       let encontrado = false;
       for (let i = 0; i < 30 && !encontrado; i++) {
@@ -350,20 +342,12 @@ if (btnPokemon) btnPokemon.onclick = () => {
         if (check.exists()) encontrado = true;
       }
       if (!encontrado) throw new Error("Timeout esperando al host");
-    } else {
-      debug("El nodo combate ya existe, no se modifica.");
     }
 
     if (combateListener) off(combateListener);
     combateListener = onValue(combateRef, (snapshot) => {
       const nuevoEstado = snapshot.val();
-      if (nuevoEstado) {
-        debug("Snapshot recibido, fase=" + nuevoEstado.fase + ", turno=" + nuevoEstado.turno);
-        estadoCombate = nuevoEstado;
-        renderEstado(estadoCombate);
-      } else {
-        debug("Snapshot vacío");
-      }
+      if (nuevoEstado) { estadoCombate = nuevoEstado; renderEstado(estadoCombate); }
     });
 
     await ocultarLoading();
@@ -376,7 +360,6 @@ if (btnPokemon) btnPokemon.onclick = () => {
 
 async function inicializarCombateEnFirebase() {
   const turnoInicial = calcularQuienEmpieza();
-  debug(`Inicializando combate. Turno inicial: ${turnoInicial}`);
   await set(ref(db, `partidas/${partidaId}/combate`), {
     turno: turnoInicial,
     fase: "elegir",
@@ -415,18 +398,10 @@ function calcularQuienEmpieza() {
 
 // ---------- RENDERIZADO ----------
 function renderEstado(estado) {
-  if (!estado) { debug("renderEstado: estado null"); log("Esperando inicio del combate..."); return; }
+  if (!estado) { log("Esperando inicio del combate..."); return; }
   if (!estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) return;
 
-  // Reseteo de flag si es necesario
-  if (estado.fase === "cambio" && estado.turno === miNombre && esperandoCambio && !cambioForzado) {
-    debug("Reseteando flag esperandoCambio porque estamos en cambio y es mi turno");
-    esperandoCambio = false;
-  }
-
-  esMiTurno = estado.turno === miNombre;
-  debug(`renderEstado: turno=${estado.turno}, miNombre=${miNombre}, esMiTurno=${esMiTurno}, fase=${estado.fase}, esperandoCambio=${esperandoCambio}, animacionEnProceso=${animacionEnProceso}`);
-
+  esMiTurno       = estado.turno === miNombre;
   miIndexActivo   = estado.indexActivo[miNombre];
   rivalIndexActivo= estado.indexActivo[rivalNombreGlobal];
 
@@ -449,6 +424,7 @@ function renderEstado(estado) {
   actualizarInfobar("jugador", miPoke, miHPActual, miEstado);
   actualizarInfobar("enemigo", rivalPoke, rivalHPActual, rivalEstado);
 
+  // Sync objetoUsado desde Firebase
   const objetosUsados = estado.objetosUsados?.[miNombre] || [];
   miEquipo.forEach((poke, idx) => { poke.objetoUsado = objetosUsados.includes(idx); });
 
@@ -459,17 +435,12 @@ function renderEstado(estado) {
 
   if (estado.fase === "fin") { finalizarCombate(estado.ganador); return; }
 
-  // Resolver ataque si es host
-  if (estado.fase === "resolver" && esHost) {
-    debug("Llamando a resolverAtaque desde renderEstado");
+  if (estado.fase === "resolver" && esHost && !animacionEnProceso) {
     resolverAtaque(estado);
     return;
   }
 
-  // Verificar cambio de Pokémon
-  debug(`🔍 Verificando cambio: fase=${estado.fase}, turno=${estado.turno}, miNombre=${miNombre}, esperandoCambio=${esperandoCambio}`);
   if (estado.fase === "cambio" && estado.turno === miNombre && !esperandoCambio) {
-    debug("✅ ¡Activando menú de cambio de Pokémon!");
     cambioForzado = true;
     mostrarSelectorPokemon();
     return;
@@ -477,6 +448,7 @@ function renderEstado(estado) {
 
   if (esMiTurno && estado.fase === "elegir" && !esperandoCambio) {
     mostrarMenuPrincipal();
+    // FIX: refrescar contenedorMovimientos cada vez (el Pokémon activo puede haber cambiado)
     contenedorMovimientos = document.querySelector(".movimientos-grid");
     if (estado.pp[miNombre]?.[miIndexActivo]) cargarMovimientos(miPoke, estado.pp[miNombre][miIndexActivo]);
   } else {
@@ -525,25 +497,19 @@ function actualizarInfobar(lado, pokemon, hpActual, estado) {
   const nomEl = document.getElementById(lado + "-nombre");
   if (nomEl) nomEl.textContent = pokemon.nombre.toUpperCase() + (estado?.nombre ? " [" + estado.nombre + "]" : "");
 
+  // Mostrar HP numérico para ambos lados (útil tenerlo también para el enemigo)
   const hpNum = document.getElementById(lado + "-hp-actual");
   const hpMax = document.getElementById(lado + "-hp-max");
   if (hpNum) hpNum.textContent = hpActual;
   if (hpMax) hpMax.textContent = pokemon.hpMax;
 }
 
+// FIX: prefijo ahora es "jugador" / "enemigo" para que coincida con IDs reales del HTML
 function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray, indexActivo) {
   for (let i = 0; i < equipo.length; i++) {
-    let ballId = "";
-    if (prefijo === "jugador") {
-      ballId = `jg-${i}`;
-    } else if (prefijo === "enemigo") {
-      ballId = `en-${i}`;
-    } else {
-      ballId = `${prefijo}-ball-${i}`;
-    }
-    const ball = document.getElementById(ballId);
+    const ball = document.getElementById(`${prefijo}-ball-${i}`);
     if (!ball) continue;
-    ball.classList.toggle("debil", hpArray[i] <= 0);
+    ball.classList.toggle("debil",  hpArray[i] <= 0);
     ball.classList.toggle("activo", i === indexActivo);
     ball.classList.toggle("estado", !!estadosArray?.[i]?.nombre);
     ball.title = estadosArray?.[i]?.nombre || "";
@@ -552,77 +518,45 @@ function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray
 
 // ---------- RESOLVER ATAQUE ----------
 async function resolverAtaque(estado) {
-  if (animacionEnProceso) {
-    debug("resolverAtaque: ya hay una resolución en curso, ignorando llamada");
-    return;
-  }
+  if (animacionEnProceso) return;
   animacionEnProceso = true;
-  debug("resolverAtaque iniciado, accion:", JSON.stringify(estado.accion));
 
-  const timeoutId = setTimeout(() => {
-    debug("resolverAtaque: TIMEOUT - forzando reset a elegir");
-    const combateRef = ref(db, `partidas/${partidaId}/combate`);
-    runTransaction(combateRef, (estadoActual) => {
-      if (!estadoActual) return estadoActual;
-      if (estadoActual.fase === "resolver") {
-        return { ...estadoActual, fase: "elegir", accion: null, log: "Timeout: reiniciando turno" };
-      }
-      return estadoActual;
-    }).finally(() => {
-      animacionEnProceso = false;
-    });
-  }, 5000);
+  // FIX: capturar referencias de sprites ANTES de la transacción (valores del estado actual)
+  const accion = estado.accion;
+  if (!accion) { animacionEnProceso = false; return; }
+
+  const atacante      = accion.jugador;
+  const defensor      = atacante === miNombre ? rivalNombreGlobal : miNombre;
+  const equipoAtac    = atacante === miNombre ? miEquipo : equipoRival;
+  const equipoDef     = atacante === miNombre ? equipoRival : miEquipo;
+  const indexAtacante = estado.indexActivo[atacante];
+  const indexDefensor = estado.indexActivo[defensor];
+  const pokeAtacante  = equipoAtac[indexAtacante];
+  const pokeDefensor  = equipoDef[indexDefensor];
+
+  if (!pokeAtacante || !pokeDefensor) { animacionEnProceso = false; return; }
+
+  const movimiento    = pokeAtacante.movimientos[accion.movIndex];
+
+  // Sprite containers para animaciones
+  const spriteAtacanteEl = atacante === miNombre
+    ? document.getElementById("jugador-sprite")?.parentElement
+    : document.getElementById("enemigo-sprite")?.parentElement;
+  const spriteDefensorEl = atacante === miNombre
+    ? document.getElementById("enemigo-sprite")?.parentElement
+    : document.getElementById("jugador-sprite")?.parentElement;
 
   try {
-    const accion = estado?.accion;
-    if (!accion) {
-      debug("resolverAtaque: accion vacía, reseteando fase a elegir");
-      const combateRef = ref(db, `partidas/${partidaId}/combate`);
-      await runTransaction(combateRef, (estadoActual) => {
-        if (!estadoActual) return estadoActual;
-        if (estadoActual.fase === "resolver") {
-          return { ...estadoActual, fase: "elegir", accion: null, log: "Acción perdida, reintenta" };
-        }
-        return estadoActual;
-      });
-      animacionEnProceso = false;
-      clearTimeout(timeoutId);
-      return;
-    }
-
-    const atacante      = accion.jugador;
-    const defensor      = atacante === miNombre ? rivalNombreGlobal : miNombre;
-    const equipoAtac    = atacante === miNombre ? miEquipo : equipoRival;
-    const equipoDef     = atacante === miNombre ? equipoRival : miEquipo;
-    const indexAtacante = estado.indexActivo[atacante];
-    const indexDefensor = estado.indexActivo[defensor];
-    const pokeAtacante  = equipoAtac[indexAtacante];
-    const pokeDefensor  = equipoDef[indexDefensor];
-
-    if (!pokeAtacante || !pokeDefensor) {
-      debug("resolverAtaque: Pokémon no encontrado");
-      animacionEnProceso = false;
-      clearTimeout(timeoutId);
-      return;
-    }
-
-    const movimiento = pokeAtacante.movimientos[accion.movIndex];
-
-    const spriteAtacanteEl = atacante === miNombre
-      ? document.getElementById("jugador-sprite")?.parentElement
-      : document.getElementById("enemigo-sprite")?.parentElement;
-    const spriteDefensorEl = atacante === miNombre
-      ? document.getElementById("enemigo-sprite")?.parentElement
-      : document.getElementById("jugador-sprite")?.parentElement;
-
+    // Animación de ataque ANTES de la transacción
     await animaciones.reproducirAtaque(movimiento, movimiento.clase === "special");
     await animaciones.sacudirPokemon(spriteAtacanteEl);
 
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
-    const resultado = await runTransaction(combateRef, (estadoActual) => {
-      if (!estadoActual) return estadoActual;
-      if (estadoActual.fase !== "resolver") return estadoActual;
-      if (!estadoActual.accion) return estadoActual;
+    const resultado  = await runTransaction(combateRef, (estadoActual) => {
+      // FIX: guards devuelven estadoActual (no undefined) para no abortar la transacción
+      if (!estadoActual)                            return estadoActual;
+      if (estadoActual.fase !== "resolver")         return estadoActual;
+      if (!estadoActual.accion)                     return estadoActual;
       if (estadoActual.accion.jugador !== atacante) return estadoActual;
 
       let nuevosHP     = structuredClone(estadoActual.hp);
@@ -630,17 +564,21 @@ async function resolverAtaque(estado) {
       let nuevosEstados= structuredClone(estadoActual.estados);
       let nuevosStats  = structuredClone(estadoActual.estadisticas);
 
+      // Descontar PP
       nuevosPP[atacante][indexAtacante][accion.movIndex] =
         Math.max(0, nuevosPP[atacante][indexAtacante][accion.movIndex] - 1);
 
+      // Verificar estado pre-acción (parálisis, sueño, congelado)
       const { puedeActuar, nuevosEstadosPost } = verificarEstadoPreAccion(nuevosEstados, atacante, indexAtacante);
       nuevosEstados = nuevosEstadosPost;
+
       if (!puedeActuar) {
         return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
           estadisticas: nuevosStats, turno: defensor, fase: "elegir",
           log: `¡${pokeAtacante.nombre} no puede moverse!`, accion: null };
       }
 
+      // Verificar precisión
       const precisionMod = obtenerModificadorPrecision(nuevosStats, atacante, indexAtacante);
       if (movimiento.precision !== null && Math.random() * 100 >= movimiento.precision * precisionMod) {
         return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
@@ -648,131 +586,111 @@ async function resolverAtaque(estado) {
           log: `¡${pokeAtacante.nombre} falló!`, accion: null };
       }
 
-      let logMsg = "", danoRealizado = 0;
+      let logMsg       = "";
+      let danoRealizado= 0;
+
       if (movimiento.clase === "status") {
+        // FIX: propiedad de retorno corregida de nuevosEstadosResult → nuevosEstados
         const result = aplicarMovimientoStatus(movimiento, pokeAtacante, pokeDefensor, nuevosEstados, defensor, indexDefensor);
-        logMsg = result.mensaje;
-        nuevosEstados = result.nuevosEstados;
+        logMsg        = result.mensaje;
+        nuevosEstados = result.nuevosEstados;   // ← nombre corregido
       } else {
+        // FIX: crítico integrado DENTRO de calcularDano, no después
         const esCritico = Math.random() < 0.0625;
         const result = calcularDano(
-          movimiento, pokeAtacante, pokeDefensor, nuevosStats, nuevosEstados,
+          movimiento, pokeAtacante, pokeDefensor,
+          nuevosStats, nuevosEstados,
           atacante, defensor, indexAtacante, indexDefensor,
           estadoActual.clima, nuevosHP, esCritico
         );
-        logMsg = result.logMsg;
-        nuevosHP = result.nuevosHP;
-        nuevosStats = result.nuevosStatsResult;
-        danoRealizado = result.dano;
+        logMsg       = result.logMsg;
+        nuevosHP     = result.nuevosHP;
+        nuevosStats  = result.nuevosStatsResult;
+        danoRealizado= result.dano;
 
+        // Efecto de estado secundario (30% de probabilidad)
         if (movimiento.efectoEstado && danoRealizado > 0 && Math.random() < 0.3) {
-          const secResult = aplicarEstadoPorMovimiento(movimiento.efectoEstado, pokeDefensor, nuevosEstados, defensor, indexDefensor);
-          if (secResult.mensaje) {
-            logMsg += " " + secResult.mensaje;
-            nuevosEstados = secResult.nuevosEstados;
-          }
+          const secResult = aplicarEstadoPorMovimiento(
+            movimiento.efectoEstado, pokeDefensor, nuevosEstados, defensor, indexDefensor
+          );
+          if (secResult.mensaje) { logMsg += " " + secResult.mensaje; nuevosEstados = secResult.nuevosEstados; }
         }
       }
 
+      // Daño post-acción (quemadura, veneno, etc.)
       const postResult = aplicarDanoPostAccion(nuevosHP, nuevosEstados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor);
-      nuevosHP = postResult.nuevosHPPost;
+      nuevosHP      = postResult.nuevosHPPost;
       nuevosEstados = postResult.nuevosEstadosPost2;
       if (postResult.mensaje) logMsg += " " + postResult.mensaje;
 
-      let nuevaFase = "elegir", nuevoTurno = defensor;
+      let nuevaFase  = "elegir";
+      let nuevoTurno = defensor;
 
-     // VERIFICAR SI EL DEFENSOR SE DEBILITÓ
-      const hpDefensorAntes = estadoActual.hp[defensor][indexDefensor];
-      const hpDefensorDespues = nuevosHP[defensor][indexDefensor];
-
-      debug(`💚 HP Defensor: antes=${hpDefensorAntes}, después=${hpDefensorDespues}, daño=${danoRealizado}`);
-
-      if (hpDefensorDespues <= 0) {
+      // Chequear KO del defensor
+      if (nuevosHP[defensor][indexDefensor] <= 0) {
         nuevosHP[defensor][indexDefensor] = 0;
         logMsg += ` ¡${pokeDefensor.nombre} se debilitó!`;
-        debug(`🔴 ¡POKEMON DEFENSOR DEBILITADO! ${pokeDefensor.nombre}`);
-        
-        const jugadorDebilitado = defensor;
-        const siguientePokemon = encontrarSiguientePokemon(nuevosHP[jugadorDebilitado]);
-        
-        debug(`📊 Siguiente Pokémon para ${jugadorDebilitado}: índice ${siguientePokemon}`);
-        
-        if (siguientePokemon === -1) {
-          debug(`🏆 FIN DEL COMBATE - Ganador: ${atacante}`);
+        if (encontrarSiguientePokemon(nuevosHP[defensor]) === -1) {
           return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
             estadisticas: nuevosStats, turno: atacante, fase: "fin", ganador: atacante,
             log: `¡${atacante} ha ganado el combate!`, accion: null };
         }
-        
-        nuevaFase = "cambio";
-        nuevoTurno = jugadorDebilitado;
-        logMsg += " ¡Elige tu siguiente Pokémon!";
-        debug(`🔄 Cambio forzado para ${jugadorDebilitado}. Fase cambiada a 'cambio'. Nuevo turno: ${nuevoTurno}`);
-      }
-        
-        nuevaFase = "cambio";
-        nuevoTurno = jugadorDebilitado;
-        logMsg += " ¡Elige tu siguiente Pokémon!";
-        debug(`🔄 Cambio forzado para ${jugadorDebilitado}. Fase cambiada a 'cambio'`);
+        nuevaFase  = "cambio";
+        nuevoTurno = defensor;
+        logMsg    += " Elige tu siguiente Pokémon.";
       }
 
-      // VERIFICAR SI EL ATACANTE SE DEBILITÓ (por daño post-acción)
+      // Chequear KO del atacante (por daño de estado post-acción)
       if (nuevosHP[atacante][indexAtacante] <= 0) {
         nuevosHP[atacante][indexAtacante] = 0;
         logMsg += ` ¡${pokeAtacante.nombre} se debilitó!`;
-        
-        const jugadorDebilitado = atacante;
-        const siguientePokemon = encontrarSiguientePokemon(nuevosHP[jugadorDebilitado]);
-        
-        if (siguientePokemon === -1) {
+        if (encontrarSiguientePokemon(nuevosHP[atacante]) === -1) {
           return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
             estadisticas: nuevosStats, turno: defensor, fase: "fin", ganador: defensor,
             log: `¡${defensor} ha ganado el combate!`, accion: null };
         }
-        
+        // Si ambos necesitan cambio, el atacante tiene prioridad para elegir primero
         if (nuevaFase !== "cambio") {
-          nuevaFase = "cambio";
-          nuevoTurno = jugadorDebilitado;
+          nuevaFase  = "cambio";
+          nuevoTurno = atacante;
         }
-        logMsg += " ¡Elige tu siguiente Pokémon!";
-        debug(`🔄 Cambio forzado para ${jugadorDebilitado}. Fase cambiada a 'cambio'`);
+        logMsg += " Elige tu siguiente Pokémon.";
       }
 
       return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
         estadisticas: nuevosStats, turno: nuevoTurno, fase: nuevaFase, log: logMsg, accion: null };
     });
 
-    clearTimeout(timeoutId);
-
+    // Animaciones post-transacción
     if (resultado.committed) {
       const estadoFinal = resultado.snapshot.val();
+      // FIX: usar el daño real del resultado en vez de parsear el log con regex inestable
       const danoFinal = calcularUltimoDanoDesdeEstado(estadoFinal, defensor, indexDefensor, estado);
       if (danoFinal > 0) {
         await animaciones.sacudirPokemon(spriteDefensorEl);
         await animaciones.flashDamage(spriteDefensorEl);
         const rect = spriteDefensorEl?.getBoundingClientRect();
-        const posX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
-        const posY = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+        const posX = rect ? rect.left + rect.width  / 2 : window.innerWidth  / 2;
+        const posY = rect ? rect.top  + rect.height / 2 : window.innerHeight / 2;
         await animaciones.mostrarDano(danoFinal, false, posX, posY);
       }
-    } else {
-      debug("resolverAtaque: transacción no cometida");
     }
   } catch (err) {
     console.error("[RESOLVER ERROR]", err);
-    log("Error al resolver el ataque: " + err.message);
+    log("Error al resolver el ataque");
   } finally {
     animacionEnProceso = false;
-    debug("resolverAtaque finalizado, animacionEnProceso=false");
   }
 }
 
+// FIX: calcular daño real comparando HP antes/después en vez de parsear el log
 function calcularUltimoDanoDesdeEstado(estadoFinal, defensorNombre, indexDefensor, estadoAnterior) {
   const hpAntes  = estadoAnterior.hp?.[defensorNombre]?.[indexDefensor] ?? 0;
   const hpDespues= estadoFinal.hp?.[defensorNombre]?.[indexDefensor]    ?? 0;
   return Math.max(0, hpAntes - hpDespues);
 }
 
+// ---------- FUNCIONES AUXILIARES DE COMBATE ----------
 function verificarEstadoPreAccion(estados, jugador, index) {
   const nuevosEstados = structuredClone(estados);
   const estadoPoke    = nuevosEstados[jugador][index];
@@ -807,6 +725,7 @@ function obtenerModificadorPrecision(estadisticas, jugador, index) {
          (evaMod >= 0 ? (3 + evaMod) / 3 : 3 / (3 - evaMod));
 }
 
+// FIX: esCritico ahora es parámetro (calculado antes de llamar), evitando doble daño
 function calcularDano(movimiento, pokeAtacante, pokeDefensor, estadisticas, estados,
     atacanteNombre, defensorNombre, indexAtacante, indexDefensor, clima, nuevosHP, esCritico = false) {
 
@@ -823,6 +742,7 @@ function calcularDano(movimiento, pokeAtacante, pokeDefensor, estadisticas, esta
   attackStat  *= atkMod >= 0 ? (2 + atkMod) / 2 : 2 / (2 - atkMod);
   defenseStat *= defMod >= 0 ? (2 + defMod) / 2 : 2 / (2 - defMod);
 
+  // Quemadura reduce ataque físico
   if (estados[atacanteNombre][indexAtacante].nombre === "QUEMADO" && movimiento.clase === "physical") attackStat *= 0.5;
 
   const stab = pokeAtacante.tipos.includes(movimiento.tipo) ? 1.5 : 1;
@@ -854,6 +774,7 @@ function calcularDano(movimiento, pokeAtacante, pokeDefensor, estadisticas, esta
   return { dano: damage, logMsg, nuevosHP, nuevosStatsResult: estadisticas };
 }
 
+// FIX: propiedad de retorno renombrada a "nuevosEstados" (coherente con quien la consume)
 function aplicarMovimientoStatus(movimiento, pokeAtacante, pokeDefensor, estados, defensorNombre, indexDefensor) {
   const nuevosEstados = structuredClone(estados);
   const estadoAplicar = movimiento.efectoEstado;
@@ -910,179 +831,88 @@ function encontrarSiguientePokemon(hpArray) {
 
 // ---------- ACCIONES DEL JUGADOR ----------
 async function elegirAtaque(mov, index) {
-  debug(`elegirAtaque llamado: mov=${mov.nombre}, index=${index}`);
-  if (!esMiTurno) { debug("No es mi turno"); return; }
-  if (animacionEnProceso) { debug("Ya hay una animación en curso"); return; }
-  if (esperandoCambio) { debug("Esperando cambio de Pokémon"); return; }
-
+  if (!esMiTurno || animacionEnProceso || esperandoCambio) { log("No puedes atacar ahora"); return; }
   const ppActual = estadoCombate?.pp[miNombre]?.[miIndexActivo]?.[index];
-  if (ppActual <= 0) {
-    log("¡No quedan PP para " + mov.nombre + "!");
-    return;
-  }
+  if (ppActual <= 0) { log("¡No quedan PP para " + mov.nombre + "!"); return; }
 
+  animacionEnProceso = true;
   ocultarMenus();
 
   try {
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
-    const result = await runTransaction(combateRef, (estadoActual) => {
-      if (!estadoActual) return estadoActual;
-      if (estadoActual.turno !== miNombre) return estadoActual;
-      if (estadoActual.fase !== "elegir") return estadoActual;
+    await runTransaction(combateRef, (estadoActual) => {
+      // FIX: guard devuelve estadoActual para no abortar
+      if (!estadoActual)                               return estadoActual;
+      if (estadoActual.turno !== miNombre)             return estadoActual;
+      if (estadoActual.fase !== "elegir")              return estadoActual;
       if (estadoActual.pp[miNombre][miIndexActivo][index] <= 0) return estadoActual;
-
-      debug("Transacción: escribiendo acción de ataque");
-      return {
-        ...estadoActual,
-        accion: { jugador: miNombre, movIndex: index, movNombre: mov.nombre },
-        fase: "resolver"
-      };
+      return { ...estadoActual, accion: { jugador: miNombre, movIndex: index, movNombre: mov.nombre }, fase: "resolver" };
     });
-
-    if (!result.committed) {
-      debug("elegirAtaque: transacción NO cometida");
-      mostrarMenuPrincipal();
-    } else {
-      debug("elegirAtaque: transacción cometida exitosamente");
-    }
   } catch (err) {
     console.error("[ATAQUE ERROR]", err);
-    log("Error al enviar el ataque: " + err.message);
-    mostrarMenuPrincipal();
+    log("Error al enviar el ataque");
+  } finally {
+    animacionEnProceso = false;
   }
 }
 
 function mostrarSelectorPokemon() {
-  debug("mostrarSelectorPokemon() llamado. cambioForzado=" + cambioForzado);
-  
   esperandoCambio = true;
-  
-  if (!menuCambio) {
-    console.error("menuCambio no encontrado");
-    return;
-  }
-  
+  log(cambioForzado ? "¡Elige tu siguiente Pokémon!" : "Elige un Pokémon:");
+  if (!menuCambio) return;
   menuCambio.innerHTML = "<h3 style='color:#ffcb05;margin-bottom:12px;text-align:center'>ELIGE POKÉMON</h3>";
   menuCambio.classList.remove("oculto");
   menuPrincipal?.classList.add("oculto");
   menuMovimientos?.classList.add("oculto");
-  menuBolsa?.classList.add("oculto");
-  
-  let pokemonsDisponibles = 0;
-  
+
   miEquipo.forEach((poke, i) => {
-    const hpActual = estadoCombate?.hp?.[miNombre]?.[i] || 0;
-    const estadoPoke = estadoCombate?.estados?.[miNombre]?.[i] || { nombre: null };
-    
+    const hpActual  = estadoCombate.hp[miNombre][i];
+    const estadoPoke= estadoCombate.estados[miNombre][i];
     if (hpActual <= 0 || i === miIndexActivo) return;
-    
-    pokemonsDisponibles++;
     const btn = document.createElement("button");
     btn.className = "combate-opcion cambio-pokemon-btn";
     btn.innerHTML = `<div class='poke-nombre'>${poke.nombre.toUpperCase()}${estadoPoke.nombre ? ` [${estadoPoke.nombre}]` : ""}</div><div class='poke-hp'>❤️ ${hpActual}/${poke.hpMax} HP</div>`;
-    btn.onclick = () => {
-      debug(`Botón de cambio clickeado para índice ${i}`);
-      confirmarCambio(i);
-    };
+    btn.onclick = () => confirmarCambio(i);
     menuCambio.appendChild(btn);
   });
-  
-  if (pokemonsDisponibles === 0) {
-    const msg = document.createElement("p");
-    msg.textContent = "No hay Pokémon disponibles para cambiar.";
-    msg.style.color = "#ff8888";
-    msg.style.textAlign = "center";
-    menuCambio.appendChild(msg);
-  }
-  
+
   if (!cambioForzado) {
-    const btnCancelar = document.createElement("button");
-    btnCancelar.className = "combate-opcion";
+    const btnCancelar   = document.createElement("button");
+    btnCancelar.className= "combate-opcion";
     btnCancelar.textContent = "CANCELAR";
     btnCancelar.onclick = cancelarCambio;
     menuCambio.appendChild(btnCancelar);
   }
-  
-  debug(`mostrarSelectorPokemon: ${pokemonsDisponibles} Pokémon disponibles para cambiar`);
 }
 
 function cancelarCambio() {
-  debug("Cancelar cambio");
   esperandoCambio = false;
-  cambioForzado = false;
+  cambioForzado   = false;
   mostrarMenuPrincipal();
   menuCambio?.classList.add("oculto");
 }
 
 async function confirmarCambio(nuevoIndex) {
-  debug(`confirmarCambio llamado para índice ${nuevoIndex}`);
-  
-  // Validaciones básicas
-  const hpSeleccionado = estadoCombate?.hp?.[miNombre]?.[nuevoIndex] || 0;
-  if (hpSeleccionado <= 0) {
-    log("Ese Pokémon está debilitado, no puedes usarlo.");
-    mostrarSelectorPokemon();
-    return;
-  }
-  
-  if (nuevoIndex === miIndexActivo) {
-    log("Ese Pokémon ya está en combate.");
-    mostrarSelectorPokemon();
-    return;
-  }
-  
-  // Guardar estado local antes de la transacción
-  const cambioVoluntario = !cambioForzado;
   esperandoCambio = false;
-  cambioForzado = false;
+  cambioForzado   = false;
   const nuevoPoke = miEquipo[nuevoIndex];
-  
+
   const combateRef = ref(db, `partidas/${partidaId}/combate`);
-  const result = await runTransaction(combateRef, (estadoActual) => {
-    if (!estadoActual) {
-      debug("confirmarCambio: estadoActual es null");
-      return estadoActual;
-    }
-    
-    // PERMITIR cambio en fase "elegir" (cambio voluntario) O en fase "cambio" (cambio forzado)
-    const esCambioValido = (estadoActual.fase === "elegir" && cambioVoluntario) || 
-                           (estadoActual.fase === "cambio" && !cambioVoluntario);
-    
-    if (!esCambioValido) {
-      debug(`confirmarCambio: fase incorrecta para este tipo de cambio. fase=${estadoActual.fase}, cambioVoluntario=${cambioVoluntario}`);
-      return estadoActual;
-    }
-    
-    if (estadoActual.turno !== miNombre) {
-      debug(`confirmarCambio: turno incorrecto: ${estadoActual.turno}`);
-      return estadoActual;
-    }
-    
-    if (estadoActual.hp[miNombre][nuevoIndex] <= 0) {
-      debug("confirmarCambio: Pokémon seleccionado está debilitado en Firebase");
-      return estadoActual;
-    }
-    
-    debug(`confirmarCambio: Transacción exitosa, cambiando a índice ${nuevoIndex}`);
+  await runTransaction(combateRef, (estadoActual) => {
+    // FIX: guard devuelve estadoActual
+    if (!estadoActual)                   return estadoActual;
+    if (estadoActual.fase !== "cambio")  return estadoActual;
+    if (estadoActual.turno !== miNombre) return estadoActual;
     return {
       ...estadoActual,
       indexActivo: { ...estadoActual.indexActivo, [miNombre]: nuevoIndex },
-      turno: rivalNombreGlobal, // El turno pasa al rival después del cambio
-      fase: "elegir", // Volvemos a fase elegir
+      turno: rivalNombreGlobal,
+      fase: "elegir",
       log: `¡${miNombre} envió a ${nuevoPoke.nombre}!`
     };
   });
-  
-  if (result.committed) {
-    debug("Cambio confirmado correctamente");
-    menuCambio?.classList.add("oculto");
-    mostrarMenuPrincipal();
-  } else {
-    debug("La transacción de cambio no se confirmó");
-    log("Error al cambiar de Pokémon. Intenta de nuevo.");
-    esperandoCambio = false;
-    mostrarSelectorPokemon();
-  }
+  menuCambio?.classList.add("oculto");
+  mostrarMenuPrincipal();
 }
 
 // ---------- BOLSA ----------
@@ -1135,7 +965,8 @@ function mostrarBolsa() {
 async function usarObjeto(indexPoke, objeto, efecto) {
   const combateRef = ref(db, `partidas/${partidaId}/combate`);
   await runTransaction(combateRef, (estadoActual) => {
-    if (!estadoActual) return estadoActual;
+    // FIX: guards devuelven estadoActual
+    if (!estadoActual)                 return estadoActual;
     if (estadoActual.turno !== miNombre) return estadoActual;
 
     const objetosUsados = estadoActual.objetosUsados?.[miNombre] || [];
@@ -1198,6 +1029,7 @@ async function usarObjeto(indexPoke, objeto, efecto) {
 
 // ---------- MENÚS ----------
 function cargarMovimientos(pokemon, ppActuales) {
+  // FIX: siempre releer el nodo del DOM (puede haber cambiado el Pokémon activo)
   contenedorMovimientos = document.querySelector(".movimientos-grid");
   if (!contenedorMovimientos) return;
   contenedorMovimientos.innerHTML = "";
@@ -1223,7 +1055,6 @@ function cargarMovimientos(pokemon, ppActuales) {
 }
 
 function mostrarMenuPrincipal() {
-  debug("mostrarMenuPrincipal()");
   menuPrincipal?.classList.remove("oculto");
   menuMovimientos?.classList.add("oculto");
   menuCambio?.classList.add("oculto");
@@ -1241,7 +1072,6 @@ function ocultarMenus() {
 async function finalizarCombate(ganador) {
   if (window.combateFinalizado) return;
   window.combateFinalizado = true;
-  debug("finalizarCombate llamado, ganador:", ganador);
   ocultarMenus();
 
   if (combateListener) { off(combateListener); combateListener = null; }
@@ -1268,37 +1098,18 @@ async function finalizarCombate(ganador) {
 
 function mostrarPantallaFin(esVictoria, ganador) {
   let overlay = document.getElementById("fin-overlay");
-  if (!overlay) {
-    overlay = document.createElement("div");
-    overlay.id = "fin-overlay";
-    overlay.style.position = "fixed";
-    overlay.style.inset = "0";
-    overlay.style.backgroundColor = "rgba(13, 27, 75, 0.96)";
-    overlay.style.display = "flex";
-    overlay.style.justifyContent = "center";
-    overlay.style.alignItems = "center";
-    overlay.style.zIndex = "10000";
-    overlay.style.backdropFilter = "blur(12px)";
-    document.body.appendChild(overlay);
-  } else {
-    overlay.style.display = "flex";
-  }
+  if (!overlay) { overlay = document.createElement("div"); overlay.id = "fin-overlay"; document.body.appendChild(overlay); }
 
   overlay.innerHTML = `
-    <div class="fin-contenido" style="text-align:center; background:rgba(26,48,128,0.9); padding:2rem; border-radius:16px; border:2px solid #ff2d78; max-width:450px;">
-      <h1 class="fin-titulo ${esVictoria ? 'victoria' : 'derrota'}" style="font-family:'Bebas Neue'; font-size:3rem; margin-bottom:1rem; ${esVictoria ? 'color:#39d353' : 'color:#ff2d78'}">
-        ${esVictoria ? 'VICTORIA' : 'DERROTA'}
-      </h1>
-      <p class="fin-mensaje" style="margin-bottom:1.5rem; font-size:1.1rem">${esVictoria ? '¡Felicidades! Has derrotado a ' + rivalNombreGlobal : ganador + ' te ha derrotado'}</p>
-      <div class="fin-stats" style="background:rgba(0,0,0,0.4); padding:0.8rem; border-radius:8px; margin-bottom:1.5rem;">
-        <p id="fin-stats-contenido">Cargando estadísticas...</p>
-      </div>
+    <div class="fin-contenido">
+      <h1 class="fin-titulo ${esVictoria ? "victoria" : "derrota"}">${esVictoria ? "VICTORIA" : "DERROTA"}</h1>
+      <p class="fin-mensaje">${esVictoria ? "¡Felicidades! Has derrotado a " + rivalNombreGlobal : ganador + " te ha derrotado"}</p>
+      <div class="fin-stats" id="fin-stats-contenido"><p>Cargando estadísticas...</p></div>
       <div>
-        <button class="fin-boton" id="fin-volver-menu" style="background:#ff2d78; border:none; color:#0d1b4b; padding:0.5rem 1.2rem; margin:0 0.5rem; border-radius:4px; cursor:pointer; font-weight:bold;">VOLVER AL MENÚ</button>
-        <button class="fin-boton secondary" id="fin-ver-estadisticas" style="background:rgba(26,48,128,0.8); border:1px solid #4fc3f7; color:white; padding:0.5rem 1.2rem; margin:0 0.5rem; border-radius:4px; cursor:pointer;">VER ESTADÍSTICAS</button>
+        <button class="fin-boton" id="fin-volver-menu">VOLVER AL MENÚ</button>
+        <button class="fin-boton secondary" id="fin-ver-estadisticas">VER ESTADÍSTICAS</button>
       </div>
-    </div>
-  `;
+    </div>`;
 
   document.getElementById("fin-volver-menu")?.addEventListener("click", () => {
     window.location.href = "Juego-Lobby.html?id=" + partidaId;
@@ -1307,16 +1118,13 @@ function mostrarPantallaFin(esVictoria, ganador) {
     window.location.href = "Estadisticas.html";
   });
 
-  const statsRef = ref(db, `estadisticas/${miNombre}`);
-  get(statsRef).then((snap) => {
-    const stats = snap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
-    const contenedor = document.getElementById("fin-stats-contenido");
-    if (contenedor) {
-      contenedor.innerHTML = `<p>Victorias: ${stats.victorias}</p><p>Derrotas: ${stats.derrotas}</p><p>Batallas totales: ${stats.batallas}</p>`;
-    }
+  get(ref(db, `estadisticas/${miNombre}`)).then((snap) => {
+    const s = snap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
+    const c = document.getElementById("fin-stats-contenido");
+    if (c) c.innerHTML = `<p>Victorias: ${s.victorias}</p><p>Derrotas: ${s.derrotas}</p><p>Batallas totales: ${s.batallas}</p>`;
   }).catch(() => {
-    const contenedor = document.getElementById("fin-stats-contenido");
-    if (contenedor) contenedor.innerHTML = "<p>No se pudieron cargar las estadísticas.</p>";
+    const c = document.getElementById("fin-stats-contenido");
+    if (c) c.innerHTML = "<p>No se pudieron cargar las estadísticas.</p>";
   });
 }
 
