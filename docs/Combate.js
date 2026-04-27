@@ -418,7 +418,7 @@ function renderEstado(estado) {
   if (!estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) return;
 
   esMiTurno = estado.turno === miNombre;
-  debug(`renderEstado: turno=${estado.turno}, miNombre=${miNombre}, esMiTurno=${esMiTurno}, fase=${estado.fase}, esperandoCambio=${esperandoCambio}`);
+  debug(`renderEstado: turno=${estado.turno}, miNombre=${miNombre}, esMiTurno=${esMiTurno}, fase=${estado.fase}, esperandoCambio=${esperandoCambio}, animacionEnProceso=${animacionEnProceso}`);
 
   miIndexActivo   = estado.indexActivo[miNombre];
   rivalIndexActivo= estado.indexActivo[rivalNombreGlobal];
@@ -452,9 +452,14 @@ function renderEstado(estado) {
 
   if (estado.fase === "fin") { finalizarCombate(estado.ganador); return; }
 
-  // CORRECCIÓN: El host siempre debe resolver cuando la fase es "resolver"
+  // --- CORRECCIÓN PRINCIPAL ---
   if (estado.fase === "resolver" && esHost) {
-    debug("Llamando a resolverAtaque desde renderEstado");
+    debug("Llamando a resolverAtaque desde renderEstado. animacionEnProceso=" + animacionEnProceso);
+    // Si el flag está activo por error, lo forzamos a false para que pueda ejecutarse
+    if (animacionEnProceso) {
+      debug("⚠️ animacionEnProceso estaba true, forzando reset");
+      animacionEnProceso = false;
+    }
     resolverAtaque(estado);
     return;
   }
