@@ -136,3 +136,30 @@ document.getElementById("BorrarEquipo").addEventListener("click", () => {
 document.getElementById("Inicio").addEventListener("click", () => {
   window.location.href = "Index.html";
 });
+
+
+async function subirConfiguracionesDelEquipo(partidaId, miNombre, equipo) {
+  const db = getDatabase(app);
+  
+  for (const pokemon of equipo) {
+    const nombrePokemon = pokemon.id || pokemon;
+    const configLocal = JSON.parse(localStorage.getItem(`configuracion-${nombrePokemon}`)) || {};
+    
+    if (Object.keys(configLocal).length === 0) continue;
+    
+    await set(ref(db, `partidas/${partidaId}/configuraciones/${miNombre}/${nombrePokemon}`), {
+      nivel: configLocal.nivel || 50,
+      apodo: configLocal.apodo || nombrePokemon,
+      shiny: configLocal.shiny || false,
+      movimientos: configLocal.movimientos || [],
+      objeto: configLocal.objeto || "ninguno"
+    });
+  }
+  
+  console.log("[EQUIPO] Configuraciones subidas a Firebase");
+}
+
+// Llamar esta función cuando el jugador confirma el equipo y antes de iniciar el combate
+// Ejemplo:
+// await subirConfiguracionesDelEquipo(partidaId, miNombre, miEquipo);
+// luego redirigir a Juego-Combate.html?id=...

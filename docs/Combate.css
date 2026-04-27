@@ -899,6 +899,165 @@ body::after {
 }
 
 /* ============================================
+   ANIMACIONES DE BATALLA (para AnimacionBatalla)
+   ============================================ */
+
+/* Sacudir Pokemon */
+@keyframes shakePokemon {
+  0%, 100% { transform: translateX(0px); }
+  25% { transform: translateX(-8px) rotate(-1deg); }
+  75% { transform: translateX(8px) rotate(1deg); }
+}
+
+.shaking {
+  animation: shakePokemon 0.3s ease-in-out;
+}
+
+/* Flash por daño */
+@keyframes flashDamage {
+  0%, 100% { filter: brightness(1); opacity: 1; }
+  50% { filter: brightness(1.8); background: rgba(255, 255, 255, 0.6); }
+}
+
+.flash-damage {
+  animation: flashDamage 0.2s ease-in-out;
+}
+
+/* Texto flotante */
+@keyframes flotarTexto {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  20% { opacity: 1; transform: translate(-50%, -50px); }
+  100% { opacity: 0; transform: translate(-50%, -120px); }
+}
+
+/* Overlay de animacion */
+#animacion-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Efectos visuales de ataques */
+.efecto-visual {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: animacionAtaque 0.5s ease-out forwards;
+}
+
+@keyframes animacionAtaque {
+  0% { transform: translateX(0) scale(0.5); opacity: 1; }
+  50% { transform: translateX(var(--tx, 100px)) scale(1.2); opacity: 1; }
+  100% { transform: translateX(var(--tx, 100px)) scale(0); opacity: 0; }
+}
+
+/* Tipos de efectos visuales */
+.efecto-visual.golpe {
+  background: radial-gradient(circle, #ffcc00 0%, #ff6600 100%);
+  border-radius: 50%;
+}
+
+.efecto-visual.rayo {
+  background: linear-gradient(90deg, #ffff00, #ffaa00);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+.efecto-visual.fuego {
+  background: radial-gradient(circle, #ff6600, #ff3300);
+  border-radius: 50%;
+  box-shadow: 0 0 30px orange;
+}
+
+.efecto-visual.agua {
+  background: radial-gradient(circle, #3399ff, #0066cc);
+  border-radius: 40% 60% 70% 30%;
+}
+
+.efecto-visual.planta {
+  background: radial-gradient(circle, #78c850, #2d6b00);
+  border-radius: 30% 70% 50% 50%;
+}
+
+.efecto-visual.hielo {
+  background: linear-gradient(135deg, #98d8d8, #4a9f9f);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+.efecto-visual.psiquico {
+  background: radial-gradient(circle, #f85888, #8f004a);
+  border-radius: 50%;
+  animation: pulsacionPsiquica 0.3s ease-out 2;
+}
+
+@keyframes pulsacionPsiquica {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+.efecto-visual.dragon {
+  background: radial-gradient(circle, #7038f8, #2d008f);
+  border-radius: 30% 70% 70% 30%;
+}
+
+.efecto-visual.sombra {
+  background: radial-gradient(circle, #705898, #2d1a5c);
+  border-radius: 50%;
+  filter: blur(8px);
+}
+
+/* Texto de animacion */
+.texto-animacion {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px black;
+  white-space: nowrap;
+  animation: flotarTexto 0.8s ease-out forwards;
+  z-index: 2001;
+}
+
+/* Popup de daño */
+#animacion-damage {
+  position: fixed;
+  z-index: 2002;
+  pointer-events: none;
+}
+
+.damage-number {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ff4444;
+  text-shadow: 2px 2px 0 #660000;
+  animation: flotarTexto 0.8s ease-out forwards;
+}
+
+.damage-number.critico {
+  font-size: 2.5rem;
+  color: #ff8888;
+  text-shadow: 0 0 15px red, 2px 2px 0 #660000;
+}
+
+/* Clase oculto (si no existe ya) */
+.oculto {
+  display: none !important;
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 900px) {
@@ -912,3 +1071,4 @@ body::after {
   .combate-pokeball { width: 24px; height: 24px; }
   .combate-pokeball::after { width: 7px; height: 7px; }
 }
+

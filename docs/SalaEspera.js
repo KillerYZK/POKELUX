@@ -59,35 +59,51 @@ document.addEventListener("DOMContentLoaded", () => {
   escucharEstadoPartida();
   cargarChat();
 
-  document
-    .getElementById("btn-cargar-equipo")
-    .addEventListener("click", async () => {
-      const equipoIDs = JSON.parse(localStorage.getItem("equipo"));
-      if (!equipoIDs || equipoIDs.length === 0) {
-        alert("No tienes Pokémon en tu equipo. Ve a la sección de equipo primero.");
-        return;
+  document.getElementById("btn-cargar-equipo").addEventListener("click", async () => {
+  const equipoIDs = JSON.parse(localStorage.getItem("equipo"));
+  if (!equipoIDs || equipoIDs.length === 0) {
+    alert("No tienes Pokémon en tu equipo. Ve a la sección de equipo primero.");
+    return;
+  }
+
+  const equipoCompleto = [];
+
+  for (const id of equipoIDs) {
+  const configuracion = JSON.parse(localStorage.getItem(`configuracion-${id}`)) || {};
+  
+  // Obtener el nombre real del Pokémon
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+  const data = await res.json();
+  const nombrePokemon = data.name; // "pikachu", "gengar", etc.
+  
+  equipoCompleto.push({ id, configuracion });
+
+  if (Object.keys(configuracion).length > 0) {
+    await set(
+      ref(db, `partidas/${idPartida}/configuraciones/${nombreJugadorLocal}/${nombrePokemon}`),
+      {
+        nivel: configuracion.nivel || 50,
+        apodo: configuracion.apodo || nombrePokemon,
+        shiny: configuracion.shiny || false,
+        movimientos: configuracion.movimientos || [],
+        objeto: configuracion.objeto || "ninguno"
       }
-      
-      const equipoCompleto = [];
+    );
+  }
+}
 
-      for (const id of equipoIDs) {
-        const configuracion =
-          JSON.parse(localStorage.getItem(`configuracion-${id}`)) || {};
-        equipoCompleto.push({ id, configuracion });
-      }
+  await set(
+    ref(db, `partidas/${idPartida}/jugadores/${nombreJugadorLocal}/equipo`),
+    equipoCompleto,
+  );
 
-      await set(
-        ref(db, `partidas/${idPartida}/jugadores/${nombreJugadorLocal}/equipo`),
-        equipoCompleto,
-      );
+  await set(
+    ref(db, `partidas/${idPartida}/jugadores/${nombreJugadorLocal}/listo`),
+    true,
+  );
 
-      await set(
-        ref(db, `partidas/${idPartida}/jugadores/${nombreJugadorLocal}/listo`),
-        true,
-      );
-
-      alert("Equipo cargado en la partida.");
-    });
+  alert("Equipo cargado en la partida.");
+});
 
   document
     .getElementById("btn-iniciar")

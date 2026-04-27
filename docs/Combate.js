@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { mostrarLoading, ocultarLoading } from "./LoadingScreen.js";
 import {
   getDatabase, ref, set, get, update, onValue
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"
 
 const firebaseConfig = {
   apiKey: "AIzaSyBq13g3hXl4a3T0VLeHPBnPDZB7BgxW1xY",
@@ -23,24 +23,24 @@ const miNombre = localStorage.getItem("nombreJugador");
 const esHost = localStorage.getItem("esHost") === "true";
 
 const TIPO_CHART = {
-  normal: { fighting: 2, ghost: 0 },
-  fire: { water: 2, rock: 2, grass: 0.5, ice: 0.5, bug: 0.5, steel: 0.5 },
-  water: { electric: 2, grass: 2, fire: 0.5, water: 0.5, ice: 0.5, steel: 0.5 },
-  electric: { ground: 2, electric: 0.5, flying: 0.5, steel: 0.5 },
-  grass: { fire: 2, ice: 2, poison: 2, flying: 2, bug: 2, water: 0.5, electric: 0.5, grass: 0.5, ground: 0.5 },
-  ice: { fire: 2, fighting: 2, rock: 2, steel: 2, ice: 0.5 },
-  fighting: { flying: 2, psychic: 2, fairy: 2, normal: 0.5, ice: 0.5, rock: 0.5, dark: 0.5, steel: 0.5 },
-  poison: { ground: 2, psychic: 2, grass: 0.5, fighting: 0.5, poison: 0.5, bug: 0.5, fairy: 0.5 },
-  ground: { water: 2, grass: 2, ice: 2, poison: 0.5, rock: 0.5, electric: 0 },
-  flying: { electric: 2, ice: 2, rock: 2, grass: 0.5, fighting: 0.5, bug: 0.5 },
-  psychic: { bug: 2, dark: 2, fighting: 0.5, psychic: 0.5 },
-  bug: { fire: 2, flying: 2, rock: 2, grass: 0.5, fighting: 0.5, ground: 0.5 },
-  rock: { water: 2, grass: 2, fighting: 2, ground: 2, steel: 2, normal: 0.5, fire: 0.5, poison: 0.5, flying: 0.5 },
-  ghost: { ghost: 2, dark: 2, normal: 0, fighting: 0, poison: 0.5, bug: 0.5 },
-  dragon: { ice: 2, dragon: 2, fairy: 2, fire: 0.5, water: 0.5, electric: 0.5, grass: 0.5 },
-  dark: { fighting: 2, bug: 2, fairy: 2, ghost: 0.5, dark: 0.5, psychic: 0 },
-  steel: { fire: 2, fighting: 2, ground: 2, normal: 0.5, grass: 0.5, ice: 0.5, flying: 0.5, psychic: 0.5, bug: 0.5, rock: 0.5, dragon: 0.5, steel: 0.5, fairy: 0.5 },
-  fairy: { poison: 2, steel: 2, fighting: 0.5, bug: 0.5, dark: 0.5, dragon: 0 }
+  normal:   { rock: 0.5, steel: 0.5, ghost: 0 },
+  fire:     { fire: 0.5, water: 0.5, rock: 0.5, dragon: 0.5, grass: 2, ice: 2, bug: 2, steel: 2 },
+  water:    { water: 0.5, grass: 0.5, dragon: 0.5, fire: 2, ground: 2, rock: 2 },
+  electric: { electric: 0.5, grass: 0.5, dragon: 0.5, ground: 0, water: 2, flying: 2 },
+  grass:    { fire: 0.5, grass: 0.5, poison: 0.5, flying: 0.5, bug: 0.5, dragon: 0.5, steel: 0.5, water: 2, ground: 2, rock: 2 },
+  ice:      { fire: 0.5, water: 0.5, ice: 0.5, steel: 0.5, grass: 2, ground: 2, flying: 2, dragon: 2 },
+  fighting: { poison: 0.5, flying: 0.5, psychic: 0.5, bug: 0.5, fairy: 0.5, normal: 2, ice: 2, rock: 2, dark: 2, steel: 2 },
+  poison:   { poison: 0.5, ground: 0.5, rock: 0.5, ghost: 0.5, steel: 0, grass: 2, fairy: 2 },
+  ground:   { grass: 0.5, bug: 0.5, electric: 0, fire: 2, poison: 2, rock: 2, steel: 2 },
+  flying:   { electric: 0.5, rock: 0.5, steel: 0.5, grass: 2, fighting: 2, bug: 2 },
+  psychic:  { psychic: 0.5, steel: 0.5, dark: 0, fighting: 2, poison: 2 },
+  bug:      { fire: 0.5, fighting: 0.5, poison: 0.5, flying: 0.5, ghost: 0.5, steel: 0.5, fairy: 0.5, grass: 2, psychic: 2, dark: 2 },
+  rock:     { fighting: 0.5, ground: 0.5, steel: 0.5, fire: 2, ice: 2, flying: 2, bug: 2 },
+  ghost:    { normal: 0, dark: 0.5, psychic: 2, ghost: 2 },
+  dragon:   { steel: 0.5, fairy: 0, dragon: 2 },
+  dark:     { fighting: 0.5, dark: 0.5, fairy: 0.5, psychic: 2, ghost: 2 },
+  steel:    { fire: 0.5, water: 0.5, electric: 0.5, steel: 0.5, ice: 2, rock: 2, fairy: 2 },
+  fairy:    { fire: 0.5, poison: 0.5, steel: 0.5, fighting: 2, dragon: 2, dark: 2 }
 };
 
 const SPRITE_BASE = {
@@ -48,7 +48,7 @@ const SPRITE_BASE = {
   back: "https://play.pokemonshowdown.com/sprites/ani-back/"
 };
 
-// ── CAMPOS DE BATALLA ────────────────────────────────────────
+// CAMPOS DE BATALLA
 function actualizarCampoPorTipo(tipos) {
   const campo = document.querySelector('.combate-campo');
   if (!campo) return;
@@ -78,7 +78,7 @@ function aplicarClima(tipoClima) {
   if (tipoClima) campo.classList.add(tipoClima);
 }
 
-// ── ESTADO LOCAL ─────────────────────────────────────────────
+// ESTADO LOCAL
 let estadoCombate = null;
 let miEquipo = [];
 let equipoRival = [];
@@ -93,28 +93,48 @@ let ultimoLog = "";
 let listenerActivo = false;
 
 const pokemonCache = new Map();
+const btnBolsa = document.getElementById("btn-bolsa");
 
-// ── DOM ──────────────────────────────────────────────────────
+// DOM
 const logTxt = document.getElementById("log-texto");
 const menuPrincipal = document.getElementById("menu-principal");
 const menuMovimientos = document.getElementById("menu-movimientos");
 const menuCambio = document.getElementById("menu-cambio");
+const menuBolsa = document.getElementById("menu-bolsa");
 const btnLuchar = document.getElementById("btn-luchar");
-const btnVolver = document.getElementById("btn-volver");
-const btnPokemon = document.getElementById("btn-pokemon");
 
-// ── FUNCIÓN PARA REINICIAR ESTADOS ───────────────────────────
-function reiniciarEstadosLocales() {
-  animacionEnProceso = false;
-  esperandoCambio = false;
-  cambisForzado = false;
+const btnPokemon = document.getElementById("btn-pokemon");
+const btnCerrarBolsa = document.getElementById("btn-cerrar-bolsa");
+
+// FUNCION PARA CALCULAR ESTADISTICAS REALES CON NIVEL
+function calcularEstadisticasReales(baseStats, nivel) {
+  const ivs = { hp: 31, atk: 31, def: 31, spAtk: 31, spDef: 31, spd: 31 };
+  const evs = { hp: 0, atk: 0, def: 0, spAtk: 0, spDef: 0, spd: 0 };
+  
+  const stats = {};
+  
+  stats.hp = Math.floor(((2 * baseStats.hp + ivs.hp + evs.hp/4) * nivel / 100) + nivel + 10);
+  stats.atk = Math.floor(((2 * baseStats.atk + ivs.atk + evs.atk/4) * nivel / 100) + 5);
+  stats.def = Math.floor(((2 * baseStats.def + ivs.def + evs.def/4) * nivel / 100) + 5);
+  stats.spAtk = Math.floor(((2 * baseStats.spAtk + ivs.spAtk + evs.spAtk/4) * nivel / 100) + 5);
+  stats.spDef = Math.floor(((2 * baseStats.spDef + ivs.spDef + evs.spDef/4) * nivel / 100) + 5);
+  stats.spd = Math.floor(((2 * baseStats.spd + ivs.spd + evs.spd/4) * nivel / 100) + 5);
+  
+  return stats;
 }
 
-// ── INICIALIZAR COMBATE ──────────────────────────────────────────────
+// REINICIAR ESTADOS
+function reiniciarEstadosLocales() {
+  if (!animacionEnProceso) {
+    esperandoCambio = false;
+    cambisForzado = false;
+  }
+}
+
+// INICIALIZAR COMBATE
 async function iniciarCombate() {
   console.log("[COMBATE] iniciarCombate() llamado");
 
-  //  Mostrar loading al inicio
   await mostrarLoading();
 
   if (!partidaId || !miNombre) {
@@ -154,8 +174,8 @@ async function iniciarCombate() {
     }
 
     [miEquipo, equipoRival] = await Promise.all([
-      cargarEquipo(equipoMiData),
-      cargarEquipo(equipoRivalData)
+      cargarEquipo(equipoMiData, miNombre),
+      cargarEquipo(equipoRivalData, rivalNombreGlobal)
     ]);
 
     if (miEquipo.length === 0 || equipoRival.length === 0) {
@@ -199,24 +219,14 @@ async function iniciarCombate() {
       }
     }
 
-       const estadoInicial = await get(combateRef);
-    console.log("🔥 [COMBATE] estadoInicial.exists() =", estadoInicial.exists());
+    const estadoInicial = await get(combateRef);
     
     if (estadoInicial.exists()) {
       estadoCombate = estadoInicial.val();
-      console.log("🔥 [COMBATE] estadoCombate obtenido:", estadoCombate);
-      console.log("🔥 [COMBATE] fase:", estadoCombate?.fase);
-      console.log("🔥 [COMBATE] turno:", estadoCombate?.turno);
-      console.log("🔥 [COMBATE] miNombre:", miNombre);
-      console.log("🔥 [COMBATE] rivalNombreGlobal:", rivalNombreGlobal);
       renderEstado(estadoCombate);
-    } else {
-      console.log("🔥 [COMBATE] estadoInicial NO existe - esto es un problema!");
     }
 
-        renderEstado(estadoCombate);
-    log("¡Combate listo!");
-
+    log("Combate listo");
     await ocultarLoading();
 
   } catch (err) {
@@ -249,7 +259,7 @@ async function inicializarCombateEnFirebase() {
       [rivalNombreGlobal]: equipoRival.map(() => ({ atk: 0, def: 0, spAtk: 0, spDef: 0, spd: 0, evasion: 0, precision: 0 }))
     },
     accion: null,
-    log: "¡El combate comienza!",
+    log: "El combate comienza",
     clima: null,
     turnoClima: 0,
     campo: { reflejo: null, muroLuz: null, velocidad: null }
@@ -263,25 +273,48 @@ function calcularQuienEmpieza() {
   return miVel > rivalVel ? miNombre : rivalNombreGlobal;
 }
 
-// ── CARGAR EQUIPO ────────────────────────────────────────────
-async function cargarEquipo(listaEquipo) {
+// CARGAR EQUIPO
+async function cargarEquipo(listaEquipo, nombreJugador) {
   if (!listaEquipo || listaEquipo.length === 0) return [];
 
   try {
     return await Promise.all(listaEquipo.map(async (entry) => {
-      const nombre = String(typeof entry === "string" ? entry : entry.id);
-      if (!nombre || nombre === "undefined") return crearPokemonPorDefecto("Unknown");
-      if (pokemonCache.has(nombre)) return structuredClone(pokemonCache.get(nombre));
+      const nombreBase = String(typeof entry === "string" ? entry : entry.id);
+      if (!nombreBase || nombreBase === "undefined") return crearPokemonPorDefecto("Unknown");
+      
+      let configGuardada = {};
+      
+      if (nombreJugador === miNombre) {
+      const configLocal = JSON.parse(localStorage.getItem(`configuracion-${nombreBase}`)) || {};
+      configGuardada = configLocal;
+    } else {
+      try {
+        // Intentar cargar configuración del rival desde Firebase
+        const configSnap = await get(ref(db, `partidas/${partidaId}/configuraciones/${nombreJugador}/${nombreBase}`));
+        configGuardada = configSnap.val() || {};
+      } catch(e) {
+        console.warn("No se pudo cargar config del rival:", e);
+      }
+}
+      
+      const nivel = parseInt(configGuardada.nivel) || 50;
+      const apodo = configGuardada.apodo || nombreBase;
+      const esShiny = configGuardada.shiny || false;
+      const movimientosGuardados = configGuardada.movimientos || [];
+      const objetoGuardado = configGuardada.objeto || null;
+      
+      const cacheKey = `${nombreBase}-${nivel}-${esShiny}-${nombreJugador}`;
+      if (pokemonCache.has(cacheKey)) return structuredClone(pokemonCache.get(cacheKey));
 
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
-        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${nombre.toLowerCase()}`, { signal: controller.signal });
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${nombreBase.toLowerCase()}`, { signal: controller.signal });
         clearTimeout(timeoutId);
-        if (!res.ok) return crearPokemonPorDefecto(nombre);
+        if (!res.ok) return crearPokemonPorDefecto(apodo);
 
         const data = await res.json();
-        const stats = {
+        const baseStats = {
           hp: data.stats.find(s => s.stat.name === "hp")?.base_stat || 50,
           atk: data.stats.find(s => s.stat.name === "attack")?.base_stat || 50,
           def: data.stats.find(s => s.stat.name === "defense")?.base_stat || 50,
@@ -290,47 +323,115 @@ async function cargarEquipo(listaEquipo) {
           spd: data.stats.find(s => s.stat.name === "speed")?.base_stat || 50
         };
 
-        const movimientos = await Promise.all(
-          (data.moves || []).slice(0, 4).map(async (m) => {
-            try {
-              const c2 = new AbortController();
-              const t2 = setTimeout(() => c2.abort(), 4000);
-              const mRes = await fetch(m.move.url, { signal: c2.signal });
-              clearTimeout(t2);
-              if (!mRes.ok) throw new Error("failed");
-              const mData = await mRes.json();
-              return {
-                nombre: mData.name.replace(/-/g, " "),
-                tipo: mData.type?.name || "normal",
-                poder: mData.power || 0,
-                pp: mData.pp || 20,
-                ppMax: mData.pp || 20,
-                clase: mData.damage_class?.name || "physical",
-                precision: mData.accuracy || 100,
-                efecto: mData.effect_entries?.find(e => e.language.name === "en")?.effect || ""
-              };
-            } catch {
-              return { nombre: m.move.name.replace(/-/g, " "), tipo: "normal", poder: 40, pp: 20, ppMax: 20, clase: "physical", precision: 100, efecto: "" };
+        const statsReales = calcularEstadisticasReales(baseStats, nivel);
+
+        let movimientos = [];
+        
+        if (movimientosGuardados.length > 0 && movimientosGuardados.some(m => m && m !== "")) {
+          for (const moveName of movimientosGuardados) {
+            if (!moveName || moveName === "") {
+              movimientos.push({
+                nombre: "Ataque Rapido",
+                tipo: "normal",
+                poder: 40,
+                pp: 30,
+                ppMax: 30,
+                clase: "physical",
+                precision: 100,
+                efecto: ""
+              });
+              continue;
             }
-          })
-        );
+            
+            try {
+              const moveRes = await fetch(`https://pokeapi.co/api/v2/move/${moveName.toLowerCase()}`);
+              if (moveRes.ok) {
+                const moveData = await moveRes.json();
+                movimientos.push({
+                  nombre: moveData.name.replace(/-/g, " "),
+                  tipo: moveData.type?.name || "normal",
+                  poder: moveData.power || 40,
+                  pp: moveData.pp || 20,
+                  ppMax: moveData.pp || 20,
+                  clase: moveData.damage_class?.name || "physical",
+                  precision: moveData.accuracy || 100,
+                  efecto: moveData.effect_entries?.find(e => e.language.name === "en")?.effect || ""
+                });
+              } else {
+                throw new Error("Move not found");
+              }
+            } catch {
+              movimientos.push({
+                nombre: moveName.replace(/-/g, " "),
+                tipo: "normal",
+                poder: 40,
+                pp: 20,
+                ppMax: 20,
+                clase: "physical",
+                precision: 100,
+                efecto: ""
+              });
+            }
+          }
+        } else {
+          movimientos = await Promise.all(
+            (data.moves || []).slice(0, 4).map(async (m) => {
+              try {
+                const c2 = new AbortController();
+                const t2 = setTimeout(() => c2.abort(), 4000);
+                const mRes = await fetch(m.move.url, { signal: c2.signal });
+                clearTimeout(t2);
+                if (!mRes.ok) throw new Error("failed");
+                const mData = await mRes.json();
+                return {
+                  nombre: mData.name.replace(/-/g, " "),
+                  tipo: mData.type?.name || "normal",
+                  poder: mData.power || 0,
+                  pp: mData.pp || 20,
+                  ppMax: mData.pp || 20,
+                  clase: mData.damage_class?.name || "physical",
+                  precision: mData.accuracy || 100,
+                  efecto: mData.effect_entries?.find(e => e.language.name === "en")?.effect || ""
+                };
+              } catch {
+                return { nombre: m.move.name.replace(/-/g, " "), tipo: "normal", poder: 40, pp: 20, ppMax: 20, clase: "physical", precision: 100, efecto: "" };
+              }
+            })
+          );
+        }
+
+        while (movimientos.length < 4) {
+          movimientos.push({
+            nombre: "Ataque Rapido",
+            tipo: "normal",
+            poder: 40,
+            pp: 30,
+            ppMax: 30,
+            clase: "physical",
+            precision: 100,
+            efecto: ""
+          });
+        }
 
         const pokemonData = {
-          nombre: data.name || nombre,
-          hpMax: stats.hp,
-          stats,
-          movimientos: movimientos.length > 0 ? movimientos : [
-            { nombre: "Ataque Rápido", tipo: "normal", poder: 40, pp: 30, ppMax: 30, clase: "physical", precision: 100, efecto: "" }
-          ],
-          tipos: data.types?.map(t => t.type.name) || ["normal"]
+          nombre: apodo,
+          nombreOriginal: data.name,
+          hpMax: statsReales.hp,
+          stats: statsReales,
+          nivel: nivel,
+          movimientos: movimientos.slice(0, 4),
+          tipos: data.types?.map(t => t.type.name) || ["normal"],
+          shiny: esShiny,
+          objeto: objetoGuardado ? { id: objetoGuardado, nombre: objetoGuardado, sprite: "" } : null,
+          objetoUsado: false
         };
 
-        pokemonCache.set(nombre, structuredClone(pokemonData));
+        pokemonCache.set(cacheKey, structuredClone(pokemonData));
         return pokemonData;
 
       } catch (err) {
-        console.error(`[EQUIPO] Error cargando ${nombre}:`, err.message);
-        return crearPokemonPorDefecto(nombre);
+        console.error("[EQUIPO] Error cargando " + nombreBase + ":", err.message);
+        return crearPokemonPorDefecto(apodo);
       }
     }));
   } catch (err) {
@@ -342,55 +443,29 @@ async function cargarEquipo(listaEquipo) {
 function crearPokemonPorDefecto(nombre) {
   return {
     nombre: nombre || "Pokemon",
+    nombreOriginal: nombre || "pokemon",
     hpMax: 50,
     stats: { hp: 50, atk: 50, def: 50, spAtk: 50, spDef: 50, spd: 50 },
-    movimientos: [{ nombre: "Ataque Rápido", tipo: "normal", poder: 40, pp: 30, ppMax: 30, clase: "physical", precision: 100, efecto: "" }],
-    tipos: ["normal"]
+    nivel: 50,
+    movimientos: [{ nombre: "Ataque Rapido", tipo: "normal", poder: 40, pp: 30, ppMax: 30, clase: "physical", precision: 100, efecto: "" }],
+    tipos: ["normal"],
+    shiny: false,
+    objeto: null,
+    objetoUsado: false
   };
 }
 
-// ── RENDERIZAR ───────────────────────────────────────────────
+// RENDERIZAR
 function renderEstado(estado) {
-  console.log("🎨 [RENDER] renderEstado llamado, estado:", estado);
-  
-  if (!estado) {
-    console.log("🎨 [RENDER] estado es null, saliendo");
-    return;
-  }
-  
-  if (!estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) {
-    console.log("🎨 [RENDER] estado incompleto, saliendo");
-    return;
-  }
+  if (!estado) return;
+  if (!estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) return;
   
   const rivalNombre = rivalNombreGlobal;
-  if (!rivalNombre) {
-    console.log("🎨 [RENDER] rivalNombreGlobal es null");
-    return;
-  }
-  
-  // ✅ LOGS PARA VERIFICAR EQUIPOS
-  console.log("🎨 [RENDER] miEquipo:", miEquipo);
-  console.log("🎨 [RENDER] equipoRival:", equipoRival);
-  console.log("🎨 [RENDER] miIndexActivo:", estado.indexActivo[miNombre]);
-  console.log("🎨 [RENDER] rivalIndexActivo:", estado.indexActivo[rivalNombre]);
+  if (!rivalNombre) return;
   
   esMiTurno = estado.turno === miNombre;
   miIndexActivo = estado.indexActivo[miNombre];
   rivalIndexActivo = estado.indexActivo[rivalNombre];
-
-  if (!miEquipo[miIndexActivo]) {
-    console.log("🎨 [RENDER] ERROR: miEquipo[" + miIndexActivo + "] no existe");
-    console.log("🎨 [RENDER] miEquipo.length:", miEquipo.length);
-    return;
-  }
-  
-  if (!equipoRival[rivalIndexActivo]) {
-    console.log("🎨 [RENDER] ERROR: equipoRival[" + rivalIndexActivo + "] no existe");
-    console.log("🎨 [RENDER] equipoRival.length:", equipoRival.length);
-    return;
-  }
-
 
   if (!miEquipo[miIndexActivo] || !equipoRival[rivalIndexActivo]) return;
 
@@ -406,8 +481,8 @@ function renderEstado(estado) {
   actualizarCampoPorTipo(miPoke.tipos);
   if (estado.clima) aplicarClima(estado.clima);
 
-  actualizarSprite("jugador-sprite", miPoke.nombre, "back");
-  actualizarSprite("enemigo-sprite", rivalPoke.nombre, "front");
+  actualizarSprite("jugador-sprite", miPoke, "back");
+  actualizarSprite("enemigo-sprite", rivalPoke, "front");
   actualizarInfobar("jugador", miPoke, miHPActual, miEstado);
   actualizarInfobar("enemigo", rivalPoke, rivalHPActual, rivalEstado);
 
@@ -448,7 +523,7 @@ function renderEstado(estado) {
   }
 }
 
-// ── RESOLVER ATAQUE ──────────────────────────────────────────
+// RESOLVER ATAQUE
 async function resolverAtaque(estado) {
   if (animacionEnProceso) return;
   
@@ -468,7 +543,20 @@ async function resolverAtaque(estado) {
     const pokeAtacante = equipoAtacante[indexAtacante];
     const pokeDefensor = equipoDefensor[indexDefensor];
     const movimiento = pokeAtacante.movimientos[accion.movIndex];
-
+    
+    const esEspecial = movimiento.clase === "special";
+    await animaciones.reproducirAtaque(movimiento, esEspecial);
+    
+    const spriteAtacante = atacante === miNombre ? 
+      document.getElementById('jugador-sprite')?.parentElement : 
+      document.getElementById('enemigo-sprite')?.parentElement;
+    const spriteDefensor = atacante === miNombre ? 
+      document.getElementById('enemigo-sprite')?.parentElement : 
+      document.getElementById('jugador-sprite')?.parentElement;
+    
+    await animaciones.sacudirPokemon(spriteAtacante);
+    await animaciones.sacudirPokemon(spriteDefensor);
+    
     let nuevosHP = structuredClone(estado.hp);
     let nuevosPP = structuredClone(estado.pp);
     let nuevosEstados = structuredClone(estado.estados);
@@ -482,21 +570,24 @@ async function resolverAtaque(estado) {
     nuevosEstados = nuevosEstadosPost;
 
     if (!puedeActuar) {
+      await animaciones.animarTextoEmergente("No puede moverse", "#ff6666");
       await commitTurno({ hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados, estadisticas: nuevosStats,
-        turno: defensor, fase: "elegir", log: `¡${pokeAtacante.nombre} no puede moverse!`, accion: null });
+        turno: defensor, fase: "elegir", log: "¡" + pokeAtacante.nombre + " no puede moverse!", accion: null });
       animacionEnProceso = false;
       return;
     }
 
     const precisionMod = obtenerModificadorPrecision(nuevosStats, atacante, indexAtacante);
     if (Math.random() * 100 >= movimiento.precision * precisionMod) {
+      await animaciones.animarTextoEmergente("Fallo", "#aaaaaa");
       await commitTurno({ hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados, estadisticas: nuevosStats,
-        turno: defensor, fase: "elegir", log: `¡${pokeAtacante.nombre} falló!`, accion: null });
+        turno: defensor, fase: "elegir", log: "¡" + pokeAtacante.nombre + " fallo!", accion: null });
       animacionEnProceso = false;
       return;
     }
 
     let logMsg = "";
+    let danoRealizado = 0;
 
     if (movimiento.clase === "status") {
       const result = aplicarMovimientoStatus(movimiento, pokeAtacante, pokeDefensor, nuevosEstados, defensor, indexDefensor);
@@ -508,48 +599,67 @@ async function resolverAtaque(estado) {
       logMsg = result.logMsg;
       nuevosHP = result.nuevosHP;
       nuevosStats = result.nuevosStatsResult;
+      danoRealizado = result.dano;
+      
+      if (danoRealizado > 0) {
+        const rect = spriteDefensor?.getBoundingClientRect();
+        const posX = rect ? rect.left + rect.width/2 : window.innerWidth/2;
+        const posY = rect ? rect.top + rect.height/2 : window.innerHeight/2;
+        await animaciones.mostrarDano(danoRealizado, false, posX, posY);
+        await animaciones.flashDamage(spriteDefensor);
+      }
 
-      if (movimiento.efecto && result.dano > 0 && Math.random() < 0.3) {
+      if (movimiento.efecto && danoRealizado > 0 && Math.random() < 0.3) {
         const secResult = aplicarEfectoSecundario(movimiento, pokeDefensor, nuevosStats, defensor, indexDefensor);
-        if (secResult.mensaje) logMsg += " " + secResult.mensaje;
+        if (secResult.mensaje) {
+          logMsg += " " + secResult.mensaje;
+          await animaciones.animarTextoEmergente(secResult.mensaje, "#ffcc00", 800);
+        }
         nuevosStats = secResult.nuevosStatsResult;
       }
     }
 
-    const postResult = aplicarDañoPostAccion(nuevosHP, nuevosEstados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor);
+    const postResult = aplicarDanoPostAccion(nuevosHP, nuevosEstados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor);
     nuevosHP = postResult.nuevosHPPost;
     nuevosEstados = postResult.nuevosEstadosPost2;
-    if (postResult.mensaje) logMsg += " " + postResult.mensaje;
+    if (postResult.mensaje) {
+      logMsg += " " + postResult.mensaje;
+      await animaciones.animarTextoEmergente(postResult.mensaje, "#ff8888", 1000);
+    }
 
     let nuevaFase = "elegir";
     let nuevoTurno = defensor;
 
     if (nuevosHP[defensor][indexDefensor] <= 0) {
       nuevosHP[defensor][indexDefensor] = 0;
-      logMsg += ` ¡${pokeDefensor.nombre} se debilitó!`;
+      logMsg += " ¡" + pokeDefensor.nombre + " se debilito!";
+      await animaciones.animarTextoEmergente(pokeDefensor.nombre + " se debilito", "#ff4444", 1200);
+      
       if (encontrarSiguientePokemon(nuevosHP[defensor]) === -1) {
         await commitTurno({ hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados, estadisticas: nuevosStats,
-          turno: atacante, fase: "fin", ganador: atacante, log: `¡${atacante} ha ganado el combate!`, accion: null });
+          turno: atacante, fase: "fin", ganador: atacante, log: "¡" + atacante + " ha ganado el combate!", accion: null });
         animacionEnProceso = false;
         return;
       }
       nuevaFase = "cambio";
       nuevoTurno = defensor;
-      logMsg += " Elige tu siguiente Pokémon.";
+      logMsg += " Elige tu siguiente Pokemon.";
     }
 
     if (nuevosHP[atacante][indexAtacante] <= 0) {
       nuevosHP[atacante][indexAtacante] = 0;
-      logMsg += ` ¡${pokeAtacante.nombre} se debilitó!`;
+      logMsg += " ¡" + pokeAtacante.nombre + " se debilito!";
+      await animaciones.animarTextoEmergente(pokeAtacante.nombre + " se debilito", "#ff4444", 1200);
+      
       if (encontrarSiguientePokemon(nuevosHP[atacante]) === -1) {
         await commitTurno({ hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados, estadisticas: nuevosStats,
-          turno: defensor, fase: "fin", ganador: defensor, log: `¡${defensor} ha ganado el combate!`, accion: null });
+          turno: defensor, fase: "fin", ganador: defensor, log: "¡" + defensor + " ha ganado el combate!", accion: null });
         animacionEnProceso = false;
         return;
       }
       nuevaFase = "cambio";
       nuevoTurno = atacante;
-      logMsg += " Elige tu siguiente Pokémon.";
+      logMsg += " Elige tu siguiente Pokemon.";
     }
 
     await commitTurno({ hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados, estadisticas: nuevosStats,
@@ -586,17 +696,17 @@ function calcularDano(movimiento, atacante, defensor, estadisticas, estados,
   if (clima === "lluvia") { if (movimiento.tipo === "water") weatherMod = 1.5; if (movimiento.tipo === "fire") weatherMod = 0.5; }
   if (clima === "sol") { if (movimiento.tipo === "fire") weatherMod = 1.5; if (movimiento.tipo === "water") weatherMod = 0.5; }
 
-  const level = 50;
-  let damage = Math.floor((((2 * level / 5 + 2) * movimiento.poder * attackStat / defenseStat) / 50) + 2);
+  const nivel = atacante.nivel || 50;
+  let damage = Math.floor((((2 * nivel / 5 + 2) * movimiento.poder * attackStat / defenseStat) / 50) + 2);
   damage = Math.floor(damage * stab * effectiveness * weatherMod * (0.85 + Math.random() * 0.15));
 
-  let logMsg = `${atacante.nombre} usó ${movimiento.nombre}!`;
-  if (stab > 1) logMsg += " ¡STAB!";
-  if (effectiveness > 1) logMsg += " ¡Es muy eficaz!";
-  if (effectiveness < 1 && effectiveness > 0) logMsg += " No es muy eficaz...";
-  if (effectiveness === 0) { logMsg += " ¡No afecta!"; damage = 0; }
+  let logMsg = atacante.nombre + " uso " + movimiento.nombre + "!";
+  if (stab > 1) logMsg += " STAB";
+  if (effectiveness > 1) logMsg += " Es muy eficaz";
+  if (effectiveness < 1 && effectiveness > 0) logMsg += " No es muy eficaz";
+  if (effectiveness === 0) { logMsg += " No afecta"; damage = 0; }
   if (damage > 0) {
-    logMsg += ` (-${damage} HP)`;
+    logMsg += " (-" + damage + " HP)";
     nuevosHP[defensorNombre][indexDefensor] = Math.max(0, nuevosHP[defensorNombre][indexDefensor] - damage);
   }
 
@@ -631,7 +741,7 @@ function verificarEstadoPreAccion(estados, jugador, index) {
   }
 }
 
-function aplicarDañoPostAccion(hp, estados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor) {
+function aplicarDanoPostAccion(hp, estados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor) {
   const nuevosHP = structuredClone(hp);
   const nuevosEstados = structuredClone(estados);
   const mensajes = [];
@@ -640,17 +750,17 @@ function aplicarDañoPostAccion(hp, estados, atacante, defensor, indexAtacante, 
   if (eAtacante.nombre === "QUEMADO") {
     const d = Math.max(1, Math.floor(pokeAtacante.hpMax * 0.0625));
     nuevosHP[atacante][indexAtacante] = Math.max(0, nuevosHP[atacante][indexAtacante] - d);
-    mensajes.push(`${pokeAtacante.nombre} sufrió daño por quemadura (-${d} HP)`);
+    mensajes.push(pokeAtacante.nombre + " sufrio daño por quemadura (-" + d + " HP)");
   } else if (eAtacante.nombre === "VENENO") {
     const d = Math.max(1, Math.floor(pokeAtacante.hpMax * 0.125));
     nuevosHP[atacante][indexAtacante] = Math.max(0, nuevosHP[atacante][indexAtacante] - d);
-    mensajes.push(`${pokeAtacante.nombre} sufrió daño por veneno (-${d} HP)`);
+    mensajes.push(pokeAtacante.nombre + " sufrio daño por veneno (-" + d + " HP)");
   } else if (eAtacante.nombre === "VENENO_GRAVE") {
     const acum = eAtacante.acumulador || 1;
     const d = Math.max(1, Math.floor(pokeAtacante.hpMax * 0.0625 * acum));
     nuevosHP[atacante][indexAtacante] = Math.max(0, nuevosHP[atacante][indexAtacante] - d);
     nuevosEstados[atacante][indexAtacante].acumulador = acum + 1;
-    mensajes.push(`${pokeAtacante.nombre} sufrió daño por veneno grave (-${d} HP)`);
+    mensajes.push(pokeAtacante.nombre + " sufrio daño por veneno grave (-" + d + " HP)");
   }
 
   return { mensaje: mensajes.join(" "), nuevosHPPost: nuevosHP, nuevosEstadosPost2: nuevosEstados };
@@ -668,9 +778,9 @@ function aplicarMovimientoStatus(movimiento, atacante, defensor, estados, defens
       turnosRestantes: estadoAplicar === "DORMIDO" ? Math.floor(Math.random() * 3) + 1 : 0,
       acumulador: estadoAplicar === "VENENO_GRAVE" ? 1 : 0
     };
-    return { mensaje: `${defensor.nombre} quedó ${estadoAplicar}!`, nuevosEstadosResult: nuevosEstados };
+    return { mensaje: defensor.nombre + " quedo " + estadoAplicar + "!", nuevosEstadosResult: nuevosEstados };
   }
-  return { mensaje: `${atacante.nombre} usó ${movimiento.nombre}, pero no tuvo efecto.`, nuevosEstadosResult: nuevosEstados };
+  return { mensaje: atacante.nombre + " uso " + movimiento.nombre + ", pero no tuvo efecto.", nuevosEstadosResult: nuevosEstados };
 }
 
 function aplicarEfectoSecundario(movimiento, objetivo, estadisticas, jugador, index) {
@@ -680,8 +790,8 @@ function aplicarEfectoSecundario(movimiento, objetivo, estadisticas, jugador, in
   let stat = null;
   for (const [key, value] of Object.entries(statMap)) { if (efecto.includes(key)) { stat = value; break; } }
   if (stat) {
-    if (efecto.includes("lower")) { nuevosStats[jugador][index][stat] = Math.max(-6, nuevosStats[jugador][index][stat] - 1); return { mensaje: `¡El ${stat} de ${objetivo.nombre} bajó!`, nuevosStatsResult: nuevosStats }; }
-    if (efecto.includes("raise")) { nuevosStats[jugador][index][stat] = Math.min(6, nuevosStats[jugador][index][stat] + 1); return { mensaje: `¡El ${stat} de ${objetivo.nombre} subió!`, nuevosStatsResult: nuevosStats }; }
+    if (efecto.includes("lower")) { nuevosStats[jugador][index][stat] = Math.max(-6, nuevosStats[jugador][index][stat] - 1); return { mensaje: "¡El " + stat + " de " + objetivo.nombre + " bajo!", nuevosStatsResult: nuevosStats }; }
+    if (efecto.includes("raise")) { nuevosStats[jugador][index][stat] = Math.min(6, nuevosStats[jugador][index][stat] + 1); return { mensaje: "¡El " + stat + " de " + objetivo.nombre + " subio!", nuevosStatsResult: nuevosStats }; }
   }
   return { mensaje: "", nuevosStatsResult: nuevosStats };
 }
@@ -695,18 +805,18 @@ async function commitTurno(payload) {
   animacionEnProceso = false;
 }
 
-// ── ACCIONES DEL JUGADOR ─────────────────────────────────────
+// ACCIONES DEL JUGADOR
 async function elegirAtaque(mov, index) {
-  console.log("⚔️ [ATAQUE] Elegido:", mov.nombre);
+  console.log("[ATAQUE] Elegido:", mov.nombre);
   
   if (!esMiTurno || animacionEnProceso || esperandoCambio) {
-    console.log("❌ [ATAQUE] No se puede atacar - no es tu turno o hay animación");
+    console.log("[ATAQUE] No se puede atacar - no es tu turno o hay animacion");
     return;
   }
 
   const ppActual = estadoCombate.pp[miNombre][miIndexActivo][index];
   if (ppActual <= 0) { 
-    log(`¡No quedan PP para ${mov.nombre}!`); 
+    log("¡No quedan PP para " + mov.nombre + "!"); 
     return; 
   }
   
@@ -718,14 +828,14 @@ async function elegirAtaque(mov, index) {
     fase: "resolver"
   });
   
-  console.log("✅ [ATAQUE] Acción enviada a Firebase");
+  console.log("[ATAQUE] Accion enviada a Firebase");
 }
 
 function mostrarSelectorPokemon() {
   esperandoCambio = true;
-  log(cambisForzado ? "¡Elige tu siguiente Pokémon!" : "Elige un Pokémon:");
+  log(cambisForzado ? "Elige tu siguiente Pokemon!" : "Elige un Pokemon:");
   if (!menuCambio) return;
-  menuCambio.innerHTML = "<h3 style='color:#ffcb05;margin-bottom:12px;text-align:center'>ELIGE POKÉMON</h3>";
+  menuCambio.innerHTML = "<h3 style='color:#ffcb05;margin-bottom:12px;text-align:center'>ELIGE POKEMON</h3>";
   menuCambio.classList.remove("oculto");
   menuPrincipal?.classList.add("oculto");
   menuMovimientos?.classList.add("oculto");
@@ -735,7 +845,7 @@ function mostrarSelectorPokemon() {
     if (hpActual <= 0 || i === miIndexActivo) return;
     const btn = document.createElement("button");
     btn.className = "combate-opcion cambio-pokemon-btn";
-    btn.innerHTML = `<div class="poke-nombre">${poke.nombre.toUpperCase()}${estadoPoke.nombre ? ` [${estadoPoke.nombre}]` : ""}</div><div class="poke-hp">❤️ ${hpActual}/${poke.hpMax} HP</div>`;
+    btn.innerHTML = "<div class='poke-nombre'>" + poke.nombre.toUpperCase() + (estadoPoke.nombre ? " [" + estadoPoke.nombre + "]" : "") + "</div><div class='poke-hp'>❤️ " + hpActual + "/" + poke.hpMax + " HP</div>";
     btn.onclick = () => confirmarCambio(i);
     menuCambio.appendChild(btn);
   });
@@ -765,30 +875,31 @@ async function confirmarCambio(nuevoIndex) {
     [`indexActivo/${miNombre}`]: nuevoIndex,
     turno: rivalNombreGlobal,
     fase: "elegir",
-    log: `¡${miNombre} envió a ${nuevoPoke.nombre}!`
+    log: "¡" + miNombre + " envio a " + nuevoPoke.nombre + "!"
   });
   
   menuCambio?.classList.add("oculto");
   mostrarMenuPrincipal();
 }
 
-// ── UI ───────────────────────────────────────────────────────
-function actualizarSprite(id, nombre, lado) {
+// UI
+function actualizarSprite(id, pokemon, lado) {
   const img = document.getElementById(id);
   if (!img) return;
-  img.src = `${SPRITE_BASE[lado]}${nombre.toLowerCase()}.gif`;
-  img.alt = nombre;
+  const nombrePokemon = pokemon.nombreOriginal || pokemon.nombre;
+  img.src = `${SPRITE_BASE[lado]}${nombrePokemon.toLowerCase()}.gif`;
+  img.alt = pokemon.nombre;
 }
 
 function actualizarInfobar(lado, pokemon, hpActual, estado) {
   const pct = Math.max(0, (hpActual / pokemon.hpMax) * 100);
-  const fill = document.getElementById(`${lado}-hp-fill`);
+  const fill = document.getElementById(lado + "-hp-fill");
   if (fill) { 
-    fill.style.width = `${pct}%`; 
-    fill.className = `combate-hpbar-fill${pct > 50 ? "" : pct > 20 ? " hp-mid" : " hp-low"}`; 
+    fill.style.width = pct + "%"; 
+    fill.className = "combate-hpbar-fill" + (pct > 50 ? "" : pct > 20 ? " hp-mid" : " hp-low"); 
   }
-  const nomEl = document.getElementById(`${lado}-nombre`);
-  if (nomEl) nomEl.textContent = pokemon.nombre.toUpperCase() + (estado?.nombre ? ` [${estado.nombre}]` : "");
+  const nomEl = document.getElementById(lado + "-nombre");
+  if (nomEl) nomEl.textContent = pokemon.nombre.toUpperCase() + (estado?.nombre ? " [" + estado.nombre + "]" : "");
   if (lado === "jugador") {
     const hpNum = document.getElementById("jugador-hp-actual");
     const hpMax = document.getElementById("jugador-hp-max");
@@ -805,7 +916,7 @@ function actualizarInfobar(lado, pokemon, hpActual, estado) {
 
 function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray, indexActivo) {
   for (let i = 0; i < equipo.length; i++) {
-    const ball = document.getElementById(`${prefijo}-${i}`);
+    const ball = document.getElementById(prefijo + "-" + i);
     if (!ball) continue;
     ball.classList.toggle("debil", hpArray[i] <= 0);
     ball.classList.toggle("activo", i === indexActivo);
@@ -822,7 +933,7 @@ function cargarMovimientos(pokemon, ppActuales) {
     const btn = document.createElement("button");
     btn.className = "combate-movimiento";
     btn.disabled = ppActuales[i] <= 0;
-    btn.innerHTML = `<span class="mov-nombre">${mov.nombre.toUpperCase()}</span><span class="mov-tipo tipo-${mov.tipo}">${mov.tipo.toUpperCase()}</span><span class="mov-pp">PP: ${ppActuales[i]}/${mov.ppMax}</span><span class="mov-poder">POD: ${mov.poder || "--"}</span>`;
+    btn.innerHTML = "<span class='mov-nombre'>" + mov.nombre.toUpperCase() + "</span><span class='mov-tipo tipo-" + mov.tipo + "'>" + mov.tipo.toUpperCase() + "</span><span class='mov-pp'>PP: " + ppActuales[i] + "/" + mov.ppMax + "</span><span class='mov-poder'>POD: " + (mov.poder || "--") + "</span>";
     if (!btn.disabled) btn.onclick = () => elegirAtaque(mov, i);
     contenedor.appendChild(btn);
   });
@@ -837,17 +948,14 @@ function mostrarMenuPrincipal() {
   menuPrincipal?.classList.remove("oculto");
   menuMovimientos?.classList.add("oculto");
   menuCambio?.classList.add("oculto");
+  menuBolsa?.classList.add("oculto");
 }
 
 function ocultarMenus() {
   menuPrincipal?.classList.add("oculto");
   menuMovimientos?.classList.add("oculto");
   menuCambio?.classList.add("oculto");
-}
-
-function mostrarFinCombate(ganador) {
-  ocultarMenus();
-  log(ganador === miNombre ? "¡VICTORIA!" : "¡DERROTA!");
+  menuBolsa?.classList.add("oculto");
 }
 
 function log(msg) {
@@ -855,14 +963,250 @@ function log(msg) {
   console.log("[COMBATE]", msg);
 }
 
-// ── EVENTOS ──────────────────────────────────────────────────
+// BOLSA
+const EFECTOS_OBJETO = {
+  "ninguno": null,
+  "potion": { tipo: "hp", cantidad: 20 },
+  "super-potion": { tipo: "hp", cantidad: 50 },
+  "hyper-potion": { tipo: "hp", cantidad: 200 },
+  "revive": { tipo: "revivir" },
+  "full-heal": { tipo: "estado" },
+  "ether": { tipo: "pp", cantidad: 10 },
+};
+
+function mostrarBolsa() {
+  const contenedor = document.getElementById("bolsa-contenido");
+  if (!contenedor) return;
+  
+  contenedor.innerHTML = "<h3 style='color:#ffcb05;margin-bottom:12px;text-align:center'>BOLSA</h3>";
+  
+  miEquipo.forEach((poke, i) => {
+    const hpActual = estadoCombate.hp[miNombre][i];
+    const objeto = poke.objeto;
+    if (!objeto || objeto === "ninguno") return;
+    if (poke.objetoUsado) return;
+
+    const btn = document.createElement("button");
+    btn.className = "combate-opcion";
+    btn.innerHTML = objeto.nombre + " — " + poke.nombre.toUpperCase() + (hpActual <= 0 && objeto.id !== "revive" ? " (debilitado)" : "");
+    
+    const efecto = EFECTOS_OBJETO[objeto.id];
+    if (!efecto) { btn.disabled = true; return; }
+    if (objeto.id !== "revive" && hpActual <= 0) { btn.disabled = true; }
+
+    btn.onclick = () => usarObjeto(i, objeto, efecto);
+    contenedor.appendChild(btn);
+  });
+
+  menuPrincipal?.classList.add("oculto");
+  menuBolsa?.classList.remove("oculto");
+}
+
+async function usarObjeto(indexPoke, objeto, efecto) {
+  const hpActual = estadoCombate.hp[miNombre][indexPoke];
+  const hpMax = miEquipo[indexPoke].hpMax;
+  let nuevosHP = structuredClone(estadoCombate.hp);
+  let nuevosPP = structuredClone(estadoCombate.pp);
+  let nuevosEstados = structuredClone(estadoCombate.estados);
+  let logMsg = "";
+  let requiereCambio = false;
+
+  switch (efecto.tipo) {
+    case "hp":
+      if (hpActual >= hpMax) { log("El Pokemon ya tiene HP lleno."); return; }
+      nuevosHP[miNombre][indexPoke] = Math.min(hpMax, hpActual + efecto.cantidad);
+      logMsg = miNombre + " uso " + objeto.nombre + " en " + miEquipo[indexPoke].nombre + "! (+" + efecto.cantidad + " HP)";
+      break;
+    case "revivir":
+      if (hpActual > 0) { log("El Pokemon no esta debilitado."); return; }
+      nuevosHP[miNombre][indexPoke] = Math.floor(hpMax * 0.5);
+      logMsg = miEquipo[indexPoke].nombre + " fue revivido con " + Math.floor(hpMax * 0.5) + " HP!";
+      break;
+    case "estado":
+      if (!estadoCombate.estados[miNombre][indexPoke].nombre) { log("El Pokemon no tiene ningun estado alterado."); return; }
+      nuevosEstados[miNombre][indexPoke] = { nombre: null, turnosRestantes: 0, acumulador: 0 };
+      logMsg = miEquipo[indexPoke].nombre + " fue curado de " + estadoCombate.estados[miNombre][indexPoke].nombre + "!";
+      break;
+    case "pp":
+      nuevosPP[miNombre][indexPoke] = nuevosPP[miNombre][indexPoke].map(pp => pp + efecto.cantidad);
+      logMsg = "Se restauraron PP de " + miEquipo[indexPoke].nombre + "!";
+      break;
+  }
+
+  miEquipo[indexPoke].objetoUsado = true;
+  menuBolsa?.classList.add("oculto");
+
+  // Verificar si el Pokemon activo esta debilitado
+  const hpActivoActual = nuevosHP[miNombre][miIndexActivo];
+  let nuevaFase = "elegir";
+  let nuevoTurno = rivalNombreGlobal;
+
+  if (hpActivoActual <= 0) {
+    nuevaFase = "cambio";
+    nuevoTurno = miNombre; // El jugador debe elegir otro Pokemon
+    logMsg += " Tu Pokemon se debilito. Elige otro.";
+  }
+
+  await update(ref(db, `partidas/${partidaId}/combate`), {
+    hp: nuevosHP,
+    pp: nuevosPP,
+    estados: nuevosEstados,
+    turno: nuevoTurno,
+    fase: nuevaFase,
+    log: logMsg,
+    accion: null
+  });
+}
+
+// CONFIGURACION DE ANIMACIONES
+const ANIMACIONES_MOVIMIENTO = {
+  physical: {
+    normal: { tipo: 'golpe', sonido: 'punch', color: '#FFFFFF' },
+    fighting: { tipo: 'golpe', sonido: 'punch', color: '#FF8000' },
+    fire: { tipo: 'fuego', sonido: 'fire', color: '#F08030' },
+    water: { tipo: 'agua', sonido: 'water', color: '#6890F0' },
+    electric: { tipo: 'rayo', sonido: 'electric', color: '#F8D030' },
+    grass: { tipo: 'planta', sonido: 'grass', color: '#78C850' },
+    ice: { tipo: 'hielo', sonido: 'ice', color: '#98D8D8' },
+    psychic: { tipo: 'psiquico', sonido: 'psychic', color: '#F85888' },
+    dragon: { tipo: 'dragon', sonido: 'dragon', color: '#7038F8' },
+  },
+  special: {
+    fire: { tipo: 'fuego_especial', sonido: 'fireball', color: '#F08030' },
+    water: { tipo: 'agua_especial', sonido: 'watergun', color: '#6890F0' },
+    electric: { tipo: 'rayo_especial', sonido: 'thunder', color: '#F8D030' },
+    grass: { tipo: 'planta_especial', sonido: 'leaf', color: '#78C850' },
+    ice: { tipo: 'hielo_especial', sonido: 'icebeam', color: '#98D8D8' },
+    psychic: { tipo: 'psiquico_especial', sonido: 'psychic', color: '#F85888' },
+    dragon: { tipo: 'dragon_especial', sonido: 'dragonbreath', color: '#7038F8' }
+  }
+};
+
+class AnimacionBatalla {
+  constructor() {
+    this.overlay = null;
+    this.efectoDiv = null;
+    this.textoDiv = null;
+    this.damagePopup = null;
+    this.animando = false;
+    this.crearElementos();
+  }
+  
+  crearElementos() {
+    if (!document.getElementById('animacion-overlay')) {
+      const overlay = document.createElement('div');
+      overlay.id = 'animacion-overlay';
+      overlay.className = 'oculto';
+      overlay.innerHTML = '<div class="efecto-visual"></div><div class="texto-animacion"></div>';
+      document.body.appendChild(overlay);
+    }
+    
+    if (!document.getElementById('animacion-damage')) {
+      const damageDiv = document.createElement('div');
+      damageDiv.id = 'animacion-damage';
+      damageDiv.className = 'oculto';
+      damageDiv.innerHTML = '<div class="damage-number"></div>';
+      document.body.appendChild(damageDiv);
+    }
+    
+    this.overlay = document.getElementById('animacion-overlay');
+    this.efectoDiv = document.querySelector('.efecto-visual');
+    this.textoDiv = document.querySelector('.texto-animacion');
+    this.damagePopup = document.getElementById('animacion-damage');
+  }
+  
+  async reproducirAtaque(movimiento, esEspecial = false) {
+    if (this.animando) return;
+    this.animando = true;
+    
+    const animConfig = this.getAnimacionConfig(movimiento, esEspecial);
+    
+    if (this.overlay) {
+      this.overlay.classList.remove('oculto');
+      if (this.efectoDiv) {
+        this.efectoDiv.className = 'efecto-visual ' + animConfig.tipo;
+      }
+      if (this.textoDiv) {
+        this.textoDiv.textContent = movimiento.nombre.toUpperCase();
+        this.textoDiv.style.color = animConfig.color;
+      }
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    if (this.overlay) this.overlay.classList.add('oculto');
+    this.animando = false;
+  }
+  
+getAnimacionConfig(movimiento, esEspecial) {
+  const tipo = movimiento.tipo;
+  const clase = esEspecial ? 'special' : 'physical';
+  // Crear copia del objeto para no mutar el original
+  const config = { ...(ANIMACIONES_MOVIMIENTO[clase]?.[tipo] || ANIMACIONES_MOVIMIENTO.physical.normal) };
+  config.tx = esEspecial ? '150px' : '-150px';
+  config.ty = '0px';
+  return config;
+}
+  
+  async mostrarDano(damage, esCritico = false, posX, posY) {
+    if (!this.damagePopup) return;
+    
+    const damageSpan = this.damagePopup.querySelector('.damage-number');
+    if (damageSpan) {
+      damageSpan.textContent = '-' + damage;
+    }
+    
+    this.damagePopup.classList.remove('oculto');
+    
+    if (esCritico) {
+      this.damagePopup.classList.add('critico');
+    } else {
+      this.damagePopup.classList.remove('critico');
+    }
+    
+    this.damagePopup.style.left = posX + 'px';
+    this.damagePopup.style.top = posY + 'px';
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
+    this.damagePopup.classList.add('oculto');
+  }
+  
+  async sacudirPokemon(elemento) {
+    if (!elemento) return;
+    elemento.classList.add('shaking');
+    await new Promise(resolve => setTimeout(resolve, 300));
+    elemento.classList.remove('shaking');
+  }
+  
+  async flashDamage(elemento) {
+    if (!elemento) return;
+    elemento.classList.add('flash-damage');
+    await new Promise(resolve => setTimeout(resolve, 200));
+    elemento.classList.remove('flash-damage');
+  }
+  
+  async animarTextoEmergente(texto, color = '#FFFFFF', duracion = 1000) {
+    const textoAnim = document.createElement('div');
+    textoAnim.textContent = texto;
+    textoAnim.style.cssText = 'position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); color: ' + color + '; font-size: 1.5rem; font-weight: bold; text-shadow: 2px 2px 4px black; z-index: 2002; animation: flotarTexto ' + (duracion/1000) + 's ease-out forwards; pointer-events: none;';
+    document.body.appendChild(textoAnim);
+    await new Promise(resolve => setTimeout(resolve, duracion));
+    textoAnim.remove();
+  }
+  
+  async animarEstado(pokemonElement, estado) {
+    await this.animarTextoEmergente(estado, '#ffcc00', 1000);
+  }
+}
+
+const animaciones = new AnimacionBatalla();
+
+// EVENTOS
 btnLuchar?.addEventListener("click", () => {
   if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
   menuPrincipal?.classList.add("oculto");
   menuMovimientos?.classList.remove("oculto");
 });
-
-btnVolver?.addEventListener("click", mostrarMenuPrincipal);
 
 btnPokemon?.addEventListener("click", () => {
   if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
@@ -870,7 +1214,17 @@ btnPokemon?.addEventListener("click", () => {
   mostrarSelectorPokemon();
 });
 
-// ── FIN DEL COMBATE ─────────────────────────────────────────
+btnBolsa?.addEventListener("click", () => {
+  if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
+  mostrarBolsa();
+});
+
+btnCerrarBolsa?.addEventListener("click", () => {
+  menuBolsa?.classList.add("oculto");
+  mostrarMenuPrincipal();
+});
+
+// FIN DEL COMBATE
 async function finalizarCombate(ganador) {
   if (window.combateFinalizado) return;
   window.combateFinalizado = true;
@@ -912,62 +1266,6 @@ function mostrarPantallaFin(esVictoria, ganador) {
     overlay = document.createElement("div");
     overlay.id = "fin-overlay";
     document.body.appendChild(overlay);
-    
-    const style = document.createElement("style");
-    style.textContent = `
-      #fin-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(13, 27, 75, 0.95);
-        z-index: 10000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        backdrop-filter: blur(8px);
-        animation: finAparecer 0.5s ease;
-      }
-      @keyframes finAparecer {
-        from { opacity: 0; transform: scale(0.9); }
-        to { opacity: 1; transform: scale(1); }
-      }
-      .fin-contenido {
-        text-align: center;
-        background: linear-gradient(135deg, #1a3080, #0d1b4b);
-        padding: 40px 60px;
-        border-radius: 20px;
-        border: 3px solid #ff2d78;
-        box-shadow: 0 0 50px rgba(255, 45, 120, 0.35);
-      }
-      .fin-titulo {
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 3rem;
-        letter-spacing: 0.1em;
-        margin-bottom: 20px;
-      }
-      .fin-titulo.victoria { color: #4caf50; text-shadow: 0 0 20px #4caf50; }
-      .fin-titulo.derrota { color: #f44336; text-shadow: 0 0 20px #f44336; }
-      .fin-mensaje { font-size: 1.2rem; margin-bottom: 20px; color: #f0f4ff; }
-      .fin-stats { background: rgba(0,0,0,0.5); border-radius: 10px; padding: 15px; margin: 20px 0; font-size: 0.9rem; }
-      .fin-boton {
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 1.2rem;
-        letter-spacing: 0.08em;
-        color: #0d1b4b;
-        background: #ff2d78;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 30px;
-        margin: 0 10px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-      .fin-boton:hover { transform: scale(1.05); background: #ff4d8d; }
-      .fin-boton.secondary { background: #4fc3f7; color: #0d1b4b; }
-    `;
-    document.head.appendChild(style);
   }
   
   const statsRef = ref(db, `estadisticas/${miNombre}`);
@@ -976,23 +1274,23 @@ function mostrarPantallaFin(esVictoria, ganador) {
     overlay.innerHTML = `
       <div class="fin-contenido">
         <h1 class="fin-titulo ${esVictoria ? 'victoria' : 'derrota'}">
-          ${esVictoria ? '¡VICTORIA!' : '¡DERROTA!'}
+          ${esVictoria ? 'VICTORIA' : 'DERROTA'}
         </h1>
-        <p class="fin-mensaje">${esVictoria ? `¡Felicidades! Has derrotado a ${rivalNombreGlobal}` : `${ganador} te ha derrotado`}</p>
+        <p class="fin-mensaje">${esVictoria ? 'Felicidades! Has derrotado a ' + rivalNombreGlobal : ganador + ' te ha derrotado'}</p>
         <div class="fin-stats">
-          <p>🏆 Victorias: ${stats.victorias}</p>
-          <p>💔 Derrotas: ${stats.derrotas}</p>
-          <p>⚔️ Batallas totales: ${stats.batallas}</p>
+          <p>Victorias: ${stats.victorias}</p>
+          <p>Derrotas: ${stats.derrotas}</p>
+          <p>Batallas totales: ${stats.batallas}</p>
         </div>
         <div>
-          <button class="fin-boton" id="fin-volver-menu">VOLVER AL MENÚ</button>
-          <button class="fin-boton secondary" id="fin-ver-estadisticas">VER ESTADÍSTICAS</button>
+          <button class="fin-boton" id="fin-volver-menu">VOLVER AL MENU</button>
+          <button class="fin-boton secondary" id="fin-ver-estadisticas">VER ESTADISTICAS</button>
         </div>
       </div>
     `;
     
     document.getElementById("fin-volver-menu")?.addEventListener("click", () => {
-      window.location.href = `Juego-Lobby.html?id=${partidaId}`;
+      window.location.href = "Juego-Lobby.html?id=" + partidaId;
     });
     
     document.getElementById("fin-ver-estadisticas")?.addEventListener("click", () => {
@@ -1001,5 +1299,5 @@ function mostrarPantallaFin(esVictoria, ganador) {
   });
 }
 
-// ── ARRANCAR ─────────────────────────────────────────────────
+// INICIAR
 iniciarCombate();
