@@ -50,7 +50,6 @@ const SPRITE_BASE = {
   back: "https://play.pokemonshowdown.com/sprites/ani-back/"
 };
 
-// ---------- VARIABLES GLOBALES ----------
 let estadoCombate = null;
 let miEquipo = [];
 let equipoRival = [];
@@ -78,7 +77,6 @@ let btnBolsa = null;
 let btnCerrarBolsa = null;
 let contenedorMovimientos = null;
 
-// ---------- UTILIDADES ----------
 function log(msg) {
   if (logTxt) logTxt.textContent = msg;
   console.log("[COMBATE]", msg);
@@ -107,7 +105,6 @@ function calcularEstadisticasReales(baseStats, nivel) {
   };
 }
 
-// ---------- CARGA DE EQUIPOS ----------
 async function cargarEquipo(listaEquipo, nombreJugador) {
   if (!listaEquipo || listaEquipo.length === 0) return [];
   try {
@@ -264,7 +261,6 @@ function crearPokemonPorDefecto(nombre) {
   };
 }
 
-// ---------- INICIALIZAR COMBATE ----------
 async function iniciarCombate() {
   logTxt         = document.getElementById("log-texto");
   menuPrincipal  = document.getElementById("menu-principal");
@@ -399,7 +395,6 @@ function calcularQuienEmpieza() {
   return miVel > rivalVel ? miNombre : rivalNombreGlobal;
 }
 
-// ---------- RENDERIZADO ----------
 function renderEstado(estado) {
   if (!estado) { log("Esperando inicio del combate..."); return; }
   if (!estado.indexActivo || !estado.hp || !estado.pp || !estado.estados) return;
@@ -497,14 +492,12 @@ function actualizarInfobar(lado, pokemon, hpActual, estado) {
   }
   const nomEl = document.getElementById(lado + "-nombre");
   if (nomEl) nomEl.textContent = pokemon.nombre.toUpperCase() + (estado?.nombre ? " [" + estado.nombre + "]" : "");
-
   const hpNum = document.getElementById(lado + "-hp-actual");
   const hpMax = document.getElementById(lado + "-hp-max");
   if (hpNum) hpNum.textContent = hpActual;
   if (hpMax) hpMax.textContent = pokemon.hpMax;
 }
 
-// CORRECCIÓN: usar los IDs reales del HTML (jg-0, en-0)
 function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray, indexActivo) {
   for (let i = 0; i < equipo.length; i++) {
     let ballId = "";
@@ -524,7 +517,6 @@ function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray
   }
 }
 
-// ---------- RESOLVER ATAQUE ----------
 async function resolverAtaque(estado) {
   if (animacionEnProceso) return;
   animacionEnProceso = true;
@@ -575,7 +567,7 @@ async function resolverAtaque(estado) {
       nuevosEstados = nuevosEstadosPost;
 
       if (!puedeActuar) {
-        return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
+        return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, states: nuevosEstados,
           estadisticas: nuevosStats, turno: defensor, fase: "elegir",
           log: `¡${pokeAtacante.nombre} no puede moverse!`, accion: null };
       }
@@ -816,7 +808,6 @@ function encontrarSiguientePokemon(hpArray) {
   return hpArray.findIndex(hp => hp > 0);
 }
 
-// ---------- ACCIONES DEL JUGADOR ----------
 async function elegirAtaque(mov, index) {
   if (!esMiTurno || animacionEnProceso || esperandoCambio) { log("No puedes atacar ahora"); return; }
   const ppActual = estadoCombate?.pp[miNombre]?.[miIndexActivo]?.[index];
@@ -828,9 +819,9 @@ async function elegirAtaque(mov, index) {
   try {
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     await runTransaction(combateRef, (estadoActual) => {
-      if (!estadoActual)                               return estadoActual;
-      if (estadoActual.turno !== miNombre)             return estadoActual;
-      if (estadoActual.fase !== "elegir")              return estadoActual;
+      if (!estadoActual) return estadoActual;
+      if (estadoActual.turno !== miNombre) return estadoActual;
+      if (estadoActual.fase !== "elegir") return estadoActual;
       if (estadoActual.pp[miNombre][miIndexActivo][index] <= 0) return estadoActual;
       return { ...estadoActual, accion: { jugador: miNombre, movIndex: index, movNombre: mov.nombre }, fase: "resolver" };
     });
@@ -878,9 +869,8 @@ function cancelarCambio() {
   menuCambio?.classList.add("oculto");
 }
 
-// ✅ FUNCIÓN CORREGIDA: permite cambio voluntario en fase "elegir"
+// ✅ Función corregida: permite cambio voluntario en fase "elegir"
 async function confirmarCambio(nuevoIndex) {
-  // Validaciones previas
   const hpSeleccionado = estadoCombate?.hp?.[miNombre]?.[nuevoIndex] || 0;
   if (hpSeleccionado <= 0) {
     log("Ese Pokémon está debilitado, no puedes usarlo.");
@@ -900,7 +890,6 @@ async function confirmarCambio(nuevoIndex) {
   const combateRef = ref(db, `partidas/${partidaId}/combate`);
   await runTransaction(combateRef, (estadoActual) => {
     if (!estadoActual) return estadoActual;
-    // ✅ PERMITIR cambio tanto en fase "elegir" (voluntario) como "cambio" (forzado)
     if (estadoActual.fase !== "elegir" && estadoActual.fase !== "cambio") return estadoActual;
     if (estadoActual.turno !== miNombre) return estadoActual;
     if (estadoActual.hp[miNombre][nuevoIndex] <= 0) return estadoActual;
@@ -917,7 +906,6 @@ async function confirmarCambio(nuevoIndex) {
   mostrarMenuPrincipal();
 }
 
-// ---------- BOLSA ----------
 const EFECTOS_OBJETO = {
   "potion":       { tipo: "hp", cantidad: 20 },
   "super-potion": { tipo: "hp", cantidad: 50 },
@@ -1028,7 +1016,6 @@ async function usarObjeto(indexPoke, objeto, efecto) {
   mostrarMenuPrincipal();
 }
 
-// ---------- MENÚS ----------
 function cargarMovimientos(pokemon, ppActuales) {
   contenedorMovimientos = document.querySelector(".movimientos-grid");
   if (!contenedorMovimientos) return;
@@ -1068,7 +1055,6 @@ function ocultarMenus() {
   menuBolsa?.classList.add("oculto");
 }
 
-// ---------- FIN DE COMBATE ----------
 async function finalizarCombate(ganador) {
   if (window.combateFinalizado) return;
   window.combateFinalizado = true;
@@ -1128,7 +1114,6 @@ function mostrarPantallaFin(esVictoria, ganador) {
   });
 }
 
-// ---------- ANIMACIONES ----------
 const ANIMACIONES_MOVIMIENTO = {
   physical: {
     normal:   { tipo: "golpe",           color: "#FFFFFF" },
@@ -1228,7 +1213,7 @@ class AnimacionBatalla {
 
 const animaciones = new AnimacionBatalla();
 
-// ---------- INICIO ----------
+// Inicio
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", iniciarCombate);
 } else {
