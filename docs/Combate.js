@@ -62,22 +62,22 @@ let esperandoCambio = false;
 let cambioForzado = false;
 let animacionEnProceso = false;
 let ultimoLog = "";
-let combateListener = null;          // Referencia al listener para poder apagarlo
-let contenedorMovimientos = null;   // Cache del contenedor de movimientos
+let combateListener = null;
+let contenedorMovimientos = null;
 
 const pokemonCache = new Map();
-const CACHE_MAX = 100;               // Límite de caché
+const CACHE_MAX = 100;
 const btnBolsa = document.getElementById("btn-bolsa");
 
-// DOM Elements
-const logTxt = document.getElementById("log-texto");
-const menuPrincipal = document.getElementById("menu-principal");
-const menuMovimientos = document.getElementById("menu-movimientos");
-const menuCambio = document.getElementById("menu-cambio");
-const menuBolsa = document.getElementById("menu-bolsa");
-const btnLuchar = document.getElementById("btn-luchar");
-const btnPokemon = document.getElementById("btn-pokemon");
-const btnCerrarBolsa = document.getElementById("btn-cerrar-bolsa");
+// DOM Elements (se verificarán después)
+let logTxt = null;
+let menuPrincipal = null;
+let menuMovimientos = null;
+let menuCambio = null;
+let menuBolsa = null;
+let btnLuchar = null;
+let btnPokemon = null;
+let btnCerrarBolsa = null;
 
 // ---------- UTILIDADES ----------
 function log(msg) {
@@ -85,7 +85,6 @@ function log(msg) {
   console.log("[COMBATE]", msg);
 }
 
-// Limitar tamaño de caché LRU simple
 function cachePokemon(key, value) {
   if (pokemonCache.size >= CACHE_MAX) {
     const firstKey = pokemonCache.keys().next().value;
@@ -94,7 +93,6 @@ function cachePokemon(key, value) {
   pokemonCache.set(key, structuredClone(value));
 }
 
-// ---------- CÁLCULO DE ESTADÍSTICAS ----------
 function calcularEstadisticasReales(baseStats, nivel) {
   const ivs = { hp: 31, atk: 31, def: 31, spAtk: 31, spDef: 31, spd: 31 };
   const evs = { hp: 0, atk: 0, def: 0, spAtk: 0, spDef: 0, spd: 0 };
@@ -108,7 +106,7 @@ function calcularEstadisticasReales(baseStats, nivel) {
   };
 }
 
-// ---------- CARGAR EQUIPOS DESDE FIREBASE (con caché mejorado) ----------
+// ---------- CARGAR EQUIPOS ----------
 async function cargarEquipo(listaEquipo, nombreJugador) {
   if (!listaEquipo || listaEquipo.length === 0) return [];
 
@@ -133,7 +131,7 @@ async function cargarEquipo(listaEquipo, nombreJugador) {
       const movimientosGuardados = configGuardada.movimientos || [];
       const objetoGuardado = configGuardada.objeto || null;
       
-      const cacheKey = `${nombreBase}-${nivel}-${esShiny}`;  // No incluir jugador
+      const cacheKey = `${nombreBase}-${nivel}-${esShiny}`;
       if (pokemonCache.has(cacheKey)) return structuredClone(pokemonCache.get(cacheKey));
 
       try {
@@ -174,7 +172,7 @@ async function cargarEquipo(listaEquipo, nombreJugador) {
                   clase: moveData.damage_class?.name || "physical",
                   precision: moveData.accuracy || 100,
                   efecto: moveData.effect_entries?.find(e => e.language.name === "en")?.effect || "",
-                  efectoEstado: extraerEfectoEstado(moveData)  // Nuevo campo
+                  efectoEstado: extraerEfectoEstado(moveData)
                 });
               } else {
                 movimientos.push(crearMovimientoPorDefecto(moveName));
@@ -239,7 +237,6 @@ async function cargarEquipo(listaEquipo, nombreJugador) {
 }
 
 function extraerEfectoEstado(moveData) {
-  // Buscar en effect_entries si causa un estado alterado
   const efecto = moveData.effect_entries?.find(e => e.language.name === "en")?.effect || "";
   const estadoMap = {
     "paralyze": "PARALIZIS",
@@ -284,8 +281,23 @@ function crearPokemonPorDefecto(nombre) {
   };
 }
 
-// ---------- INICIALIZAR COMBATE (CON LISTENER CONTROLADO) ----------
+// ---------- INICIALIZAR COMBATE ----------
 async function iniciarCombate() {
+  // Obtener referencias DOM después de que la página cargue
+  logTxt = document.getElementById("log-texto");
+  menuPrincipal = document.getElementById("menu-principal");
+  menuMovimientos = document.getElementById("menu-movimientos");
+  menuCambio = document.getElementById("menu-cambio");
+  menuBolsa = document.getElementById("menu-bolsa");
+  btnLuchar = document.getElementById("btn-luchar");
+  btnPokemon = document.getElementById("btn-pokemon");
+  btnCerrarBolsa = document.getElementById("btn-cerrar-bolsa");
+
+  if (!menuPrincipal || !menuMovimientos) {
+    console.error("Faltan elementos del DOM necesarios");
+    return;
+  }
+
   await mostrarLoading();
 
   if (!partidaId || !miNombre) {
@@ -314,9 +326,9 @@ async function iniciarCombate() {
 
     if (miEquipo.length === 0 || equipoRival.length === 0) throw new Error("No se pudieron cargar los equipos");
 
-    // Inicializar combate en Firebase si es necesario
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     const combateSnap = await get(combateRef);
+    
     if (!combateSnap.exists() && esHost) {
       await inicializarCombateEnFirebase();
     }
@@ -331,7 +343,7 @@ async function iniciarCombate() {
       if (!encontrado) throw new Error("Timeout esperando al host");
     }
 
-    // Registrar listener (único)
+    // Registrar listener
     if (combateListener) off(combateListener);
     combateListener = onValue(combateRef, (snapshot) => {
       const nuevoEstado = snapshot.val();
@@ -375,7 +387,7 @@ async function inicializarCombateEnFirebase() {
     clima: null,
     turnoClima: 0,
     campo: { reflejo: null, muroLuz: null, velocidad: null },
-    objetosUsados: { [miNombre]: [], [rivalNombreGlobal]: [] }  // Persistencia de objetos usados
+    objetosUsados: { [miNombre]: [], [rivalNombreGlobal]: [] }
   });
 }
 
@@ -386,7 +398,7 @@ function calcularQuienEmpieza() {
   return miVel > rivalVel ? miNombre : rivalNombreGlobal;
 }
 
-// ---------- RENDERIZADO CON MENSAJES ACUMULADOS ----------
+// ---------- RENDERIZADO ----------
 function renderEstado(estado) {
   if (!estado) {
     log("Esperando inicio del combate...");
@@ -417,7 +429,6 @@ function renderEstado(estado) {
   actualizarInfobar("jugador", miPoke, miHPActual, miEstado);
   actualizarInfobar("enemigo", rivalPoke, rivalHPActual, rivalEstado);
 
-  // Actualizar objetos usados visualmente
   const objetosUsados = estado.objetosUsados?.[miNombre] || [];
   miEquipo.forEach((poke, idx) => {
     poke.objetoUsado = objetosUsados.includes(idx);
@@ -426,7 +437,6 @@ function renderEstado(estado) {
   actualizarPokeballs("equipo-jugador", estado.hp[miNombre], miEquipo, "jg", estado.estados[miNombre], miIndexActivo);
   actualizarPokeballs("equipo-enemigo", estado.hp[rivalNombreGlobal], equipoRival, "en", estado.estados[rivalNombreGlobal], rivalIndexActivo);
 
-  // Mostrar log si hay mensajes nuevos (acumulados)
   if (estado.log && estado.log !== ultimoLog) {
     log(estado.log);
     ultimoLog = estado.log;
@@ -542,28 +552,24 @@ async function resolverAtaque(estado) {
     const pokeDefensor = equipoDefensor[indexDefensor];
     const movimiento = pokeAtacante.movimientos[accion.movIndex];
 
-    // Animaciones
     const spriteAtacante = atacante === miNombre ? document.getElementById('jugador-sprite')?.parentElement : document.getElementById('enemigo-sprite')?.parentElement;
     const spriteDefensor = atacante === miNombre ? document.getElementById('enemigo-sprite')?.parentElement : document.getElementById('jugador-sprite')?.parentElement;
     await animaciones.reproducirAtaque(movimiento, movimiento.clase === "special");
     await animaciones.sacudirPokemon(spriteAtacante);
     await animaciones.sacudirPokemon(spriteDefensor);
 
-    // Realizar cálculo y actualización atómica con transacción
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     const resultado = await runTransaction(combateRef, (estadoActual) => {
       if (!estadoActual) return estadoActual;
-      if (estadoActual.accion !== accion) return; // Ya fue procesado
+      if (estadoActual.accion !== accion) return;
 
       let nuevosHP = structuredClone(estadoActual.hp);
       let nuevosPP = structuredClone(estadoActual.pp);
       let nuevosEstados = structuredClone(estadoActual.estados);
       let nuevosStats = structuredClone(estadoActual.estadisticas);
 
-      // Reducir PP
       nuevosPP[atacante][indexAtacante][accion.movIndex] = Math.max(0, nuevosPP[atacante][indexAtacante][accion.movIndex] - 1);
 
-      // Verificar estado previo (parálisis, dormido)
       const { puedeActuar, nuevosEstadosPost } = verificarEstadoPreAccion(nuevosEstados, atacante, indexAtacante);
       nuevosEstados = nuevosEstadosPost;
       if (!puedeActuar) {
@@ -580,7 +586,6 @@ async function resolverAtaque(estado) {
         };
       }
 
-      // Precisión
       const precisionMod = obtenerModificadorPrecision(nuevosStats, atacante, indexAtacante);
       if (Math.random() * 100 >= movimiento.precision * precisionMod) {
         return {
@@ -612,7 +617,6 @@ async function resolverAtaque(estado) {
         resultadoStats = result.nuevosStatsResult;
         danoRealizado = result.dano;
 
-        // Efecto secundario
         if (movimiento.efectoEstado && danoRealizado > 0 && Math.random() < 0.3) {
           const secResult = aplicarEstadoPorMovimiento(movimiento.efectoEstado, pokeDefensor, nuevosEstados, defensor, indexDefensor);
           if (secResult.mensaje) {
@@ -620,7 +624,6 @@ async function resolverAtaque(estado) {
             nuevosEstados = secResult.nuevosEstados;
           }
         }
-        // Golpe crítico
         const crit = Math.random() < 0.0625 ? 1.5 : 1;
         if (crit > 1) {
           danoRealizado = Math.floor(danoRealizado * crit);
@@ -629,7 +632,6 @@ async function resolverAtaque(estado) {
         }
       }
 
-      // Daño post-acción (quemadura, veneno)
       const postResult = aplicarDanoPostAccion(nuevosHP, nuevosEstados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor);
       nuevosHP = postResult.nuevosHPPost;
       nuevosEstados = postResult.nuevosEstadosPost2;
@@ -637,7 +639,6 @@ async function resolverAtaque(estado) {
 
       let nuevaFase = "elegir";
       let nuevoTurno = defensor;
-      const ganador = null;
 
       if (nuevosHP[defensor][indexDefensor] <= 0) {
         nuevosHP[defensor][indexDefensor] = 0;
@@ -696,15 +697,12 @@ async function resolverAtaque(estado) {
       };
     });
 
-    if (resultado.committed) {
-      // Mostrar animación de daño si corresponde
-      if (resultado.snapshot.val().log?.includes("-")) {
-        const rect = spriteDefensor?.getBoundingClientRect();
-        const posX = rect ? rect.left + rect.width/2 : window.innerWidth/2;
-        const posY = rect ? rect.top + rect.height/2 : window.innerHeight/2;
-        await animaciones.mostrarDano(calcularUltimoDano(resultado.snapshot.val().log), false, posX, posY);
-        await animaciones.flashDamage(spriteDefensor);
-      }
+    if (resultado.committed && resultado.snapshot.val().log?.includes("-")) {
+      const rect = spriteDefensor?.getBoundingClientRect();
+      const posX = rect ? rect.left + rect.width/2 : window.innerWidth/2;
+      const posY = rect ? rect.top + rect.height/2 : window.innerHeight/2;
+      await animaciones.mostrarDano(calcularUltimoDano(resultado.snapshot.val().log), false, posX, posY);
+      await animaciones.flashDamage(spriteDefensor);
     }
   } catch (err) {
     console.error("[RESOLVER ERROR]", err);
@@ -714,7 +712,7 @@ async function resolverAtaque(estado) {
   }
 }
 
-// Funciones auxiliares usadas dentro de resolverAtaque
+// Funciones auxiliares (sin cambios)
 function verificarEstadoPreAccion(estados, jugador, index) {
   const nuevosEstados = structuredClone(estados);
   const estadoPoke = nuevosEstados[jugador][index];
@@ -846,7 +844,7 @@ function calcularUltimoDano(logMsg) {
   return match ? parseInt(match[1]) : 0;
 }
 
-// ---------- ACCIONES DEL JUGADOR (con transacción para elegir ataque) ----------
+// ---------- ACCIONES DEL JUGADOR ----------
 async function elegirAtaque(mov, index) {
   if (!esMiTurno || animacionEnProceso || esperandoCambio) {
     log("No puedes atacar ahora");
@@ -882,7 +880,6 @@ async function elegirAtaque(mov, index) {
   }
 }
 
-// ---------- MENÚ DE CAMBIO ----------
 function mostrarSelectorPokemon() {
   esperandoCambio = true;
   log(cambioForzado ? "¡Elige tu siguiente Pokémon!" : "Elige un Pokémon:");
@@ -929,7 +926,10 @@ async function confirmarCambio(nuevoIndex) {
     if (estadoActual.fase !== "cambio" && estadoActual.turno !== miNombre) return;
     return {
       ...estadoActual,
-      [`indexActivo/${miNombre}`]: nuevoIndex,
+      indexActivo: {
+        ...estadoActual.indexActivo,
+        [miNombre]: nuevoIndex
+      },
       turno: rivalNombreGlobal,
       fase: "elegir",
       log: "¡" + miNombre + " envió a " + nuevoPoke.nombre + "!"
@@ -939,7 +939,7 @@ async function confirmarCambio(nuevoIndex) {
   mostrarMenuPrincipal();
 }
 
-// ---------- BOLSA (con persistencia de objetos usados) ----------
+// ---------- BOLSA ----------
 const EFECTOS_OBJETO = {
   "potion": { tipo: "hp", cantidad: 20 },
   "super-potion": { tipo: "hp", cantidad: 50 },
@@ -985,7 +985,6 @@ async function usarObjeto(indexPoke, objeto, efecto) {
     let nuevosPP = structuredClone(estadoActual.pp);
     let nuevosEstados = structuredClone(estadoActual.estados);
     let logMsg = "";
-    let requiereCambio = false;
 
     const hpActual = nuevosHP[miNombre][indexPoke];
     const hpMax = miEquipo[indexPoke].hpMax;
@@ -1072,13 +1071,12 @@ function ocultarMenus() {
   menuBolsa?.classList.add("oculto");
 }
 
-// ---------- FINALIZAR COMBATE Y LIMPIEZA ----------
+// ---------- FINALIZAR COMBATE ----------
 async function finalizarCombate(ganador) {
   if (window.combateFinalizado) return;
   window.combateFinalizado = true;
   ocultarMenus();
   
-  // Desconectar listener
   if (combateListener) {
     off(combateListener);
     combateListener = null;
@@ -1148,7 +1146,7 @@ function mostrarPantallaFin(esVictoria, ganador) {
   });
 }
 
-// ---------- ANIMACIONES (sin cambios, pero se mantienen) ----------
+// ---------- ANIMACIONES ----------
 const ANIMACIONES_MOVIMIENTO = {
   physical: {
     normal: { tipo: 'golpe', sonido: 'punch', color: '#FFFFFF' },
@@ -1275,4 +1273,9 @@ btnCerrarBolsa?.addEventListener("click", () => {
 });
 
 // ---------- INICIO ----------
-iniciarCombate();
+// Esperar a que el DOM esté listo antes de inicializar
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => iniciarCombate());
+} else {
+  iniciarCombate();
+}
