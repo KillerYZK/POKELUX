@@ -290,11 +290,12 @@ async function iniciarCombate() {
     menuPrincipal.classList.add("oculto");
     menuMovimientos.classList.remove("oculto");
   };
-  if (btnPokemon) btnPokemon.onclick = () => {
-    if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
-    cambioForzado = false;
-    mostrarSelectorPokemon();
-  };
+if (btnPokemon) btnPokemon.onclick = () => {
+  if (!esMiTurno || animacionEnProceso) return;
+  if (esperandoCambio) return;
+  cambioForzado = false; // IMPORTANTE: esto indica que es un cambio voluntario
+  mostrarSelectorPokemon();
+};
   if (btnBolsa) btnBolsa.onclick = () => {
     if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
     mostrarBolsa();
@@ -680,19 +681,34 @@ async function resolverAtaque(estado) {
 
       let nuevaFase = "elegir", nuevoTurno = defensor;
 
-      // VERIFICAR SI EL DEFENSOR SE DEBILITÓ
-      if (nuevosHP[defensor][indexDefensor] <= 0) {
+     // VERIFICAR SI EL DEFENSOR SE DEBILITÓ
+      const hpDefensorAntes = estadoActual.hp[defensor][indexDefensor];
+      const hpDefensorDespues = nuevosHP[defensor][indexDefensor];
+
+      debug(`💚 HP Defensor: antes=${hpDefensorAntes}, después=${hpDefensorDespues}, daño=${danoRealizado}`);
+
+      if (hpDefensorDespues <= 0) {
         nuevosHP[defensor][indexDefensor] = 0;
         logMsg += ` ¡${pokeDefensor.nombre} se debilitó!`;
+        debug(`🔴 ¡POKEMON DEFENSOR DEBILITADO! ${pokeDefensor.nombre}`);
         
         const jugadorDebilitado = defensor;
         const siguientePokemon = encontrarSiguientePokemon(nuevosHP[jugadorDebilitado]);
         
+        debug(`📊 Siguiente Pokémon para ${jugadorDebilitado}: índice ${siguientePokemon}`);
+        
         if (siguientePokemon === -1) {
+          debug(`🏆 FIN DEL COMBATE - Ganador: ${atacante}`);
           return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
             estadisticas: nuevosStats, turno: atacante, fase: "fin", ganador: atacante,
             log: `¡${atacante} ha ganado el combate!`, accion: null };
         }
+        
+        nuevaFase = "cambio";
+        nuevoTurno = jugadorDebilitado;
+        logMsg += " ¡Elige tu siguiente Pokémon!";
+        debug(`🔄 Cambio forzado para ${jugadorDebilitado}. Fase cambiada a 'cambio'. Nuevo turno: ${nuevoTurno}`);
+      }
         
         nuevaFase = "cambio";
         nuevoTurno = jugadorDebilitado;
@@ -1001,6 +1017,7 @@ function cancelarCambio() {
 async function confirmarCambio(nuevoIndex) {
   debug(`confirmarCambio llamado para índice ${nuevoIndex}`);
   
+  // Validaciones básicas
   const hpSeleccionado = estadoCombate?.hp?.[miNombre]?.[nuevoIndex] || 0;
   if (hpSeleccionado <= 0) {
     log("Ese Pokémon está debilitado, no puedes usarlo.");
@@ -1014,6 +1031,8 @@ async function confirmarCambio(nuevoIndex) {
     return;
   }
   
+  // Guardar estado local antes de la transacción
+  const cambioVoluntario = !cambioForzado;
   esperandoCambio = false;
   cambioForzado = false;
   const nuevoPoke = miEquipo[nuevoIndex];
@@ -1025,8 +1044,12 @@ async function confirmarCambio(nuevoIndex) {
       return estadoActual;
     }
     
-    if (estadoActual.fase !== "cambio") {
-      debug(`confirmarCambio: fase incorrecta: ${estadoActual.fase}`);
+    // PERMITIR cambio en fase "elegir" (cambio voluntario) O en fase "cambio" (cambio forzado)
+    const esCambioValido = (estadoActual.fase === "elegir" && cambioVoluntario) || 
+                           (estadoActual.fase === "cambio" && !cambioVoluntario);
+    
+    if (!esCambioValido) {
+      debug(`confirmarCambio: fase incorrecta para este tipo de cambio. fase=${estadoActual.fase}, cambioVoluntario=${cambioVoluntario}`);
       return estadoActual;
     }
     
@@ -1044,8 +1067,8 @@ async function confirmarCambio(nuevoIndex) {
     return {
       ...estadoActual,
       indexActivo: { ...estadoActual.indexActivo, [miNombre]: nuevoIndex },
-      turno: rivalNombreGlobal,
-      fase: "elegir",
+      turno: rivalNombreGlobal, // El turno pasa al rival después del cambio
+      fase: "elegir", // Volvemos a fase elegir
       log: `¡${miNombre} envió a ${nuevoPoke.nombre}!`
     };
   });
