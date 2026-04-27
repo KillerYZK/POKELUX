@@ -23,7 +23,7 @@ const partidaId = params.get("id");
 const miNombre = localStorage.getItem("nombreJugador");
 const esHost = localStorage.getItem("esHost") === "true";
 
-// ---------- TABLA DE EFECTIVIDAD (Gen 6+) ----------
+// ---------- TABLA DE EFECTIVIDAD ----------
 const TIPO_CHART = {
   normal:   { rock: 0.5, steel: 0.5, ghost: 0 },
   fire:     { fire: 0.5, water: 0.5, rock: 0.5, dragon: 0.5, grass: 2, ice: 2, bug: 2, steel: 2 },
@@ -67,7 +67,6 @@ let combateListener = null;
 const pokemonCache = new Map();
 const CACHE_MAX = 100;
 
-// DOM refs — se asignan en iniciarCombate() tras DOMContentLoaded
 let logTxt = null;
 let menuPrincipal = null;
 let menuMovimientos = null;
@@ -83,6 +82,10 @@ let contenedorMovimientos = null;
 function log(msg) {
   if (logTxt) logTxt.textContent = msg;
   console.log("[COMBATE]", msg);
+}
+
+function debug(msg) {
+  console.log("[DEBUG]", msg);
 }
 
 function cachePokemon(key, value) {
@@ -263,7 +266,6 @@ function crearPokemonPorDefecto(nombre) {
 
 // ---------- INICIALIZAR COMBATE ----------
 async function iniciarCombate() {
-  // FIX: Asignar referencias DOM aquí, después de DOMContentLoaded
   logTxt         = document.getElementById("log-texto");
   menuPrincipal  = document.getElementById("menu-principal");
   menuMovimientos= document.getElementById("menu-movimientos");
@@ -271,19 +273,20 @@ async function iniciarCombate() {
   menuBolsa      = document.getElementById("menu-bolsa");
   btnLuchar      = document.getElementById("btn-luchar");
   btnPokemon     = document.getElementById("btn-pokemon");
-  btnBolsa       = document.getElementById("btn-bolsa");        // FIX: antes se leía a nivel módulo (null)
+  btnBolsa       = document.getElementById("btn-bolsa");
   btnCerrarBolsa = document.getElementById("btn-cerrar-bolsa");
+
+  debug("Elementos DOM: menuPrincipal=" + !!menuPrincipal + ", btnLuchar=" + !!btnLuchar);
 
   if (!menuPrincipal || !menuMovimientos) {
     console.error("Faltan elementos del DOM necesarios");
     return;
   }
 
-  // FIX: Registrar event listeners aquí, donde los botones ya existen
   btnLuchar?.addEventListener("click", () => {
     if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
-    menuPrincipal?.classList.add("oculto");
-    menuMovimientos?.classList.remove("oculto");
+    menuPrincipal.classList.add("oculto");
+    menuMovimientos.classList.remove("oculto");
   });
   btnPokemon?.addEventListener("click", () => {
     if (!esMiTurno || esperandoCambio || animacionEnProceso) return;
@@ -295,7 +298,7 @@ async function iniciarCombate() {
     mostrarBolsa();
   });
   btnCerrarBolsa?.addEventListener("click", () => {
-    menuBolsa?.classList.add("oculto");
+    menuBolsa.classList.add("oculto");
     mostrarMenuPrincipal();
   });
 
@@ -424,7 +427,6 @@ function renderEstado(estado) {
   actualizarInfobar("jugador", miPoke, miHPActual, miEstado);
   actualizarInfobar("enemigo", rivalPoke, rivalHPActual, rivalEstado);
 
-  // Sync objetoUsado desde Firebase
   const objetosUsados = estado.objetosUsados?.[miNombre] || [];
   miEquipo.forEach((poke, idx) => { poke.objetoUsado = objetosUsados.includes(idx); });
 
@@ -448,7 +450,6 @@ function renderEstado(estado) {
 
   if (esMiTurno && estado.fase === "elegir" && !esperandoCambio) {
     mostrarMenuPrincipal();
-    // FIX: refrescar contenedorMovimientos cada vez (el Pokémon activo puede haber cambiado)
     contenedorMovimientos = document.querySelector(".movimientos-grid");
     if (estado.pp[miNombre]?.[miIndexActivo]) cargarMovimientos(miPoke, estado.pp[miNombre][miIndexActivo]);
   } else {
@@ -497,17 +498,24 @@ function actualizarInfobar(lado, pokemon, hpActual, estado) {
   const nomEl = document.getElementById(lado + "-nombre");
   if (nomEl) nomEl.textContent = pokemon.nombre.toUpperCase() + (estado?.nombre ? " [" + estado.nombre + "]" : "");
 
-  // Mostrar HP numérico para ambos lados (útil tenerlo también para el enemigo)
   const hpNum = document.getElementById(lado + "-hp-actual");
   const hpMax = document.getElementById(lado + "-hp-max");
   if (hpNum) hpNum.textContent = hpActual;
   if (hpMax) hpMax.textContent = pokemon.hpMax;
 }
 
-// FIX: prefijo ahora es "jugador" / "enemigo" para que coincida con IDs reales del HTML
+// CORRECCIÓN: usar los IDs reales del HTML (jg-0, en-0)
 function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray, indexActivo) {
   for (let i = 0; i < equipo.length; i++) {
-    const ball = document.getElementById(`${prefijo}-ball-${i}`);
+    let ballId = "";
+    if (prefijo === "jugador") {
+      ballId = `jg-${i}`;
+    } else if (prefijo === "enemigo") {
+      ballId = `en-${i}`;
+    } else {
+      ballId = `${prefijo}-ball-${i}`;
+    }
+    const ball = document.getElementById(ballId);
     if (!ball) continue;
     ball.classList.toggle("debil",  hpArray[i] <= 0);
     ball.classList.toggle("activo", i === indexActivo);
@@ -521,7 +529,6 @@ async function resolverAtaque(estado) {
   if (animacionEnProceso) return;
   animacionEnProceso = true;
 
-  // FIX: capturar referencias de sprites ANTES de la transacción (valores del estado actual)
   const accion = estado.accion;
   if (!accion) { animacionEnProceso = false; return; }
 
@@ -538,7 +545,6 @@ async function resolverAtaque(estado) {
 
   const movimiento    = pokeAtacante.movimientos[accion.movIndex];
 
-  // Sprite containers para animaciones
   const spriteAtacanteEl = atacante === miNombre
     ? document.getElementById("jugador-sprite")?.parentElement
     : document.getElementById("enemigo-sprite")?.parentElement;
@@ -547,13 +553,11 @@ async function resolverAtaque(estado) {
     : document.getElementById("jugador-sprite")?.parentElement;
 
   try {
-    // Animación de ataque ANTES de la transacción
     await animaciones.reproducirAtaque(movimiento, movimiento.clase === "special");
     await animaciones.sacudirPokemon(spriteAtacanteEl);
 
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     const resultado  = await runTransaction(combateRef, (estadoActual) => {
-      // FIX: guards devuelven estadoActual (no undefined) para no abortar la transacción
       if (!estadoActual)                            return estadoActual;
       if (estadoActual.fase !== "resolver")         return estadoActual;
       if (!estadoActual.accion)                     return estadoActual;
@@ -564,11 +568,9 @@ async function resolverAtaque(estado) {
       let nuevosEstados= structuredClone(estadoActual.estados);
       let nuevosStats  = structuredClone(estadoActual.estadisticas);
 
-      // Descontar PP
       nuevosPP[atacante][indexAtacante][accion.movIndex] =
         Math.max(0, nuevosPP[atacante][indexAtacante][accion.movIndex] - 1);
 
-      // Verificar estado pre-acción (parálisis, sueño, congelado)
       const { puedeActuar, nuevosEstadosPost } = verificarEstadoPreAccion(nuevosEstados, atacante, indexAtacante);
       nuevosEstados = nuevosEstadosPost;
 
@@ -578,7 +580,6 @@ async function resolverAtaque(estado) {
           log: `¡${pokeAtacante.nombre} no puede moverse!`, accion: null };
       }
 
-      // Verificar precisión
       const precisionMod = obtenerModificadorPrecision(nuevosStats, atacante, indexAtacante);
       if (movimiento.precision !== null && Math.random() * 100 >= movimiento.precision * precisionMod) {
         return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
@@ -590,12 +591,10 @@ async function resolverAtaque(estado) {
       let danoRealizado= 0;
 
       if (movimiento.clase === "status") {
-        // FIX: propiedad de retorno corregida de nuevosEstadosResult → nuevosEstados
         const result = aplicarMovimientoStatus(movimiento, pokeAtacante, pokeDefensor, nuevosEstados, defensor, indexDefensor);
         logMsg        = result.mensaje;
-        nuevosEstados = result.nuevosEstados;   // ← nombre corregido
+        nuevosEstados = result.nuevosEstados;
       } else {
-        // FIX: crítico integrado DENTRO de calcularDano, no después
         const esCritico = Math.random() < 0.0625;
         const result = calcularDano(
           movimiento, pokeAtacante, pokeDefensor,
@@ -608,7 +607,6 @@ async function resolverAtaque(estado) {
         nuevosStats  = result.nuevosStatsResult;
         danoRealizado= result.dano;
 
-        // Efecto de estado secundario (30% de probabilidad)
         if (movimiento.efectoEstado && danoRealizado > 0 && Math.random() < 0.3) {
           const secResult = aplicarEstadoPorMovimiento(
             movimiento.efectoEstado, pokeDefensor, nuevosEstados, defensor, indexDefensor
@@ -617,7 +615,6 @@ async function resolverAtaque(estado) {
         }
       }
 
-      // Daño post-acción (quemadura, veneno, etc.)
       const postResult = aplicarDanoPostAccion(nuevosHP, nuevosEstados, atacante, defensor, indexAtacante, indexDefensor, pokeAtacante, pokeDefensor);
       nuevosHP      = postResult.nuevosHPPost;
       nuevosEstados = postResult.nuevosEstadosPost2;
@@ -626,7 +623,6 @@ async function resolverAtaque(estado) {
       let nuevaFase  = "elegir";
       let nuevoTurno = defensor;
 
-      // Chequear KO del defensor
       if (nuevosHP[defensor][indexDefensor] <= 0) {
         nuevosHP[defensor][indexDefensor] = 0;
         logMsg += ` ¡${pokeDefensor.nombre} se debilitó!`;
@@ -640,7 +636,6 @@ async function resolverAtaque(estado) {
         logMsg    += " Elige tu siguiente Pokémon.";
       }
 
-      // Chequear KO del atacante (por daño de estado post-acción)
       if (nuevosHP[atacante][indexAtacante] <= 0) {
         nuevosHP[atacante][indexAtacante] = 0;
         logMsg += ` ¡${pokeAtacante.nombre} se debilitó!`;
@@ -649,7 +644,6 @@ async function resolverAtaque(estado) {
             estadisticas: nuevosStats, turno: defensor, fase: "fin", ganador: defensor,
             log: `¡${defensor} ha ganado el combate!`, accion: null };
         }
-        // Si ambos necesitan cambio, el atacante tiene prioridad para elegir primero
         if (nuevaFase !== "cambio") {
           nuevaFase  = "cambio";
           nuevoTurno = atacante;
@@ -661,10 +655,8 @@ async function resolverAtaque(estado) {
         estadisticas: nuevosStats, turno: nuevoTurno, fase: nuevaFase, log: logMsg, accion: null };
     });
 
-    // Animaciones post-transacción
     if (resultado.committed) {
       const estadoFinal = resultado.snapshot.val();
-      // FIX: usar el daño real del resultado en vez de parsear el log con regex inestable
       const danoFinal = calcularUltimoDanoDesdeEstado(estadoFinal, defensor, indexDefensor, estado);
       if (danoFinal > 0) {
         await animaciones.sacudirPokemon(spriteDefensorEl);
@@ -683,14 +675,12 @@ async function resolverAtaque(estado) {
   }
 }
 
-// FIX: calcular daño real comparando HP antes/después en vez de parsear el log
 function calcularUltimoDanoDesdeEstado(estadoFinal, defensorNombre, indexDefensor, estadoAnterior) {
   const hpAntes  = estadoAnterior.hp?.[defensorNombre]?.[indexDefensor] ?? 0;
   const hpDespues= estadoFinal.hp?.[defensorNombre]?.[indexDefensor]    ?? 0;
   return Math.max(0, hpAntes - hpDespues);
 }
 
-// ---------- FUNCIONES AUXILIARES DE COMBATE ----------
 function verificarEstadoPreAccion(estados, jugador, index) {
   const nuevosEstados = structuredClone(estados);
   const estadoPoke    = nuevosEstados[jugador][index];
@@ -725,7 +715,6 @@ function obtenerModificadorPrecision(estadisticas, jugador, index) {
          (evaMod >= 0 ? (3 + evaMod) / 3 : 3 / (3 - evaMod));
 }
 
-// FIX: esCritico ahora es parámetro (calculado antes de llamar), evitando doble daño
 function calcularDano(movimiento, pokeAtacante, pokeDefensor, estadisticas, estados,
     atacanteNombre, defensorNombre, indexAtacante, indexDefensor, clima, nuevosHP, esCritico = false) {
 
@@ -742,7 +731,6 @@ function calcularDano(movimiento, pokeAtacante, pokeDefensor, estadisticas, esta
   attackStat  *= atkMod >= 0 ? (2 + atkMod) / 2 : 2 / (2 - atkMod);
   defenseStat *= defMod >= 0 ? (2 + defMod) / 2 : 2 / (2 - defMod);
 
-  // Quemadura reduce ataque físico
   if (estados[atacanteNombre][indexAtacante].nombre === "QUEMADO" && movimiento.clase === "physical") attackStat *= 0.5;
 
   const stab = pokeAtacante.tipos.includes(movimiento.tipo) ? 1.5 : 1;
@@ -774,7 +762,6 @@ function calcularDano(movimiento, pokeAtacante, pokeDefensor, estadisticas, esta
   return { dano: damage, logMsg, nuevosHP, nuevosStatsResult: estadisticas };
 }
 
-// FIX: propiedad de retorno renombrada a "nuevosEstados" (coherente con quien la consume)
 function aplicarMovimientoStatus(movimiento, pokeAtacante, pokeDefensor, estados, defensorNombre, indexDefensor) {
   const nuevosEstados = structuredClone(estados);
   const estadoAplicar = movimiento.efectoEstado;
@@ -841,7 +828,6 @@ async function elegirAtaque(mov, index) {
   try {
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     await runTransaction(combateRef, (estadoActual) => {
-      // FIX: guard devuelve estadoActual para no abortar
       if (!estadoActual)                               return estadoActual;
       if (estadoActual.turno !== miNombre)             return estadoActual;
       if (estadoActual.fase !== "elegir")              return estadoActual;
@@ -892,17 +878,33 @@ function cancelarCambio() {
   menuCambio?.classList.add("oculto");
 }
 
+// ✅ FUNCIÓN CORREGIDA: permite cambio voluntario en fase "elegir"
 async function confirmarCambio(nuevoIndex) {
+  // Validaciones previas
+  const hpSeleccionado = estadoCombate?.hp?.[miNombre]?.[nuevoIndex] || 0;
+  if (hpSeleccionado <= 0) {
+    log("Ese Pokémon está debilitado, no puedes usarlo.");
+    mostrarSelectorPokemon();
+    return;
+  }
+  if (nuevoIndex === miIndexActivo) {
+    log("Ese Pokémon ya está en combate.");
+    mostrarSelectorPokemon();
+    return;
+  }
+
   esperandoCambio = false;
-  cambioForzado   = false;
+  cambioForzado = false;
   const nuevoPoke = miEquipo[nuevoIndex];
 
   const combateRef = ref(db, `partidas/${partidaId}/combate`);
   await runTransaction(combateRef, (estadoActual) => {
-    // FIX: guard devuelve estadoActual
-    if (!estadoActual)                   return estadoActual;
-    if (estadoActual.fase !== "cambio")  return estadoActual;
+    if (!estadoActual) return estadoActual;
+    // ✅ PERMITIR cambio tanto en fase "elegir" (voluntario) como "cambio" (forzado)
+    if (estadoActual.fase !== "elegir" && estadoActual.fase !== "cambio") return estadoActual;
     if (estadoActual.turno !== miNombre) return estadoActual;
+    if (estadoActual.hp[miNombre][nuevoIndex] <= 0) return estadoActual;
+
     return {
       ...estadoActual,
       indexActivo: { ...estadoActual.indexActivo, [miNombre]: nuevoIndex },
@@ -965,7 +967,6 @@ function mostrarBolsa() {
 async function usarObjeto(indexPoke, objeto, efecto) {
   const combateRef = ref(db, `partidas/${partidaId}/combate`);
   await runTransaction(combateRef, (estadoActual) => {
-    // FIX: guards devuelven estadoActual
     if (!estadoActual)                 return estadoActual;
     if (estadoActual.turno !== miNombre) return estadoActual;
 
@@ -1029,7 +1030,6 @@ async function usarObjeto(indexPoke, objeto, efecto) {
 
 // ---------- MENÚS ----------
 function cargarMovimientos(pokemon, ppActuales) {
-  // FIX: siempre releer el nodo del DOM (puede haber cambiado el Pokémon activo)
   contenedorMovimientos = document.querySelector(".movimientos-grid");
   if (!contenedorMovimientos) return;
   contenedorMovimientos.innerHTML = "";
