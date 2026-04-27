@@ -133,8 +133,6 @@ function reiniciarEstadosLocales() {
 
 // INICIALIZAR COMBATE
 async function iniciarCombate() {
-  console.log("[COMBATE] iniciarCombate() llamado");
-
   await mostrarLoading();
 
   if (!partidaId || !miNombre) {
@@ -162,8 +160,6 @@ async function iniciarCombate() {
       return;
     }
 
-    log("Cargando equipos...");
-
     const equipoMiData = data.jugadores[miNombre]?.equipo;
     const equipoRivalData = data.jugadores[rivalNombreGlobal]?.equipo;
 
@@ -172,6 +168,8 @@ async function iniciarCombate() {
       await ocultarLoading();
       return;
     }
+
+    log("Cargando equipos...");
 
     [miEquipo, equipoRival] = await Promise.all([
       cargarEquipo(equipoMiData, miNombre),
@@ -185,7 +183,31 @@ async function iniciarCombate() {
     }
 
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
-    
+    const combateSnap = await get(combateRef);
+
+    // El host inicializa si no existe aún
+    if (!combateSnap.exists() && esHost) {
+      await inicializarCombateEnFirebase();
+    }
+
+    // El guest espera a que el host inicialice
+    if (!combateSnap.exists() && !esHost) {
+      log("Esperando al host...");
+      let encontrado = false;
+      for (let i = 0; i < 30 && !encontrado; i++) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const check = await get(combateRef);
+        if (check.exists()) encontrado = true;
+      }
+      if (!encontrado) {
+        log("Error: timeout esperando al host.");
+        await ocultarLoading();
+        return;
+      }
+    }
+
+    // Registrar listener DESPUÉS de que el nodo ya existe
+    // El onValue disparará inmediatamente con el estado actual
     if (!listenerActivo) {
       listenerActivo = true;
       onValue(combateRef, (snapshot) => {
@@ -198,35 +220,6 @@ async function iniciarCombate() {
       });
     }
 
-    const combateSnap = await get(combateRef);
-
-    if (!combateSnap.exists()) {
-      if (esHost) {
-        await inicializarCombateEnFirebase();
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } else {
-        let espera = true;
-        for (let i = 0; i < 30 && espera; i++) {
-          await new Promise(resolve => setTimeout(resolve, 500));
-          const check = await get(combateRef);
-          if (check.exists()) espera = false;
-        }
-        if (espera) {
-          log("Error: timeout esperando al host.");
-          await ocultarLoading();
-          return;
-        }
-      }
-    }
-
-    const estadoInicial = await get(combateRef);
-    
-    if (estadoInicial.exists()) {
-      estadoCombate = estadoInicial.val();
-      renderEstado(estadoCombate);
-    }
-
-    log("Combate listo");
     await ocultarLoading();
 
   } catch (err) {
