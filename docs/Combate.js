@@ -1187,18 +1187,38 @@ async function finalizarCombate(ganador) {
 
 function mostrarPantallaFin(esVictoria, ganador) {
   let overlay = document.getElementById("fin-overlay");
-  if (!overlay) { overlay = document.createElement("div"); overlay.id = "fin-overlay"; document.body.appendChild(overlay); }
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "fin-overlay";
+    // Estilos inline de respaldo (por si el CSS falla)
+    overlay.style.position = "fixed";
+    overlay.style.inset = "0";
+    overlay.style.backgroundColor = "rgba(13, 27, 75, 0.96)";
+    overlay.style.display = "flex";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.zIndex = "10000";
+    overlay.style.backdropFilter = "blur(12px)";
+    document.body.appendChild(overlay);
+  } else {
+    overlay.style.display = "flex";
+  }
 
   overlay.innerHTML = `
-    <div class="fin-contenido">
-      <h1 class="fin-titulo ${esVictoria ? "victoria" : "derrota"}">${esVictoria ? "VICTORIA" : "DERROTA"}</h1>
-      <p class="fin-mensaje">${esVictoria ? "¡Felicidades! Has derrotado a " + rivalNombreGlobal : ganador + " te ha derrotado"}</p>
-      <div class="fin-stats" id="fin-stats-contenido"><p>Cargando estadísticas...</p></div>
-      <div>
-        <button class="fin-boton" id="fin-volver-menu">VOLVER AL MENÚ</button>
-        <button class="fin-boton secondary" id="fin-ver-estadisticas">VER ESTADÍSTICAS</button>
+    <div class="fin-contenido" style="text-align:center; background:rgba(26,48,128,0.9); padding:2rem; border-radius:16px; border:2px solid #ff2d78; max-width:450px;">
+      <h1 class="fin-titulo ${esVictoria ? 'victoria' : 'derrota'}" style="font-family:'Bebas Neue'; font-size:3rem; margin-bottom:1rem; ${esVictoria ? 'color:#39d353' : 'color:#ff2d78'}">
+        ${esVictoria ? 'VICTORIA' : 'DERROTA'}
+      </h1>
+      <p class="fin-mensaje" style="margin-bottom:1.5rem; font-size:1.1rem">${esVictoria ? '¡Felicidades! Has derrotado a ' + rivalNombreGlobal : ganador + ' te ha derrotado'}</p>
+      <div class="fin-stats" style="background:rgba(0,0,0,0.4); padding:0.8rem; border-radius:8px; margin-bottom:1.5rem;">
+        <p id="fin-stats-contenido">Cargando estadísticas...</p>
       </div>
-    </div>`;
+      <div>
+        <button class="fin-boton" id="fin-volver-menu" style="background:#ff2d78; border:none; color:#0d1b4b; padding:0.5rem 1.2rem; margin:0 0.5rem; border-radius:4px; cursor:pointer; font-weight:bold;">VOLVER AL MENÚ</button>
+        <button class="fin-boton secondary" id="fin-ver-estadisticas" style="background:rgba(26,48,128,0.8); border:1px solid #4fc3f7; color:white; padding:0.5rem 1.2rem; margin:0 0.5rem; border-radius:4px; cursor:pointer;">VER ESTADÍSTICAS</button>
+      </div>
+    </div>
+  `;
 
   document.getElementById("fin-volver-menu")?.addEventListener("click", () => {
     window.location.href = "Juego-Lobby.html?id=" + partidaId;
@@ -1207,13 +1227,17 @@ function mostrarPantallaFin(esVictoria, ganador) {
     window.location.href = "Estadisticas.html";
   });
 
-  get(ref(db, `estadisticas/${miNombre}`)).then((snap) => {
-    const s = snap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
-    const c = document.getElementById("fin-stats-contenido");
-    if (c) c.innerHTML = `<p>Victorias: ${s.victorias}</p><p>Derrotas: ${s.derrotas}</p><p>Batallas totales: ${s.batallas}</p>`;
+  // Cargar estadísticas reales
+  const statsRef = ref(db, `estadisticas/${miNombre}`);
+  get(statsRef).then((snap) => {
+    const stats = snap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
+    const contenedor = document.getElementById("fin-stats-contenido");
+    if (contenedor) {
+      contenedor.innerHTML = `<p>Victorias: ${stats.victorias}</p><p>Derrotas: ${stats.derrotas}</p><p>Batallas totales: ${stats.batallas}</p>`;
+    }
   }).catch(() => {
-    const c = document.getElementById("fin-stats-contenido");
-    if (c) c.innerHTML = "<p>No se pudieron cargar las estadísticas.</p>";
+    const contenedor = document.getElementById("fin-stats-contenido");
+    if (contenedor) contenedor.innerHTML = "<p>No se pudieron cargar las estadísticas.</p>";
   });
 }
 
