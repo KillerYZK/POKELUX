@@ -71,25 +71,23 @@ document.addEventListener("DOMContentLoaded", () => {
   for (const id of equipoIDs) {
   const configuracion = JSON.parse(localStorage.getItem(`configuracion-${id}`)) || {};
   
-  // Obtener el nombre real del Pokémon
+  // Resolver nombre real
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
   const data = await res.json();
-  const nombrePokemon = data.name; // "pikachu", "gengar", etc.
-  
-  equipoCompleto.push({ id, configuracion });
+  const nombreReal = data.name; // "pidgeot", "zeraora", etc.
 
-  if (Object.keys(configuracion).length > 0) {
-    await set(
-      ref(db, `partidas/${idPartida}/configuraciones/${nombreJugadorLocal}/${nombrePokemon}`),
-      {
-        nivel: configuracion.nivel || 50,
-        apodo: configuracion.apodo || nombrePokemon,
-        shiny: configuracion.shiny || false,
-        movimientos: configuracion.movimientos || [],
-        objeto: configuracion.objeto || "ninguno"
-      }
-    );
-  }
+  equipoCompleto.push({ id, nombre: nombreReal, configuracion });
+
+  await set(
+    ref(db, `partidas/${idPartida}/configuraciones/${nombreJugadorLocal}/${nombreReal}`),
+    {
+      nivel: configuracion.nivel || 50,
+      apodo: configuracion.apodo || nombreReal,
+      shiny: configuracion.shiny || false,
+      movimientos: configuracion.movimientos || [],
+      objeto: configuracion.objeto || "ninguno"
+    }
+  );
 }
 
   await set(
