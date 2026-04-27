@@ -458,14 +458,17 @@ function renderEstado(estado) {
 
   if (estado.fase === "fin") { finalizarCombate(estado.ganador); return; }
 
-  // CORRECCIÓN FUNDAMENTAL: llamamos siempre a resolverAtaque si es host y fase resolviendo
+  // Resolver ataque si es host
   if (estado.fase === "resolver" && esHost) {
     debug("Llamando a resolverAtaque desde renderEstado");
     resolverAtaque(estado);
     return;
   }
 
+  // Verificar cambio de Pokémon
+  debug(`🔍 Verificando cambio: fase=${estado.fase}, turno=${estado.turno}, miNombre=${miNombre}, esperandoCambio=${esperandoCambio}`);
   if (estado.fase === "cambio" && estado.turno === miNombre && !esperandoCambio) {
+    debug("✅ ¡Activando menú de cambio de Pokémon!");
     cambioForzado = true;
     mostrarSelectorPokemon();
     return;
@@ -527,7 +530,6 @@ function actualizarInfobar(lado, pokemon, hpActual, estado) {
   if (hpMax) hpMax.textContent = pokemon.hpMax;
 }
 
-// CORRECCIÓN: usa los IDs reales del HTML (jg-0, en-0, etc.)
 function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray, indexActivo) {
   for (let i = 0; i < equipo.length; i++) {
     let ballId = "";
@@ -536,7 +538,7 @@ function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray
     } else if (prefijo === "enemigo") {
       ballId = `en-${i}`;
     } else {
-      ballId = `${prefijo}-ball-${i}`; // fallback
+      ballId = `${prefijo}-ball-${i}`;
     }
     const ball = document.getElementById(ballId);
     if (!ball) continue;
@@ -556,7 +558,6 @@ async function resolverAtaque(estado) {
   animacionEnProceso = true;
   debug("resolverAtaque iniciado, accion:", JSON.stringify(estado.accion));
 
-  // Timeout de seguridad (5 segundos)
   const timeoutId = setTimeout(() => {
     debug("resolverAtaque: TIMEOUT - forzando reset a elegir");
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
@@ -613,7 +614,6 @@ async function resolverAtaque(estado) {
       ? document.getElementById("enemigo-sprite")?.parentElement
       : document.getElementById("jugador-sprite")?.parentElement;
 
-    // Animaciones
     await animaciones.reproducirAtaque(movimiento, movimiento.clase === "special");
     await animaciones.sacudirPokemon(spriteAtacanteEl);
 
@@ -680,32 +680,46 @@ async function resolverAtaque(estado) {
 
       let nuevaFase = "elegir", nuevoTurno = defensor;
 
+      // VERIFICAR SI EL DEFENSOR SE DEBILITÓ
       if (nuevosHP[defensor][indexDefensor] <= 0) {
         nuevosHP[defensor][indexDefensor] = 0;
         logMsg += ` ¡${pokeDefensor.nombre} se debilitó!`;
-        if (encontrarSiguientePokemon(nuevosHP[defensor]) === -1) {
+        
+        const jugadorDebilitado = defensor;
+        const siguientePokemon = encontrarSiguientePokemon(nuevosHP[jugadorDebilitado]);
+        
+        if (siguientePokemon === -1) {
           return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
             estadisticas: nuevosStats, turno: atacante, fase: "fin", ganador: atacante,
             log: `¡${atacante} ha ganado el combate!`, accion: null };
         }
+        
         nuevaFase = "cambio";
-        nuevoTurno = defensor;
-        logMsg += " Elige tu siguiente Pokémon.";
+        nuevoTurno = jugadorDebilitado;
+        logMsg += " ¡Elige tu siguiente Pokémon!";
+        debug(`🔄 Cambio forzado para ${jugadorDebilitado}. Fase cambiada a 'cambio'`);
       }
 
+      // VERIFICAR SI EL ATACANTE SE DEBILITÓ (por daño post-acción)
       if (nuevosHP[atacante][indexAtacante] <= 0) {
         nuevosHP[atacante][indexAtacante] = 0;
         logMsg += ` ¡${pokeAtacante.nombre} se debilitó!`;
-        if (encontrarSiguientePokemon(nuevosHP[atacante]) === -1) {
+        
+        const jugadorDebilitado = atacante;
+        const siguientePokemon = encontrarSiguientePokemon(nuevosHP[jugadorDebilitado]);
+        
+        if (siguientePokemon === -1) {
           return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
             estadisticas: nuevosStats, turno: defensor, fase: "fin", ganador: defensor,
             log: `¡${defensor} ha ganado el combate!`, accion: null };
         }
+        
         if (nuevaFase !== "cambio") {
           nuevaFase = "cambio";
-          nuevoTurno = atacante;
+          nuevoTurno = jugadorDebilitado;
         }
-        logMsg += " Elige tu siguiente Pokémon.";
+        logMsg += " ¡Elige tu siguiente Pokémon!";
+        debug(`🔄 Cambio forzado para ${jugadorDebilitado}. Fase cambiada a 'cambio'`);
       }
 
       return { ...estadoActual, hp: nuevosHP, pp: nuevosPP, estados: nuevosEstados,
@@ -923,21 +937,30 @@ async function elegirAtaque(mov, index) {
 }
 
 function mostrarSelectorPokemon() {
+  debug("mostrarSelectorPokemon() llamado. cambioForzado=" + cambioForzado);
+  
   esperandoCambio = true;
-  log(cambioForzado ? "¡Elige tu siguiente Pokémon!" : "Elige un Pokémon:");
+  
   if (!menuCambio) {
     console.error("menuCambio no encontrado");
     return;
   }
+  
   menuCambio.innerHTML = "<h3 style='color:#ffcb05;margin-bottom:12px;text-align:center'>ELIGE POKÉMON</h3>";
   menuCambio.classList.remove("oculto");
   menuPrincipal?.classList.add("oculto");
   menuMovimientos?.classList.add("oculto");
-
+  menuBolsa?.classList.add("oculto");
+  
+  let pokemonsDisponibles = 0;
+  
   miEquipo.forEach((poke, i) => {
-    const hpActual = estadoCombate.hp[miNombre][i];
-    const estadoPoke = estadoCombate.estados[miNombre][i];
+    const hpActual = estadoCombate?.hp?.[miNombre]?.[i] || 0;
+    const estadoPoke = estadoCombate?.estados?.[miNombre]?.[i] || { nombre: null };
+    
     if (hpActual <= 0 || i === miIndexActivo) return;
+    
+    pokemonsDisponibles++;
     const btn = document.createElement("button");
     btn.className = "combate-opcion cambio-pokemon-btn";
     btn.innerHTML = `<div class='poke-nombre'>${poke.nombre.toUpperCase()}${estadoPoke.nombre ? ` [${estadoPoke.nombre}]` : ""}</div><div class='poke-hp'>❤️ ${hpActual}/${poke.hpMax} HP</div>`;
@@ -947,7 +970,15 @@ function mostrarSelectorPokemon() {
     };
     menuCambio.appendChild(btn);
   });
-
+  
+  if (pokemonsDisponibles === 0) {
+    const msg = document.createElement("p");
+    msg.textContent = "No hay Pokémon disponibles para cambiar.";
+    msg.style.color = "#ff8888";
+    msg.style.textAlign = "center";
+    menuCambio.appendChild(msg);
+  }
+  
   if (!cambioForzado) {
     const btnCancelar = document.createElement("button");
     btnCancelar.className = "combate-opcion";
@@ -955,6 +986,8 @@ function mostrarSelectorPokemon() {
     btnCancelar.onclick = cancelarCambio;
     menuCambio.appendChild(btnCancelar);
   }
+  
+  debug(`mostrarSelectorPokemon: ${pokemonsDisponibles} Pokémon disponibles para cambiar`);
 }
 
 function cancelarCambio() {
@@ -965,25 +998,49 @@ function cancelarCambio() {
   menuCambio?.classList.add("oculto");
 }
 
-// CORRECCIÓN: transacción robusta y reintento
 async function confirmarCambio(nuevoIndex) {
   debug(`confirmarCambio llamado para índice ${nuevoIndex}`);
+  
+  const hpSeleccionado = estadoCombate?.hp?.[miNombre]?.[nuevoIndex] || 0;
+  if (hpSeleccionado <= 0) {
+    log("Ese Pokémon está debilitado, no puedes usarlo.");
+    mostrarSelectorPokemon();
+    return;
+  }
+  
+  if (nuevoIndex === miIndexActivo) {
+    log("Ese Pokémon ya está en combate.");
+    mostrarSelectorPokemon();
+    return;
+  }
+  
   esperandoCambio = false;
   cambioForzado = false;
   const nuevoPoke = miEquipo[nuevoIndex];
-
+  
   const combateRef = ref(db, `partidas/${partidaId}/combate`);
   const result = await runTransaction(combateRef, (estadoActual) => {
-    if (!estadoActual) return estadoActual;
+    if (!estadoActual) {
+      debug("confirmarCambio: estadoActual es null");
+      return estadoActual;
+    }
+    
     if (estadoActual.fase !== "cambio") {
-      debug(`Fase actual no es cambio: ${estadoActual.fase}`);
+      debug(`confirmarCambio: fase incorrecta: ${estadoActual.fase}`);
       return estadoActual;
     }
+    
     if (estadoActual.turno !== miNombre) {
-      debug(`Turno no es del jugador: ${estadoActual.turno}`);
+      debug(`confirmarCambio: turno incorrecto: ${estadoActual.turno}`);
       return estadoActual;
     }
-    debug("Transacción de cambio exitosa, actualizando índice activo");
+    
+    if (estadoActual.hp[miNombre][nuevoIndex] <= 0) {
+      debug("confirmarCambio: Pokémon seleccionado está debilitado en Firebase");
+      return estadoActual;
+    }
+    
+    debug(`confirmarCambio: Transacción exitosa, cambiando a índice ${nuevoIndex}`);
     return {
       ...estadoActual,
       indexActivo: { ...estadoActual.indexActivo, [miNombre]: nuevoIndex },
@@ -992,7 +1049,7 @@ async function confirmarCambio(nuevoIndex) {
       log: `¡${miNombre} envió a ${nuevoPoke.nombre}!`
     };
   });
-
+  
   if (result.committed) {
     debug("Cambio confirmado correctamente");
     menuCambio?.classList.add("oculto");
@@ -1000,6 +1057,7 @@ async function confirmarCambio(nuevoIndex) {
   } else {
     debug("La transacción de cambio no se confirmó");
     log("Error al cambiar de Pokémon. Intenta de nuevo.");
+    esperandoCambio = false;
     mostrarSelectorPokemon();
   }
 }
