@@ -330,9 +330,22 @@ async function iniciarCombate() {
     const combateRef = ref(db, `partidas/${partidaId}/combate`);
     const combateSnap = await get(combateRef);
 
-    if (!combateSnap.exists() && esHost) {
-      await inicializarCombateEnFirebase();
-    }
+      // FIX: si el combate quedó colgado en "resolver", el host lo resetea a "elegir"
+      if (combateSnap.exists() && esHost) {
+        const estadoGuardado = combateSnap.val();
+        if (estadoGuardado.fase === "resolver" || estadoGuardado.fase === "cambio") {
+          await update(combateRef, {
+            fase: "elegir",
+            accion: null,
+            turno: estadoGuardado.turno  // mantiene a quién le tocaba
+          });
+          console.log("[INIT] Estado colgado detectado, reseteado a elegir");
+        }
+      }
+
+      if (!combateSnap.exists() && esHost) {
+        await inicializarCombateEnFirebase();
+      }
     if (!combateSnap.exists() && !esHost) {
       log("Esperando al host...");
       let encontrado = false;
@@ -520,6 +533,7 @@ function actualizarPokeballs(containerId, hpArray, equipo, prefijo, estadosArray
 
 // ---------- RESOLVER ATAQUE ----------
 async function resolverAtaque(estado) {
+  console.log("resolverAtaque llamado, accion:", JSON.stringify(estado.accion));
   if (animacionEnProceso) return;
   animacionEnProceso = true;
 
@@ -1057,6 +1071,7 @@ function cargarMovimientos(pokemon, ppActuales) {
 }
 
 function mostrarMenuPrincipal() {
+  console.log("mostrarMenuPrincipal() llamado", { menuPrincipal, menuMovimientos });
   menuPrincipal?.classList.remove("oculto");
   menuMovimientos?.classList.add("oculto");
   menuCambio?.classList.add("oculto");
