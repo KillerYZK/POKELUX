@@ -182,45 +182,46 @@ async function iniciarCombate() {
       return;
     }
 
-    const combateRef = ref(db, `partidas/${partidaId}/combate`);
-    const combateSnap = await get(combateRef);
 
-    // El host inicializa si no existe aún
-    if (!combateSnap.exists() && esHost) {
-      await inicializarCombateEnFirebase();
-    }
+// Dentro de iniciarCombate(), después de cargar equipos...
+const combateRef = ref(db, `partidas/${partidaId}/combate`);
+const combateSnap = await get(combateRef);
 
-    // El guest espera a que el host inicialice
-    if (!combateSnap.exists() && !esHost) {
-      log("Esperando al host...");
-      let encontrado = false;
-      for (let i = 0; i < 30 && !encontrado; i++) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const check = await get(combateRef);
-        if (check.exists()) encontrado = true;
-      }
-      if (!encontrado) {
-        log("Error: timeout esperando al host.");
-        await ocultarLoading();
-        return;
-      }
-    }
+// El host inicializa si no existe
+if (!combateSnap.exists() && esHost) {
+  await inicializarCombateEnFirebase();
+}
 
-    // Registrar listener DESPUÉS de que el nodo ya existe
-    // El onValue disparará inmediatamente con el estado actual
-    if (!listenerActivo) {
-      listenerActivo = true;
-      onValue(combateRef, (snapshot) => {
-        const nuevoEstado = snapshot.val();
-        if (nuevoEstado) {
-          estadoCombate = nuevoEstado;
-          reiniciarEstadosLocales();
-          renderEstado(estadoCombate);
-        }
-      });
-    }
-
+// El guest espera a que el host cree el nodo
+if (!combateSnap.exists() && !esHost) {
+  log("Esperando al host...");
+  let encontrado = false;
+  for (let i = 0; i < 30 && !encontrado; i++) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const check = await get(combateRef);
+    if (check.exists()) encontrado = true;
+  }
+  if (!encontrado) {
+    log("Error: timeout esperando al host.");
     await ocultarLoading();
+    return;
+  }
+}
+
+// AHORA el nodo existe para ambos, registramos el listener
+if (!listenerActivo) {
+  listenerActivo = true;
+  onValue(combateRef, (snapshot) => {
+    const nuevoEstado = snapshot.val();
+    if (nuevoEstado) {
+      estadoCombate = nuevoEstado;
+      reiniciarEstadosLocales();
+      renderEstado(estadoCombate);
+    }
+  });
+}
+
+await ocultarLoading();
 
   } catch (err) {
     console.error("[INIT]", err);
@@ -272,7 +273,7 @@ async function cargarEquipo(listaEquipo, nombreJugador) {
 
   try {
     return await Promise.all(listaEquipo.map(async (entry) => {
-      const nombreBase = String(typeof entry === "string" ? entry : entry.id);
+      const nombreBase = String(entry.nombre || (typeof entry === "string" ? entry : entry.id));
       if (!nombreBase || nombreBase === "undefined") return crearPokemonPorDefecto("Unknown");
       
       let configGuardada = {};
@@ -1260,35 +1261,47 @@ function mostrarPantallaFin(esVictoria, ganador) {
     overlay.id = "fin-overlay";
     document.body.appendChild(overlay);
   }
-  
+
+  // Mostrar el overlay inmediatamente, sin esperar Firebase
+  overlay.innerHTML = `
+    <div class="fin-contenido">
+      <h1 class="fin-titulo ${esVictoria ? 'victoria' : 'derrota'}">
+        ${esVictoria ? 'VICTORIA' : 'DERROTA'}
+      </h1>
+      <p class="fin-mensaje">${esVictoria ? 'Felicidades! Has derrotado a ' + rivalNombreGlobal : ganador + ' te ha derrotado'}</p>
+      <div class="fin-stats" id="fin-stats-contenido">
+        <p>Cargando estadísticas...</p>
+      </div>
+      <div>
+        <button class="fin-boton" id="fin-volver-menu">VOLVER AL MENU</button>
+        <button class="fin-boton secondary" id="fin-ver-estadisticas">VER ESTADISTICAS</button>
+      </div>
+    </div>
+  `;
+
+  // Eventos de los botones (se asignan después de inyectar)
+  document.getElementById("fin-volver-menu")?.addEventListener("click", () => {
+    window.location.href = "Juego-Lobby.html?id=" + partidaId;
+  });
+  document.getElementById("fin-ver-estadisticas")?.addEventListener("click", () => {
+    window.location.href = "Estadisticas.html";
+  });
+
+  // Cargar estadísticas reales en segundo plano
   const statsRef = ref(db, `estadisticas/${miNombre}`);
   get(statsRef).then((snap) => {
     const stats = snap.val() || { victorias: 0, derrotas: 0, batallas: 0 };
-    overlay.innerHTML = `
-      <div class="fin-contenido">
-        <h1 class="fin-titulo ${esVictoria ? 'victoria' : 'derrota'}">
-          ${esVictoria ? 'VICTORIA' : 'DERROTA'}
-        </h1>
-        <p class="fin-mensaje">${esVictoria ? 'Felicidades! Has derrotado a ' + rivalNombreGlobal : ganador + ' te ha derrotado'}</p>
-        <div class="fin-stats">
-          <p>Victorias: ${stats.victorias}</p>
-          <p>Derrotas: ${stats.derrotas}</p>
-          <p>Batallas totales: ${stats.batallas}</p>
-        </div>
-        <div>
-          <button class="fin-boton" id="fin-volver-menu">VOLVER AL MENU</button>
-          <button class="fin-boton secondary" id="fin-ver-estadisticas">VER ESTADISTICAS</button>
-        </div>
-      </div>
-    `;
-    
-    document.getElementById("fin-volver-menu")?.addEventListener("click", () => {
-      window.location.href = "Juego-Lobby.html?id=" + partidaId;
-    });
-    
-    document.getElementById("fin-ver-estadisticas")?.addEventListener("click", () => {
-      window.location.href = "Estadisticas.html";
-    });
+    const contenedor = document.getElementById("fin-stats-contenido");
+    if (contenedor) {
+      contenedor.innerHTML = `
+        <p>Victorias: ${stats.victorias}</p>
+        <p>Derrotas: ${stats.derrotas}</p>
+        <p>Batallas totales: ${stats.batallas}</p>
+      `;
+    }
+  }).catch(() => {
+    const contenedor = document.getElementById("fin-stats-contenido");
+    if (contenedor) contenedor.innerHTML = "<p>No se pudieron cargar las estadísticas.</p>";
   });
 }
 
